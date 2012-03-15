@@ -1,0 +1,22 @@
+﻿@{
+    ViewBag.Title = "Lobby";
+}
+
+<h2>Lobby</h2>
+
+<ul id="chat_messages"></ul>
+
+<input type="text" id="chat_text"/>
+<input type="button" id="chat_broadcast" value="Chat" />
+
+<ul id="chat_playerList"></ul>
+
+<div id="proposal" />
+
+@Html.DropDownList("SelectedDeck")
+
+<script type="text/javascript">
+
+    initLobbyChat("@ViewBag.PlayerName");
+
+</script>

@@ -1,0 +1,32 @@
+﻿@model IEnumerable<DeckBuilder.Models.Table>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Players</th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.TableID)</td>
+        <td>@Html.DisplayFor(modelItem => item.Seats.ToList()[0].Player.Name) vs @Html.DisplayFor(modelItem => item.Seats.ToList()[1].Player.Name)</td>       
+        
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.TableID }) |
+            @Html.ActionLink("Details", "Details", new { id = item.TableID }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.TableID })
+        </td>
+    </tr>
+}
+
+</table>

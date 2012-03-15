@@ -1,0 +1,32 @@
+﻿@model DeckBuilder.Models.Deck
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Deck</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">Player</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Player.Name)
+    </div>
+</fieldset>
+<fieldset>
+    <legend>Card List</legend>
+    @foreach(DeckBuilder.Models.CardSet cardSet in Model.CardSets)
+    {
+        <div>@Html.Raw(cardSet.Card.Name + "(" + cardSet.Quantity +")")</div>
+    }
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.DeckID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

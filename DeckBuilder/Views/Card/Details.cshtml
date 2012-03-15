@@ -1,0 +1,41 @@
+﻿@model DeckBuilder.Models.Card
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Card</legend>
+
+    <div class="display-label">ID</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CardID)
+    </div>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">ManaCost</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ManaCost)
+    </div>
+
+    <div class="display-label">Description</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+
+    <div class="display-label">CardArtUrl</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CardArtUrl)
+    </div>
+
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.CardID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,19 @@
+﻿@model DeckBuilder.Models.Table
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+@for (int i = 0; i < Model.Seats.Count; i++ )
+{
+    <fieldset>
+        <legend>@Model.Seats.ElementAt(i).Player.Name</legend>     
+        <div>@Model.Seats.ElementAt(i).Deck.Name</div>   
+    </fieldset>
+    if (i < Model.Seats.Count - 1)
+    {
+        <div>versus</div><br/>
+    }       
+}

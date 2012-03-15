@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "Play";
+}
+
+<h2>Play</h2>
+
+
+<p>@ViewBag.Results</p>
+
+@if (ViewBag.Finished == true)
+{
+    <p>@ViewBag.FinalResults</p>
+    <p>Final Score</p>
+}
+else
+{
+    <p>Current Score (Best to 3 wins)</p>
+}
+<ul>
+<li>@ViewBag.PlayerName : @ViewBag.PlayerScore</li>
+<li>@ViewBag.OpponentName : @ViewBag.OpponentScore</li>
+</ul>
+
+
+
+@ViewBag.Message
+@if (ViewBag.YourTurn == true && ViewBag.Finished == false)
+{
+    @Html.DropDownList("MoveList")
+    <input type="button" id="playMove"/>
+}
+
+<script type="text/javascript">
+
+    initPlayArea("@ViewBag.PlayerName", "@ViewBag.TableId");
+
+</script>

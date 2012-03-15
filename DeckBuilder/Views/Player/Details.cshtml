@@ -1,0 +1,54 @@
+﻿@model DeckBuilder.Models.Player
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Player</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">ProfileImageUrl</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ProfileImageUrl)
+    </div>
+
+    <div class="display-label">Win Ratio</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.WinRatio)
+    </div>
+
+</fieldset>
+
+<fieldset>
+    <legend>Deck List</legend>
+    @foreach (var deck in Model.Decks)
+    {
+        
+        <div class="display-field">
+            @Html.ActionLink(deck.Name, "Details", "Deck", new { id = deck.DeckID}, null)
+        </div>
+    }
+    @Html.ActionLink("New Deck", "Create", "Deck", new { playerId = Model.PlayerID }, null)
+</fieldset>
+
+<fieldset>
+    <legend>Card Library</legend>
+    @foreach (var cardSet in Model.CardSets)
+    {
+        
+        <div class="display-field">
+            @Html.Raw(cardSet.Card.Name + "(" + cardSet.Quantity +")")
+        </div>
+    }
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.PlayerID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

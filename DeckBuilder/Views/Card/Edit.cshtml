@@ -1,0 +1,70 @@
+﻿@model DeckBuilder.Models.Card
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Card</legend>
+
+        @Html.HiddenFor(model => model.CardID)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ManaCost)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ManaCost)
+            @Html.ValidationMessageFor(model => model.ManaCost)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Description)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Description)
+            @Html.ValidationMessageFor(model => model.Description)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.CardTypeId, "Type")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("CardTypeId", String.Empty)
+            @Html.ValidationMessageFor(model => model.CardTypeId)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.CardArtUrl)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.CardArtUrl)
+            @Html.ValidationMessageFor(model => model.CardArtUrl)
+        </div>
+
+        
+
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

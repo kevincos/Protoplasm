@@ -1,0 +1,64 @@
+﻿@model DeckBuilder.Models.Player
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Player</legend>
+
+        @Html.HiddenFor(model => model.PlayerID)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ProfileImageUrl)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ProfileImageUrl)
+            @Html.ValidationMessageFor(model => model.ProfileImageUrl)
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Deck List</legend>
+        @foreach (DeckBuilder.Models.Deck deck in Model.Decks)
+        {
+            <div>
+                @deck.Name
+            </div>
+        }
+    </fieldset>
+        
+    <fieldset>
+        <legend>Card Library</legend>
+        @foreach (DeckBuilder.Models.CardSet cardSet in @ViewBag.CardSets)
+        {
+            <div>                            
+                @cardSet.Card.Name <input type="text" name="cardQuantities" value=@Html.Raw(cardSet.Quantity.ToString()) />                                 
+            </div>
+        }
+    </fieldset>
+
+    <p>
+        <input type="submit" value="Save" />
+    </p>
+
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

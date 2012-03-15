@@ -1,0 +1,48 @@
+﻿@model IEnumerable<DeckBuilder.Models.Card>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th>
+            Card
+        </th>
+        <th>
+        </th>
+        <th>
+            Description
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            <img id="CardImage" alt="@item.Name" 
+                        src="@item.CardArtUrl" />
+        </td>        
+        <td>
+            <p>
+            Mana Cost: @Html.DisplayFor(modelItem => item.ManaCost)<br/>
+            Type: @Html.DisplayFor(modelItem => item.CardType.Name)<br/>
+            Description: @Html.DisplayFor(modelItem => item.Description)</p>            
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.CardID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.CardID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.CardID })
+        </td>
+    </tr>
+}
+
+</table>
