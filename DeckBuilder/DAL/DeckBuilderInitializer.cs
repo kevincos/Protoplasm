@@ -46,7 +46,7 @@ namespace DeckBuilder.DAL
                 new Card { Name = "Minotaur",   ManaCost = 2,     Description = "Powerful melee warrior.", CardArtUrl="Content/Images/Minotaur.png", CardType = cardTypes.Single(t => t.Name == "Summon") },
                 new Card { Name = "Necromancer",   ManaCost = 3,     Description = "Powerful wizard capable of summoning skeletons.", CardArtUrl="Content/Images/Minotaur.png", CardType = cardTypes.Single(t => t.Name == "Summon") },
                 new Card { Name = "Lightning Bolt",   ManaCost = 1,     Description = "Strikes a creature with a surge of lightning.", CardArtUrl="Content/Images/LightningBolt.png", CardType = cardTypes.Single(t => t.Name == "Spell") },
-                new Card { Name = "Fireball",   ManaCost = 2,     Description = "Deals area of effect damage to target location.", CardArtUrl="Content/Images/LightningBolt.png", CardType = cardTypes.Single(t => t.Name == "Spell") }
+                new Card { Name = "Fireball",   ManaCost = 3,     Description = "Deals area of effect damage to target location.", CardArtUrl="Content/Images/LightningBolt.png", CardType = cardTypes.Single(t => t.Name == "Spell") }
             };
             cards.ForEach(c => context.Cards.Add(c));
             context.SaveChanges();
