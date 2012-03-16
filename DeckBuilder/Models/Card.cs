@@ -30,6 +30,8 @@ namespace DeckBuilder.Models
         [DisplayName("Type")]
         public int? CardTypeId { get; set; }
 
+        public int Extra { get; set; }
+
         public virtual CardType CardType { get; set; }
         public virtual ICollection<CardSet> CardSets { get; set; }
 

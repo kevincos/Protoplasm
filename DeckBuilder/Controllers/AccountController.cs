@@ -118,13 +118,22 @@ namespace DeckBuilder.Controllers
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
-                    Player playerToAdd = db.Players.Add(new Player
+                    if (db.Players.Where(p => p.Name == userName).Count() == 0)
                     {
-                        Name = userName
-                    });
-                    db.SaveChanges();
-                    FormsAuth.SignIn(userName, false /* createPersistentCookie */);
-                    return RedirectToAction("Edit", "Player", new { id = playerToAdd.PlayerID });
+                        Player playerToAdd = db.Players.Add(new Player
+                        {
+                            Name = userName
+                        });
+                        db.SaveChanges();
+                        FormsAuth.SignIn(userName, false /* createPersistentCookie */);
+                        return RedirectToAction("Edit", "Player", new { id = playerToAdd.PlayerID });
+                    }
+                    else
+                    {
+                        Player player = db.Players.Single(p => p.Name == userName);
+                        FormsAuth.SignIn(userName, false /* createPersistentCookie */);
+                        return RedirectToAction("Edit", "Player", new { id = player.PlayerID });
+                    }
                 }
                 else
                 {
