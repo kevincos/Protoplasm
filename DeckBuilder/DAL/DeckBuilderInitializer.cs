@@ -7,7 +7,7 @@ using DeckBuilder.Models;
 
 namespace DeckBuilder.DAL
 {
-    public class DeckBuilderInitializer : DropCreateDatabaseIfModelChanges<DeckBuilderContext>
+    public class DeckBuilderInitializer : DeckBuilder.App_Start.DontDropDbJustCreateTablesIfModelChanged<DeckBuilderContext>
     {
         protected override void Seed(DeckBuilderContext context)
         {
@@ -40,13 +40,11 @@ namespace DeckBuilder.DAL
 
             var cards = new List<Card>
             {
-                new Card { Name = "Mana Crystal",   ManaCost = 0, Description="Basic Mana Crystal.", CardArtUrl="Content/Images/ManaCrystal.png", CardType = cardTypes.Single(t => t.Name == "Crystal") },
-                new Card { Name = "Amplifier Crystal", ManaCost = 0,    Description = "Crystal with long spell range but no mana generation.", CardArtUrl="Content/Images/AmplifierCrystal.png", CardType = cardTypes.Single(t => t.Name == "Crystal") },
-                new Card { Name = "Power Crystal",   ManaCost = 0,     Description = "Crystal with high mana generation, but no spell range.", CardArtUrl="Content/Images/PowerCrystal.png", CardType = cardTypes.Single(t => t.Name == "Crystal") },
-                new Card { Name = "Minotaur",   ManaCost = 2,     Description = "Powerful melee warrior.", CardArtUrl="Content/Images/Minotaur.png", CardType = cardTypes.Single(t => t.Name == "Summon") },
-                new Card { Name = "Necromancer",   ManaCost = 3,     Description = "Powerful wizard capable of summoning skeletons.", CardArtUrl="Content/Images/Minotaur.png", CardType = cardTypes.Single(t => t.Name == "Summon") },
+                new Card { Name = "Mana Crystal",   ManaCost = 1, Description="Basic Mana Crystal.", CardArtUrl="Content/Images/ManaCrystal.png", CardType = cardTypes.Single(t => t.Name == "Crystal"),  Crystal_Name = "Mana Crystal", Crystal_Url = "Content/Images/manacrystalportrait.png" },
+                new Card { Name = "Minotaur",   ManaCost = 3,     Description = "Powerful half man half bull melee warrior.", CardArtUrl="Content/Images/Minotaur.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack =4, Unit_Awareness = "dad___", Unit_Defense = 2, Unit_MaxHP = 3, Unit_Speed = 2, Unit_Name = "Minotaur", Unit_Url= "Content/Images/minotaurportrait.png"},
+                new Card { Name = "Hydra",   ManaCost = 6,     Description = "Multiheaded Serpant that can attack in all directions.", CardArtUrl="Content/Images/hydraportrait.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack = 6, Unit_Awareness = "aaaaaa", Unit_Defense = 1, Unit_Speed = 1, Unit_MaxHP = 8, Unit_Name = "Hyrda", Unit_Url = "Content/Images/hydraportrait.png"},
+                new Card { Name = "Raider",   ManaCost = 4,     Description = "Fast and deadly wolf rider.", CardArtUrl="Content/Images/raiderportrait.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack = 5, Unit_Awareness = "_a____", Unit_Defense = 0, Unit_Speed = 4, Unit_Name = "Raider", Unit_MaxHP = 3, Unit_Url = "Content/Images/raiderportrait.png" },
                 new Card { Name = "Lightning Bolt",   ManaCost = 1,     Description = "Strikes a creature with a surge of lightning.", CardArtUrl="Content/Images/LightningBolt.png", CardType = cardTypes.Single(t => t.Name == "Spell") },
-                new Card { Name = "Fireball",   ManaCost = 3,     Description = "Deals area of effect damage to target location.", CardArtUrl="Content/Images/LightningBolt.png", CardType = cardTypes.Single(t => t.Name == "Spell") }
             };
             cards.ForEach(c => context.Cards.Add(c));
             context.SaveChanges();
@@ -77,9 +75,9 @@ namespace DeckBuilder.DAL
                 new CardSet {DeckID = 1, CardID = 4, Quantity = 4},
                 new CardSet {DeckID = 1, CardID = 5, Quantity = 4},
                 new CardSet {DeckID = 2, CardID = 1, Quantity = 10},
-                new CardSet {DeckID = 2, CardID = 5, Quantity = 4},
+                new CardSet {DeckID = 2, CardID = 5, Quantity = 10},
                 new CardSet {DeckID = 3, CardID = 1, Quantity = 10},
-                new CardSet {DeckID = 3, CardID = 4, Quantity = 4}
+                new CardSet {DeckID = 3, CardID = 2, Quantity = 10}
             };
             cardSets.ForEach(c => context.CardSets.Add(c));
             context.SaveChanges();

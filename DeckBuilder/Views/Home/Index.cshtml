@@ -2,7 +2,15 @@
     ViewBag.Title = "Deck Builder";
 }
 
-<h2>@ViewBag.Message</h2>
-<p>
-    To learn more about ASP.NET MVC visit <a href="http://asp.net/mvc" title="ASP.NET MVC Website">http://asp.net/mvc</a>.
-</p>
+<canvas id="canvas" width="800" height="800">
+<p>Your browser does not support the canvas element.</p>
+</canvas>
+
+<button id = "postheta" >Rotate +</button>
+<button id = "negtheta" >Rotate -</button>
+
+<button id = "submitMove">Submit</button>
+
+<script type="text/javascript">
+    window.onload = init(@ViewBag.test);    
+</script>

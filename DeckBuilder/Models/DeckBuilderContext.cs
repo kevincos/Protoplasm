@@ -24,6 +24,10 @@ namespace DeckBuilder.Models
                     .HasRequired(s => s.Deck)
                     .WithMany()
                     .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Card>()
+                    .HasRequired(c => c.CardType);
+                    
             
                 
                 

@@ -60,6 +60,7 @@
     </Reference>
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Entity.Design" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -106,6 +107,8 @@
     <Compile Include="Models\CardType.cs" />
     <Compile Include="Models\Deck.cs" />
     <Compile Include="Models\DeckBuilderContext.cs" />
+    <Compile Include="Models\GeomancerState.cs" />
+    <Compile Include="Models\PersonInputModel.cs" />
     <Compile Include="Models\PlayerIdentity.cs" />
     <Compile Include="Models\Table.cs" />
     <Compile Include="Models\Seat.cs" />
@@ -114,11 +117,41 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Images\amplifiercrystal.png" />
-    <Content Include="Content\Images\cardframe.png" />
+    <Content Include="Content\Images\attackedge.png" />
+    <Content Include="Content\Images\awarenessedge.png" />
+    <Content Include="Content\Images\barren.png" />
+    <Content Include="Content\Images\blueframe.png" />
+    <Content Include="Content\Images\bluespellframe.png" />
+    <Content Include="Content\Images\cardback.png" />
+    <Content Include="Content\Images\cardborder.png" />
+    <Content Include="Content\Images\cardfront.png" />
+    <Content Include="Content\Images\cardused.png" />
+    <Content Include="Content\Images\dad.png" />
+    <Content Include="Content\Images\frank.png" />
+    <Content Include="Content\Images\hexagon.png" />
+    <Content Include="Content\Images\hexagonused.png" />
+    <Content Include="Content\Images\highlight.png" />
+    <Content Include="Content\Images\homecrystal.png" />
+    <Content Include="Content\Images\homecrystalportrait.png" />
+    <Content Include="Content\Images\hydraportrait.png" />
+    <Content Include="Content\Images\hydraunit.png" />
+    <Content Include="Content\Images\infowindow.png" />
+    <Content Include="Content\Images\kevin.png" />
     <Content Include="Content\Images\lightningbolt.png" />
+    <Content Include="Content\Images\lightningboltportrait.png" />
     <Content Include="Content\Images\manacrystal.png" />
+    <Content Include="Content\Images\manacrystalportrait.png" />
+    <Content Include="Content\Images\manacrystalunit.png" />
     <Content Include="Content\Images\minotaur.png" />
+    <Content Include="Content\Images\minotaurportrait.png" />
+    <Content Include="Content\Images\minotaurunit.png" />
+    <Content Include="Content\Images\orangeframe.png" />
+    <Content Include="Content\Images\orangespellframe.png" />
     <Content Include="Content\Images\powercrystal.png" />
+    <Content Include="Content\Images\rachel.png" />
+    <Content Include="Content\Images\raiderportrait.png" />
+    <Content Include="Content\Images\raiderunit.png" />
+    <Content Include="Content\Images\unitframe.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -148,6 +181,11 @@
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Global.asax" />
     <Content Include="README.jQuery.vsdoc.txt" />
+    <Content Include="Scripts\Geomancer\main.js" />
+    <Content Include="Scripts\Graphics\sprite.js" />
+    <Content Include="Scripts\Graphics\spritecontext.js" />
+    <Content Include="Scripts\json2.js" />
+    <Content Include="Scripts\Math\hexmath.js" />
     <Content Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
@@ -162,6 +200,7 @@
     <Content Include="Scripts\modernizr-1.7.js" />
     <Content Include="Scripts\modernizr-1.7.min.js" />
     <Content Include="Scripts\play.js" />
+    <Content Include="Scripts\Math\vector.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -267,6 +306,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Table\Play.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Home\Submit.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

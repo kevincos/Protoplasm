@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
+using System;
 
 namespace DeckBuilder.App_Start
 {
@@ -31,6 +32,12 @@ namespace DeckBuilder.App_Start
             CreateTables(objectContext);
 
             SaveModelHashToDatabase(context, modelHash, objectContext);
+
+            Seed(context);
+        }
+
+        protected virtual void Seed(T context)
+        {
         }
 
         private void SaveModelHashToDatabase(T context, string modelHash,
@@ -50,12 +57,23 @@ namespace DeckBuilder.App_Start
             string dataBaseCreateScript =
                 objectContext.CreateDatabaseScript();
             objectContext.ExecuteStoreCommand(dataBaseCreateScript);
+            
         }
 
         private void DeleteExistingTables(ObjectContext objectContext)
         {
-            objectContext.ExecuteStoreCommand(Dropallconstraintsscript);
-            objectContext.ExecuteStoreCommand(Deletealltablesscript);
+            bool success = false;
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    objectContext.ExecuteStoreCommand(Dropallconstraintsscript);
+                    objectContext.ExecuteStoreCommand(Deletealltablesscript);
+                    success = true;
+                }
+                catch (Exception e) { }
+                if (success) return;
+            }
         }
 
         private string GetModelHash(ObjectContext context)
