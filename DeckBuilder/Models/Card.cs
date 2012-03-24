@@ -46,7 +46,7 @@ namespace DeckBuilder.Models
         public int Unit_Speed { get; set; }
         public string Unit_Awareness { get; set; }
 
-        public int extra { get; set; }
+        //public int extra { get; set; }
 
         [DisplayName("Type")]
         public int? CardTypeId { get; set; }

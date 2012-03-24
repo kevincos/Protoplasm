@@ -152,6 +152,9 @@ namespace DeckBuilder.Async
                         db.Seats.Add(s2);
                         db.SaveChanges();
 
+                        newTable.GenerateInitialState();
+                        db.SaveChanges();
+
                         proposals.Remove(p);                                     
 
                         // Redirect plyaers to game

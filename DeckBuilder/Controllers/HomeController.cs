@@ -38,7 +38,7 @@ namespace DeckBuilder.Controllers
             serializer.WriteObject(ms, gameState);
             string json = Encoding.Default.GetString(ms.ToArray());
 
-            ViewBag.test = new HtmlString(json);            
+            ViewBag.state = new HtmlString(json);            
             
 
             return View();

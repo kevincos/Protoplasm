@@ -5,6 +5,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.IO;
+using System.Text;
+using System.Runtime.Serialization.Json;
 using DeckBuilder.Models;
 
 namespace DeckBuilder.Controllers
@@ -78,7 +81,77 @@ namespace DeckBuilder.Controllers
                     ViewBag.Message = "You've played " + currentSeat.LastMove + "! Waiting for opponent...";
                 }
             }
+
+            string gameState = table.GameState;
+            //System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
+            //MemoryStream ms = new MemoryStream();
+            //serializer.WriteObject(ms, gameState);
+            //string json = Encoding.Default.GetString(ms.ToArray());
+
+            ViewBag.state = new HtmlString(gameState);  
+
             return View(table);
+        }
+
+        // Update
+        [HttpPost]
+        public ActionResult Update(int id, GeomancerState state)
+        {
+            Table table = db.Tables.Find(id);
+            foreach (GeomancerCard card in state.hand)
+            {
+                card.used = false;
+            }
+            for (int a = 0; a < state.tileList.Count(); a++)
+            {
+                for (int b = 0; b < state.tileList[a].Count(); b++)
+                {
+                    GeomancerTile tile = state.tileList[a][b];
+                    if (tile != null)
+                    {
+                        if (tile.moveUnit != null)
+                        {
+                            tile.unit = tile.moveUnit;
+                            if (state.tileList[tile.moveUnit.moveA][tile.moveUnit.moveB].unit.used == true)
+                                state.tileList[tile.moveUnit.moveA][tile.moveUnit.moveB].unit = null;
+                            tile.moveUnit = null;
+                        }
+
+                    }
+                }
+            }
+            for (int a = 0; a < state.tileList.Count(); a++)
+            {
+                for (int b = 0; b < state.tileList[a].Count(); b++)
+                {
+                    GeomancerTile tile = state.tileList[a][b];
+                    if (tile != null)
+                    {
+                        if (tile.spell != null)
+                        {
+                            GeomancerCard sourceCard = state.hand[tile.spell.sourceCardIndex];
+                            if (sourceCard.type == "Summon")
+                            {
+                                tile.unit = state.hand[tile.spell.sourceCardIndex].castUnit;
+                            }
+                            if (sourceCard.type == "Crystal")
+                            {
+                                tile.crystal = state.hand[tile.spell.sourceCardIndex].castCrystal;
+                            }
+                            tile.spell = null;
+                        }
+                    }
+                }
+            }
+
+            System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
+            MemoryStream ms = new MemoryStream();
+            serializer.WriteObject(ms, state);
+            string json = Encoding.Default.GetString(ms.ToArray());
+            table.GameState = json;
+            db.SaveChanges();
+
+            return Json(state);
         }
 
         //

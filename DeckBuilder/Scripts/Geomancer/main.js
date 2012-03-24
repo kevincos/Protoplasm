@@ -3,30 +3,32 @@ var FPS = 30;
 var SECONDS_BETWEEN_FRAMES = 1 / FPS;
 var canvas = null;
 
+var tableId = 0;
+
 var spriteContext = null;
 
-var hexFrame = new Sprite("content/images/hexagon.png");
-var usedHexagon = new Sprite("content/images/hexagonused.png");
-var highlight = new Sprite("content/images/highlight.png");
-var homeCrystal = new Sprite("content/images/homecrystalportrait.png");
-var manaCrystal = new Sprite("content/images/manacrystalportrait.png");
-var barrenHex = new Sprite("content/images/barren.png");
-var unitFrame = new Sprite("content/images/unitframe.png");
-var blueFrame = new Sprite("content/images/blueframe.png");
-var orangeFrame = new Sprite("content/images/orangeframe.png");
-var blueSpellFrame = new Sprite("content/images/bluespellframe.png");
-var orangeSpellFrame = new Sprite("content/images/orangespellframe.png");
-var attackEdge = new Sprite("content/images/attackedge.png");
-var awarenessEdge = new Sprite("content/images/awarenessedge.png");
-var minotaur = new Sprite("content/images/minotaurportrait.png");
-var lightningBolt = new Sprite("content/images/lightningboltportrait.png");
-var hydra = new Sprite("content/images/hydraportrait.png");
-var raider = new Sprite("content/images/raiderportrait.png");
-var cardBorder = new Sprite("content/images/cardborder.png");
-var cardFront = new Sprite("content/images/cardfront.png");
-var cardUsed = new Sprite("content/images/cardused.png");
-var cardBack = new Sprite("content/images/cardback.png");
-var infoWindow = new Sprite("content/images/infowindow.png");
+var hexFrame = new Sprite("/content/images/hexagon.png");
+var usedHexagon = new Sprite("/content/images/hexagonused.png");
+var highlight = new Sprite("/content/images/highlight.png");
+var homeCrystal = new Sprite("/content/images/homecrystalportrait.png");
+var manaCrystal = new Sprite("/content/images/manacrystalportrait.png");
+var barrenHex = new Sprite("/content/images/barren.png");
+var unitFrame = new Sprite("/content/images/unitframe.png");
+var blueFrame = new Sprite("/content/images/blueframe.png");
+var orangeFrame = new Sprite("/content/images/orangeframe.png");
+var blueSpellFrame = new Sprite("/content/images/bluespellframe.png");
+var orangeSpellFrame = new Sprite("/content/images/orangespellframe.png");
+var attackEdge = new Sprite("/content/images/attackedge.png");
+var awarenessEdge = new Sprite("/content/images/awarenessedge.png");
+var minotaur = new Sprite("/content/images/minotaurportrait.png");
+var lightningBolt = new Sprite("/content/images/lightningboltportrait.png");
+var hydra = new Sprite("/content/images/hydraportrait.png");
+var raider = new Sprite("/content/images/raiderportrait.png");
+var cardBorder = new Sprite("/content/images/cardborder.png");
+var cardFront = new Sprite("/content/images/cardfront.png");
+var cardUsed = new Sprite("/content/images/cardused.png");
+var cardBack = new Sprite("/content/images/cardback.png");
+var infoWindow = new Sprite("/content/images/infowindow.png");
 
 var pos = new vMath.vector2(150, 0);
 var yVel = 1;
@@ -57,7 +59,7 @@ var mouseDown = false;
 
 
 
-function init(state) {
+function init(state, tableId) {
     gameState = state;
 
     $('#postheta').click(function () {
@@ -70,6 +72,23 @@ function init(state) {
 
         $.ajax({
             url: 'home/submit',
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(gameState),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                gameState = data;
+            },
+            error: function () { alert("ERROR"); }
+        });
+
+
+    });
+    $('#submitGameMove').click(function () {
+
+        var updateUrl = '/table/update/' + tableId
+        $.ajax({
+            url: updateUrl,
             type: 'POST',
             dataType: 'json',
             data: JSON.stringify(gameState),

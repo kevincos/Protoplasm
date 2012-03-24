@@ -119,21 +119,21 @@ namespace DeckBuilder.Models
                     }
                 }
             }
-            tileList[2][5].unit = new GeomancerUnit { name = "HomeCrystal", direction = 0, playerId = 0, hp = 17, maxHP = 20, url = "content/images/homecrystalportrait.png", awareness = "______"};
-            tileList[11][5].unit = new GeomancerUnit { name = "HomeCrystal", direction = 0, playerId = 1, hp = 20, maxHP = 20, url = "content/images/homecrystalportrait.png", awareness = "______"};
-            tileList[4][4].crystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "content/images/manacrystalportrait.png" };
-            tileList[3][6].crystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "content/images/manacrystalportrait.png" };
-            tileList[9][5].crystal = new GeomancerCrystal { name = "ManaCrystal", charged = true, playerId = 1, url = "content/images/manacrystalportrait.png" };
-            tileList[5][3].unit = new GeomancerUnit { name = "Minotaur", direction = 2, playerId = 0, hp = 2, maxHP = 3, attack = 4, defense = 2, speed = 2, url = "content/images/minotaurportrait.png", awareness = "dad___" };
-            tileList[4][5].unit = new GeomancerUnit { name = "Minotaur", direction = 3, playerId = 0, hp = 3, maxHP = 3, attack = 4, defense = 2, speed = 2, url = "content/images/minotaurportrait.png", awareness = "dad___" };
-            tileList[9][5].unit = new GeomancerUnit { name = "Hydra", direction = 3, playerId = 1, hp = 8, maxHP = 8, attack = 6, defense = 1, speed = 1, url = "content/images/hydraportrait.png", awareness = "aaaaaa" };
-            tileList[7][7].unit = new GeomancerUnit { name = "Raider", direction = 5, playerId = 1, hp = 3, maxHP = 3, attack = 5, defense = 0, speed = 4, url = "content/images/raiderportrait.png" ,awareness = "_a____"};
+            tileList[2][5].unit = new GeomancerUnit { name = "HomeCrystal", direction = 0, playerId = 0, hp = 17, maxHP = 20, url = "/content/images/homecrystalportrait.png", awareness = "______"};
+            tileList[11][5].unit = new GeomancerUnit { name = "HomeCrystal", direction = 0, playerId = 1, hp = 20, maxHP = 20, url = "/content/images/homecrystalportrait.png", awareness = "______"};
+            tileList[4][4].crystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "/content/images/manacrystalportrait.png" };
+            tileList[3][6].crystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "/content/images/manacrystalportrait.png" };
+            tileList[9][5].crystal = new GeomancerCrystal { name = "ManaCrystal", charged = true, playerId = 1, url = "/content/images/manacrystalportrait.png" };
+            tileList[5][3].unit = new GeomancerUnit { name = "Minotaur", direction = 2, playerId = 0, hp = 2, maxHP = 3, attack = 4, defense = 2, speed = 2, url = "/content/images/minotaurportrait.png", awareness = "dad___" };
+            tileList[4][5].unit = new GeomancerUnit { name = "Minotaur", direction = 3, playerId = 0, hp = 3, maxHP = 3, attack = 4, defense = 2, speed = 2, url = "/content/images/minotaurportrait.png", awareness = "dad___" };
+            tileList[9][5].unit = new GeomancerUnit { name = "Hydra", direction = 3, playerId = 1, hp = 8, maxHP = 8, attack = 6, defense = 1, speed = 1, url = "/content/images/hydraportrait.png", awareness = "aaaaaa" };
+            tileList[7][7].unit = new GeomancerUnit { name = "Raider", direction = 5, playerId = 1, hp = 3, maxHP = 3, attack = 5, defense = 0, speed = 4, url = "/content/images/raiderportrait.png" ,awareness = "_a____"};
 
-            hand.Add(new GeomancerCard { name = "Summon Minotaur", description = "Summons a fearsome minotaur to the battlefield.", type = "Summon", cost = 3, castUnit = new GeomancerUnit { name = "Minotaur", direction = 3, playerId = 0, hp = 3, maxHP = 3, attack = 4, defense = 2, speed = 2, url = "content/images/minotaurportrait.png", awareness = "dad___" }, url = "content/images/minotaurportrait.png" });
-            hand.Add(new GeomancerCard { name = "Summon Hydra", description = "Summons a powerful multiheaded serpant to the battlefield.", type = "Summon", cost = 3, castUnit = new GeomancerUnit { name = "Hydra", direction = 3, playerId = 1, hp = 8, maxHP = 8, attack = 6, defense = 1, speed = 1, url = "content/images/hydraportrait.png", awareness = "aaaaaa" }, url = "content/images/hydraportrait.png" });
-            hand.Add(new GeomancerCard { name = "Lightning Bolt", description = "Blast a unit with a burst of lightning.", type = "Spell", cost = 2, url = "content/images/lightningboltportrait.png" });
-            hand.Add(new GeomancerCard { name = "Mana Crystal", description = "Conjures a mana crystal from the ground.", type = "Crystal", cost = 1, url = "content/images/manacrystalportrait.png", castCrystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "content/images/manacrystalportrait.png" } });
-            hand.Add(new GeomancerCard { name = "Mana Crystal", description = "Conjures a mana crystal from the ground.", type = "Crystal", cost = 1, url = "content/images/manacrystalportrait.png", castCrystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "content/images/manacrystalportrait.png" } });
+            hand.Add(new GeomancerCard { name = "Summon Minotaur", description = "Summons a fearsome minotaur to the battlefield.", type = "Summon", cost = 3, castUnit = new GeomancerUnit { name = "Minotaur", direction = 3, playerId = 0, hp = 3, maxHP = 3, attack = 4, defense = 2, speed = 2, url = "/content/images/minotaurportrait.png", awareness = "dad___" }, url = "/content/images/minotaurportrait.png" });
+            hand.Add(new GeomancerCard { name = "Summon Hydra", description = "Summons a powerful multiheaded serpant to the battlefield.", type = "Summon", cost = 3, castUnit = new GeomancerUnit { name = "Hydra", direction = 3, playerId = 1, hp = 8, maxHP = 8, attack = 6, defense = 1, speed = 1, url = "/content/images/hydraportrait.png", awareness = "aaaaaa" }, url = "/content/images/hydraportrait.png" });
+            hand.Add(new GeomancerCard { name = "Lightning Bolt", description = "Blast a unit with a burst of lightning.", type = "Spell", cost = 2, url = "/content/images/lightningboltportrait.png" });
+            hand.Add(new GeomancerCard { name = "Mana Crystal", description = "Conjures a mana crystal from the ground.", type = "Crystal", cost = 1, url = "/content/images/manacrystalportrait.png", castCrystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "/content/images/manacrystalportrait.png" } });
+            hand.Add(new GeomancerCard { name = "Mana Crystal", description = "Conjures a mana crystal from the ground.", type = "Crystal", cost = 1, url = "/content/images/manacrystalportrait.png", castCrystal = new GeomancerCrystal { name = "ManaCrystal", charged = false, playerId = 0, url = "/content/images/manacrystalportrait.png" } });
 
             opponentDeckCount = 30;
             opponentHandCount = 4;

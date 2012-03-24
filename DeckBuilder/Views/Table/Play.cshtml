@@ -5,6 +5,21 @@
 <h2>Play</h2>
 
 
+<canvas id="canvas" width="800" height="800">
+<p>Your browser does not support the canvas element.</p>
+</canvas>
+
+<button id = "postheta" >Rotate +</button>
+<button id = "negtheta" >Rotate -</button>
+
+<button id = "submitMove">Submit</button>
+<button id = "submitGameMove">RealSubmit</button>
+
+<script type="text/javascript">
+    window.onload = init(@ViewBag.state, "@ViewBag.TableId");    
+</script>
+
+
 <p>@ViewBag.Results</p>
 
 @if (ViewBag.Finished == true)
