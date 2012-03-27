@@ -40,9 +40,9 @@
     <Reference Include="DotNetOpenAuth">
       <HintPath>..\packages\DotNetOpenAuth.3.4.7.11121\lib\DotNetOpenAuth.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\EntityFramework.4.1.10715.0\lib\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=4.3.1.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.4.3.1\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -101,6 +101,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201203271948003_AddCrystalData.cs" />
+    <Compile Include="Migrations\201203271948003_AddCrystalData.Designer.cs">
+      <DependentUpon>201203271948003_AddCrystalData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\CardSet.cs" />
@@ -116,7 +121,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Images\amplifiercrystal.png" />
+    <Content Include="Content\Images\ampcrystal.png" />
+    <Content Include="Content\Images\archer.png" />
     <Content Include="Content\Images\attackedge.png" />
     <Content Include="Content\Images\awarenessedge.png" />
     <Content Include="Content\Images\barren.png" />
@@ -126,31 +132,26 @@
     <Content Include="Content\Images\cardborder.png" />
     <Content Include="Content\Images\cardfront.png" />
     <Content Include="Content\Images\cardused.png" />
+    <Content Include="Content\Images\cerberus.png" />
     <Content Include="Content\Images\dad.png" />
     <Content Include="Content\Images\frank.png" />
     <Content Include="Content\Images\hexagon.png" />
     <Content Include="Content\Images\hexagonused.png" />
     <Content Include="Content\Images\highlight.png" />
     <Content Include="Content\Images\homecrystal.png" />
-    <Content Include="Content\Images\homecrystalportrait.png" />
-    <Content Include="Content\Images\hydraportrait.png" />
-    <Content Include="Content\Images\hydraunit.png" />
+    <Content Include="Content\Images\hydra.png" />
     <Content Include="Content\Images\infowindow.png" />
     <Content Include="Content\Images\kevin.png" />
+    <Content Include="Content\Images\knight.png" />
     <Content Include="Content\Images\lightningbolt.png" />
-    <Content Include="Content\Images\lightningboltportrait.png" />
     <Content Include="Content\Images\manacrystal.png" />
-    <Content Include="Content\Images\manacrystalportrait.png" />
-    <Content Include="Content\Images\manacrystalunit.png" />
     <Content Include="Content\Images\minotaur.png" />
-    <Content Include="Content\Images\minotaurportrait.png" />
-    <Content Include="Content\Images\minotaurunit.png" />
     <Content Include="Content\Images\orangeframe.png" />
     <Content Include="Content\Images\orangespellframe.png" />
     <Content Include="Content\Images\powercrystal.png" />
     <Content Include="Content\Images\rachel.png" />
-    <Content Include="Content\Images\raiderportrait.png" />
-    <Content Include="Content\Images\raiderunit.png" />
+    <Content Include="Content\Images\raider.png" />
+    <Content Include="Content\Images\troll.png" />
     <Content Include="Content\Images\unitframe.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -248,12 +249,6 @@
     <Content Include="Views\Card\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Card\Create.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Card\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Card\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -309,6 +304,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Submit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Card\Edit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Card\Create.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

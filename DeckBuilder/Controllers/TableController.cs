@@ -8,7 +8,14 @@ using System.Web.Mvc;
 using System.IO;
 using System.Text;
 using System.Runtime.Serialization.Json;
+
 using DeckBuilder.Models;
+using SignalR.Infrastructure;
+using SignalR;
+using SignalR.Hosting.AspNet;
+using System.IO.Compression;
+
+using DeckBuilder.Async;
 
 namespace DeckBuilder.Controllers
 { 
@@ -16,6 +23,7 @@ namespace DeckBuilder.Controllers
     {
         private DeckBuilderContext db = new DeckBuilderContext();
 
+        
         //
         // GET: /Table/
 
@@ -52,6 +60,7 @@ namespace DeckBuilder.Controllers
 
             ViewBag.YourTurn = currentSeat.Active;
             ViewBag.PlayerName = User.Identity.Name;
+            ViewBag.PlayerId = currentSeat.PlayerId;
             ViewBag.TableId = id;
             if (table.TotalTurns > 0)
             {
@@ -82,76 +91,174 @@ namespace DeckBuilder.Controllers
                 }
             }
 
-            string gameState = table.GameState;
-            //System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
-            //MemoryStream ms = new MemoryStream();
-            //serializer.WriteObject(ms, gameState);
-            //string json = Encoding.Default.GetString(ms.ToArray());
+            // DATABASE DECOMPRESS: decompress from database
+            string minijson = table.GameState;
+            string json = "";            
+            using (var decomStream = new MemoryStream(Encoding.Default.GetBytes(minijson)))
+            {
+                using (var hgs = new GZipStream(decomStream, CompressionMode.Decompress))
+                {
+                    using (var reader = new StreamReader(hgs))
+                    {
+                        json = reader.ReadToEnd();
+                    }
+                }
+            }
 
-            ViewBag.state = new HtmlString(gameState);  
+            System.Runtime.Serialization.Json.DataContractJsonSerializer deserializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
+            MemoryStream masterStream = new MemoryStream(Encoding.Default.GetBytes(json));
+            GeomancerState masterState = (GeomancerState)deserializer.ReadObject(masterStream);
+            foreach (GeomancerPlayerContext playerContext in masterState.playerContexts)
+            {
+                playerContext.deck = null;
+                if (playerContext.playerId != currentSeat.PlayerId)
+                {
+                    playerContext.hand = null;
+                }
+            }
+            System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
+            MemoryStream ms = new MemoryStream();
+            serializer.WriteObject(ms, masterState);
+            string clientJson = Encoding.Default.GetString(ms.ToArray());
+
+            // WIRE COMPRESS : Send compressed game state to clinet
+            ViewBag.state = new HtmlString(clientJson);  
 
             return View(table);
         }
 
         // Update
         [HttpPost]
-        public ActionResult Update(int id, GeomancerState state)
+        public ActionResult Update(int id, GeomancerState inputState)
         {
             Table table = db.Tables.Find(id);
-            foreach (GeomancerCard card in state.hand)
+            
+            // DATABASE DECOMPRESS: Get and decompress master state from database
+            string minijson = table.GameState;
+            string json = "";
+            using (var decomStream = new MemoryStream(Encoding.Default.GetBytes(minijson)))
             {
-                card.used = false;
-            }
-            for (int a = 0; a < state.tileList.Count(); a++)
-            {
-                for (int b = 0; b < state.tileList[a].Count(); b++)
+                using (var hgs = new GZipStream(decomStream, CompressionMode.Decompress))
                 {
-                    GeomancerTile tile = state.tileList[a][b];
-                    if (tile != null)
+                    using (var reader = new StreamReader(hgs))
                     {
-                        if (tile.moveUnit != null)
+                        json = reader.ReadToEnd();
+                    }
+                }
+            }
+            System.Runtime.Serialization.Json.DataContractJsonSerializer deserializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
+            MemoryStream masterStream = new MemoryStream(Encoding.Default.GetBytes(json));
+            GeomancerState masterState = (GeomancerState)deserializer.ReadObject(masterStream);
+
+            // WIRE DECOMPRESS: Merge state with master gamestate
+
+
+
+            for (int a = 0; a < inputState.tileList.Count(); a++)
+            {
+                for (int b = 0; b < inputState.tileList[a].Count(); b++)
+                {
+                    GeomancerTile inputTile = inputState.tileList[a][b];
+                    GeomancerTile masterTile = masterState.tileList[a][b];
+                    if (inputTile != null)
+                    {
+                        if (inputTile.moveUnit != null)
                         {
-                            tile.unit = tile.moveUnit;
-                            if (state.tileList[tile.moveUnit.moveA][tile.moveUnit.moveB].unit.used == true)
-                                state.tileList[tile.moveUnit.moveA][tile.moveUnit.moveB].unit = null;
-                            tile.moveUnit = null;
+                            masterTile.unit = inputTile.moveUnit;
+                            if (inputState.tileList[inputTile.moveUnit.moveA][inputTile.moveUnit.moveB].unit.used == true)
+                                masterState.tileList[inputTile.moveUnit.moveA][inputTile.moveUnit.moveB].unit = null;
+                            masterTile.moveUnit = null;
                         }
 
                     }
                 }
             }
-            for (int a = 0; a < state.tileList.Count(); a++)
+            for (int a = 0; a < inputState.tileList.Count(); a++)
             {
-                for (int b = 0; b < state.tileList[a].Count(); b++)
+                for (int b = 0; b < inputState.tileList[a].Count(); b++)
                 {
-                    GeomancerTile tile = state.tileList[a][b];
-                    if (tile != null)
+                    GeomancerTile inputTile = inputState.tileList[a][b];
+                    GeomancerTile masterTile = masterState.tileList[a][b];
+                    if (inputTile != null)
                     {
-                        if (tile.spell != null)
+                        if (inputTile.spell != null)
                         {
-                            GeomancerCard sourceCard = state.hand[tile.spell.sourceCardIndex];
+                            GeomancerCard sourceCard = inputState.playerContexts[inputState.activePlayerIndex].hand[inputTile.spell.sourceCardIndex];
                             if (sourceCard.type == "Summon")
                             {
-                                tile.unit = state.hand[tile.spell.sourceCardIndex].castUnit;
+                                masterTile.unit = inputState.playerContexts[inputState.activePlayerIndex].hand[inputTile.spell.sourceCardIndex].castUnit;
+                                masterTile.unit.playerId = inputTile.spell.playerId;
                             }
                             if (sourceCard.type == "Crystal")
                             {
-                                tile.crystal = state.hand[tile.spell.sourceCardIndex].castCrystal;
+                                masterTile.crystal = inputState.playerContexts[inputState.activePlayerIndex].hand[inputTile.spell.sourceCardIndex].castCrystal;
+                                masterTile.crystal.playerId = inputTile.spell.playerId;
                             }
-                            tile.spell = null;
+                            masterTile.spell = null;
                         }
                     }
                 }
             }
 
+            masterState.playerContexts[inputState.activePlayerIndex].hand = inputState.playerContexts[inputState.activePlayerIndex].hand.Where(c => c.used == false).ToList();
+            Random r = new Random();
+            masterState.DrawCard(r, masterState.playerContexts[masterState.activePlayerIndex]);
+
+            masterState.activePlayerIndex++;
+            masterState.activePlayerIndex %= masterState.playerContexts.Count;
+
+            // DATABASE COMPRESS: Compress state for database storage
             System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
             MemoryStream ms = new MemoryStream();
-            serializer.WriteObject(ms, state);
-            string json = Encoding.Default.GetString(ms.ToArray());
-            table.GameState = json;
+            serializer.WriteObject(ms, masterState);
+            ms.Close();
+            MemoryStream compressStream = new MemoryStream(ms.ToArray());
+            minijson = "";
+            using (var cmpStream = new MemoryStream())
+            {
+                using (var hgs = new GZipStream(cmpStream, CompressionMode.Compress))
+                {
+                    compressStream.CopyTo(hgs);
+                }
+                minijson = Encoding.Default.GetString(cmpStream.ToArray());
+            }                                               
+            json = Encoding.Default.GetString(ms.ToArray());
+            
+            //table.GameState = json;
+            table.GameState = minijson;
             db.SaveChanges();
 
-            return Json(state);
+            
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (GeomancerPlayerContext playerContext in masterState.playerContexts)
+            {
+                playerContext.deck = null;
+            }
+            foreach (Seat s in table.Seats)
+            {
+                List<List<GeomancerCard>> savedHands = new List<List<GeomancerCard>>();
+                foreach (GeomancerPlayerContext playerContext in masterState.playerContexts)
+                {
+                    savedHands.Add(playerContext.hand);
+                    if (s.PlayerId != playerContext.playerId)
+                    {
+                        playerContext.hand = null;
+                    }
+                    
+                }
+                // WIRE COMPRESS: Send compact version to client                   
+                clients[s.Player.Name].updateGameState(masterState);
+                for(int i = 0;i < masterState.playerContexts.Count; i++)
+                {
+                    GeomancerPlayerContext playerContext = masterState.playerContexts[i];
+                    playerContext.hand = savedHands[i];
+                }
+            }
+
+            // WIRE COMPRESS: Return compact version to client
+            //return Json(masterState);
+            return View();
         }
 
         //

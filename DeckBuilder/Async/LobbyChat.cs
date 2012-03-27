@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Threading.Tasks;
+using System.Data.Entity;
 using SignalR.Hubs;
 using DeckBuilder.Models;
 
@@ -151,6 +152,8 @@ namespace DeckBuilder.Async
                         db.Seats.Add(s1);
                         db.Seats.Add(s2);
                         db.SaveChanges();
+
+                        newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
 
                         newTable.GenerateInitialState();
                         db.SaveChanges();

@@ -34,6 +34,8 @@ namespace DeckBuilder.Models
         public string Crystal_Name { get; set; }
         [StringLength(1024)]
         public string Crystal_Url { get; set; }
+        public int Crystal_Range { get; set; }
+        public int Crystal_Mana { get; set; }
 
         // Summon Unit Info
         [StringLength(50)]

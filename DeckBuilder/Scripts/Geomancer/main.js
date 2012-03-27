@@ -10,8 +10,7 @@ var spriteContext = null;
 var hexFrame = new Sprite("/content/images/hexagon.png");
 var usedHexagon = new Sprite("/content/images/hexagonused.png");
 var highlight = new Sprite("/content/images/highlight.png");
-var homeCrystal = new Sprite("/content/images/homecrystalportrait.png");
-var manaCrystal = new Sprite("/content/images/manacrystalportrait.png");
+var homeCrystal = new Sprite("/content/images/homecrystal.png");
 var barrenHex = new Sprite("/content/images/barren.png");
 var unitFrame = new Sprite("/content/images/unitframe.png");
 var blueFrame = new Sprite("/content/images/blueframe.png");
@@ -20,10 +19,6 @@ var blueSpellFrame = new Sprite("/content/images/bluespellframe.png");
 var orangeSpellFrame = new Sprite("/content/images/orangespellframe.png");
 var attackEdge = new Sprite("/content/images/attackedge.png");
 var awarenessEdge = new Sprite("/content/images/awarenessedge.png");
-var minotaur = new Sprite("/content/images/minotaurportrait.png");
-var lightningBolt = new Sprite("/content/images/lightningboltportrait.png");
-var hydra = new Sprite("/content/images/hydraportrait.png");
-var raider = new Sprite("/content/images/raiderportrait.png");
 var cardBorder = new Sprite("/content/images/cardborder.png");
 var cardFront = new Sprite("/content/images/cardfront.png");
 var cardUsed = new Sprite("/content/images/cardused.png");
@@ -54,13 +49,30 @@ var scale = 1;
 var currentTime = 0;
 
 var gameState;
+var playerHand;
+var activePlayerId;
+var currentPlayerId;
+var currentPlayerIndex;
+var refreshView;
 
 var mouseDown = false;
 
-
-
-function init(state, tableId) {
+function setGameState(state, playerId) {
     gameState = state;
+    currentPlayerId = playerId;
+    activePlayerId = gameState.playerContexts[gameState.activePlayerIndex].playerId;
+    for (var i = 0; i < gameState.playerContexts.length; i++) {
+        if (gameState.playerContexts[i].playerId == currentPlayerId) {
+            currentPlayerIndex = i;
+            playerHand = gameState.playerContexts[i].hand;
+        }
+    }
+    refreshView = true;
+    
+}
+
+function init(state, tableId, playerId) {
+    setGameState(state, playerId);
 
     $('#postheta').click(function () {
         hexMath.theta += .05;
@@ -77,7 +89,7 @@ function init(state, tableId) {
             data: JSON.stringify(gameState),
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                gameState = data;
+                setGameState(data, playerId);
             },
             error: function () { alert("ERROR"); }
         });
@@ -93,10 +105,10 @@ function init(state, tableId) {
             dataType: 'json',
             data: JSON.stringify(gameState),
             contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                gameState = data;
-            },
-            error: function () { alert("ERROR"); }
+            //success: function () {
+                //setGameState(data, playerId);
+            //},
+            //error: function () { alert("ERROR"); }
         });
 
 
@@ -145,7 +157,7 @@ function draw() {
 
     var hoverCardIndex = null;
     var handMousePos = new vMath.vector2(vMath.mousePos.x - playerCardBase.x, vMath.mousePos.y - playerCardBase.y);
-    if (handMousePos.x > -30 && handMousePos.x < 60 * gameState.hand.length && handMousePos.y > -40 && handMousePos.y < 40) {
+    if (handMousePos.x > -30 && handMousePos.x < 60 * playerHand.length && handMousePos.y > -40 && handMousePos.y < 40) {
         hoverCardIndex = Math.round(handMousePos.x / 60);
     }
 
@@ -153,9 +165,11 @@ function draw() {
         mouseDown = false;
     }
 
-    if (hoverDirection == prevDirection && roundedA == prevTileA && roundedB == prevTileB && hoverCardIndex == prevCardIndex && vMath.mouseDown == false) {
+    if (refreshView == false && hoverDirection == prevDirection && roundedA == prevTileA && roundedB == prevTileB && hoverCardIndex == prevCardIndex && vMath.mouseDown == false) {
         return;
     }
+    prevDirection = hoverDirection;
+    refreshView = false;
 
 
     if (mouseDown == true) {
@@ -183,46 +197,49 @@ function draw() {
 
     var resetSelection = false;
 
+    
     // Select/Deselect Tile
     if (roundedA >= 0 && roundedA < 14 && roundedB >= 0 && roundedB < 11) {
         var roundedC = 18 - roundedA - roundedB;
         if (roundedC >= 0 && roundedC < 14) {
             showHoverUnitInfo = true;
-            if (vMath.mouseDown == true) {
-                if (selectedTileA == null && selectedCardIndex == null) {
-                    if (gameState.tileList[roundedA][roundedB].moveUnit != null) {
+            if (vMath.mouseDown == true && activePlayerId == currentPlayerId) { // mouse button down over valid tile
+                if (selectedTileA == null && selectedCardIndex == null) { // select
+                    if (gameState.tileList[roundedA][roundedB].moveUnit != null && gameState.tileList[roundedA][roundedB].moveUnit.playerId == activePlayerId) { // move unit, select original unit
                         selectedTileA = gameState.tileList[roundedA][roundedB].moveUnit.moveA;
                         selectedTileB = gameState.tileList[roundedA][roundedB].moveUnit.moveB;
                         selectedCardIndex = null;
                         resetSelection = true;
                     }
-                    else if (gameState.tileList[roundedA][roundedB].spell != null) {
+                    else if (gameState.tileList[roundedA][roundedB].spell != null && gameState.tileList[roundedA][roundedB].spell.playerId == activePlayerId) { // spell, select source card
                         selectedTileA = null;
                         selectedTileB = null;
                         selectedCardIndex = gameState.tileList[roundedA][roundedB].spell.sourceCardIndex;
                         resetSelection = true;
                     }
-                    else {
-                        selectedTileA = roundedA;
-                        selectedTileB = roundedB;
-                        selectedCardIndex = null;
+                    else { // normal select tile
+                        if (gameState.tileList[roundedA][roundedB].unit != null && gameState.tileList[roundedA][roundedB].unit.playerId == activePlayerId) {
+                            selectedTileA = roundedA;
+                            selectedTileB = roundedB;
+                            selectedCardIndex = null;
+                        }
                     }
                     if (selectedTileA != null && gameState.tileList[selectedTileA][selectedTileB].unit != null && gameState.tileList[selectedTileA][selectedTileB].unit.used == true) {
                         gameState.tileList[selectedTileA][selectedTileB].unit.used = false;
                         gameState.tileList[gameState.tileList[selectedTileA][selectedTileB].unit.moveA][gameState.tileList[selectedTileA][selectedTileB].unit.moveB].moveUnit = null;
                         gameState.tileList[selectedTileA][selectedTileB].unit.moveA = null;
                         gameState.tileList[selectedTileA][selectedTileB].unit.moveB = null;
-                        
+
                     }
                     else if (selectedCardIndex != null) {
                         gameState.tileList[roundedA][roundedB].spell = null;
-                        gameState.hand[selectedCardIndex].used = false;
-                        gameState.hand[selectedCardIndex].castA = null;
-                        gameState.hand[selectedCardIndex].castB = null;
+                        playerHand[selectedCardIndex].used = false;
+                        playerHand[selectedCardIndex].castA = null;
+                        playerHand[selectedCardIndex].castB = null;
                     }
-                    
+
                 }
-                else if (selectedTileA == roundedA && selectedTileB == roundedB) {
+                else if (selectedTileA == roundedA && selectedTileB == roundedB) { // deselect
                     if (gameState.tileList[selectedTileA][selectedTileB].unit != null && gameState.tileList[selectedTileA][selectedTileB].unit.used == true) {
                         gameState.tileList[selectedTileA][selectedTileB].unit.used = false;
                         gameState.tileList[gameState.tileList[selectedTileA][selectedTileB].unit.moveA][gameState.tileList[selectedTileA][selectedTileB].unit.moveB].moveUnit = null;
@@ -238,26 +255,26 @@ function draw() {
 
     }
     // Select/Deselect Card
-    if (hoverCardIndex != null && hoverCardIndex < gameState.hand.length && hoverCardIndex >= 0) {
+    if (hoverCardIndex != null && hoverCardIndex < playerHand.length && hoverCardIndex >= 0) {
         showHoverCardInfo = true;
-        if (vMath.mouseDown == true) {
+        if (vMath.mouseDown == true && activePlayerId == currentPlayerId) {
             if (selectedTileA == null && selectedCardIndex == null) {
                 selectedCardIndex = hoverCardIndex;
-                if (gameState.hand[selectedCardIndex].used == true) {
-                    gameState.hand[selectedCardIndex].used = false;
-                    gameState.tileList[gameState.hand[selectedCardIndex].castA][gameState.hand[selectedCardIndex].castB].spell = null;
-                    gameState.hand[selectedCardIndex].castA = null;
-                    gameState.hand[selectedCardIndex].castB = null;
+                if (playerHand[selectedCardIndex].used == true) {
+                    playerHand[selectedCardIndex].used = false;
+                    gameState.tileList[playerHand[selectedCardIndex].castA][playerHand[selectedCardIndex].castB].spell = null;
+                    playerHand[selectedCardIndex].castA = null;
+                    playerHand[selectedCardIndex].castB = null;
                 }
                 selectedTileA = null;
                 selectedTileB = null;
             }
             else if (selectedCardIndex == hoverCardIndex) {
-                if (gameState.hand[selectedCardIndex].used == true) {
-                    gameState.hand[selectedCardIndex].used = false;
-                    gameState.tileList[gameState.hand[selectedCardIndex].castA][gameState.hand[selectedCardIndex].castB].spell = null;
-                    gameState.hand[selectedCardIndex].castA = null;
-                    gameState.hand[selectedCardIndex].castB = null;                    
+                if (playerHand[selectedCardIndex].used == true) {
+                    playerHand[selectedCardIndex].used = false;
+                    gameState.tileList[playerHand[selectedCardIndex].castA][playerHand[selectedCardIndex].castB].spell = null;
+                    playerHand[selectedCardIndex].castA = null;
+                    playerHand[selectedCardIndex].castB = null;
                 }
                 selectedCardIndex = null;
                 selectedTileA = null;
@@ -268,20 +285,21 @@ function draw() {
     }
 
     //Card Selected, click space
-    if (vMath.mouseDown == true && selectedCardIndex != null && resetSelection == false) {
+    if (vMath.mouseDown == true && selectedCardIndex != null && resetSelection == false && activePlayerId == currentPlayerId) {
         if (roundedA >= 0 && roundedA < 14 && roundedB >= 0 && roundedB < 11) {
             var roundedC = 18 - roundedA - roundedB;
             if (roundedC >= 0 && roundedC < 14) {
-                if (gameState.hand[selectedCardIndex].used == undefined || gameState.hand[selectedCardIndex].used == false) {
-                    gameState.hand[selectedCardIndex].used = true;
-                    gameState.hand[selectedCardIndex].castA = roundedA;
-                    gameState.hand[selectedCardIndex].castB = roundedB;
+                if (playerHand[selectedCardIndex].used == undefined || playerHand[selectedCardIndex].used == false) {
+                    playerHand[selectedCardIndex].used = true;
+                    playerHand[selectedCardIndex].castA = roundedA;
+                    playerHand[selectedCardIndex].castB = roundedB;
                     gameState.tileList[roundedA][roundedB].spell = {};
-                    gameState.tileList[roundedA][roundedB].spell.name = gameState.hand[selectedCardIndex].name;
+                    gameState.tileList[roundedA][roundedB].spell.name = playerHand[selectedCardIndex].name;
                     gameState.tileList[roundedA][roundedB].spell.awareness = "dad___";
                     gameState.tileList[roundedA][roundedB].spell.direction = hoverDirection;
-                    gameState.tileList[roundedA][roundedB].spell.url = gameState.hand[selectedCardIndex].url;
+                    gameState.tileList[roundedA][roundedB].spell.url = playerHand[selectedCardIndex].url;
                     gameState.tileList[roundedA][roundedB].spell.sourceCardIndex = selectedCardIndex;
+                    gameState.tileList[roundedA][roundedB].spell.playerId = activePlayerId;
                     selectedCardIndex = null;
                 }
             }
@@ -289,7 +307,7 @@ function draw() {
     }
 
     // Unit selected, click space
-    if (vMath.mouseDown == true && selectedTileA != null && resetSelection == false) {
+    if (vMath.mouseDown == true && selectedTileA != null && resetSelection == false && activePlayerId == currentPlayerId) {
         if (roundedA >= 0 && roundedA < 14 && roundedB >= 0 && roundedB < 11) {
             var roundedC = 18 - roundedA - roundedB;
             if (roundedC >= 0 && roundedC < 14) {
@@ -316,6 +334,8 @@ function draw() {
             }
         }
     }
+    
+
 
     for(var a = 0; a < 14; a++)
     {
@@ -332,7 +352,7 @@ function draw() {
 
 
 
-    for (var i = 0; i < gameState.hand.length; i++) {
+    for (var i = 0; i < playerHand.length; i++) {
         if (i != hoverCardIndex && i != selectedCardIndex) {
             drawCard(i, false);
         }
@@ -403,33 +423,33 @@ function drawCard(i, hover, select) {
     }
 
     spriteContext.draw(cardFront, new vMath.vector2(playerCardBase.x + i * 60, playerCardBase.y), cardWidth, cardHeight, 0, 1);
-    spriteContext.draw(new Sprite(gameState.hand[i].url), new vMath.vector2(playerCardBase.x + i * 60, playerCardBase.y), portraitSize, portraitSize, 0, 1);
-    spriteContext.text(gameState.hand[i].cost, new vMath.vector2(playerCardBase.x + i * 60 - cardWidth / 3, playerCardBase.y - cardHeight / 4));
-    if (gameState.hand[i].used == true) {
+    spriteContext.draw(new Sprite(playerHand[i].url), new vMath.vector2(playerCardBase.x + i * 60, playerCardBase.y), portraitSize, portraitSize, 0, 1);
+    spriteContext.text(playerHand[i].cost, new vMath.vector2(playerCardBase.x + i * 60 - cardWidth / 3, playerCardBase.y - cardHeight / 4));
+    if (playerHand[i].used == true || activePlayerId != currentPlayerId) {
         spriteContext.draw(cardUsed, new vMath.vector2(playerCardBase.x + i * 60, playerCardBase.y), cardWidth, cardHeight, 0, 1);
     }
 
     if (hover == true) {
         var textY = hoverInfoWindowPos.y - 60;
-        spriteContext.text(gameState.hand[i].name, new vMath.vector2(hoverInfoWindowPos.x - 80, textY));
-        textY += 15;        
-        spriteContext.text("Cost: " + gameState.hand[i].cost, new vMath.vector2(hoverInfoWindowPos.x - 70, textY));
+        spriteContext.text(playerHand[i].name, new vMath.vector2(hoverInfoWindowPos.x - 80, textY));
+        textY += 15;
+        spriteContext.text("Cost: " + playerHand[i].cost, new vMath.vector2(hoverInfoWindowPos.x - 70, textY));
         textY += 15;
 
-        spriteContext.text("Type: " + gameState.hand[i].type, new vMath.vector2(hoverInfoWindowPos.x - 70, textY));
+        spriteContext.text("Type: " + playerHand[i].type, new vMath.vector2(hoverInfoWindowPos.x - 70, textY));
         textY += 25;
-        spriteContext.textWrap(gameState.hand[i].description, new vMath.vector2(hoverInfoWindowPos.x - 80, textY), 160, 15);
+        spriteContext.textWrap(playerHand[i].description, new vMath.vector2(hoverInfoWindowPos.x - 80, textY), 160, 15);
     }
     if (select == true) {
         var textY = selectInfoWindowPos.y - 60;
-        spriteContext.text(gameState.hand[i].name, new vMath.vector2(selectInfoWindowPos.x - 80, textY));
+        spriteContext.text(playerHand[i].name, new vMath.vector2(selectInfoWindowPos.x - 80, textY));
         textY += 15;
-        spriteContext.text("Cost: " + gameState.hand[i].cost, new vMath.vector2(selectInfoWindowPos.x - 70, textY));
+        spriteContext.text("Cost: " + playerHand[i].cost, new vMath.vector2(selectInfoWindowPos.x - 70, textY));
         textY += 15;
 
-        spriteContext.text("Type: " + gameState.hand[i].type, new vMath.vector2(selectInfoWindowPos.x - 70, textY));
+        spriteContext.text("Type: " + playerHand[i].type, new vMath.vector2(selectInfoWindowPos.x - 70, textY));
         textY += 25;
-        spriteContext.textWrap(gameState.hand[i].description, new vMath.vector2(selectInfoWindowPos.x - 80, textY), 160, 15);
+        spriteContext.textWrap(playerHand[i].description, new vMath.vector2(selectInfoWindowPos.x - 80, textY), 160, 15);
     }
 }
 
@@ -453,8 +473,11 @@ function drawTile(a, b, hover, select, hoverDirection) {
         }
 
         if (tile.crystal != null) {
-            if (tile.crystal.playerId == 0)
+            if (tile.crystal.playerId == currentPlayerId) {
                 spriteContext.draw(blueFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);
+                if(activePlayerId != currentPlayerId)
+                    spriteContext.draw(usedHexagon, screenCoords, tileSize, tileSize, hexMath.theta, 1);
+            }
             else
                 spriteContext.draw(orangeFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);
 
@@ -464,8 +487,11 @@ function drawTile(a, b, hover, select, hoverDirection) {
             screenCoords.y -= 20;
         }
         if (tile.unit != null) {
-            if (tile.unit.playerId == 0)
+            if (tile.unit.playerId == currentPlayerId) {
                 spriteContext.draw(blueFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);
+                if (activePlayerId != currentPlayerId)
+                    spriteContext.draw(usedHexagon, screenCoords, tileSize, tileSize, hexMath.theta, 1);
+            }
             else
                 spriteContext.draw(orangeFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);
             if (tile.unit.used == true) {
@@ -487,7 +513,7 @@ function drawTile(a, b, hover, select, hoverDirection) {
             screenCoords.y -= 20;
         }
         if (tile.moveUnit != null) {
-            if (tile.moveUnit.playerId == 0)
+            if (tile.moveUnit.playerId == currentPlayerId)
                 spriteContext.draw(blueFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);
             else
                 spriteContext.draw(orangeFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);
@@ -505,7 +531,7 @@ function drawTile(a, b, hover, select, hoverDirection) {
             screenCoords.y -= 20;
         }
         if (tile.spell != null) {
-            if (tile.spell.playerId == 0)
+            if (tile.spell.playerId == currentPlayerId)
                 spriteContext.draw(blueSpellFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);
             else
                 spriteContext.draw(orangeSpellFrame, screenCoords, tileSize, tileSize, hexMath.theta, 1);

@@ -12,7 +12,7 @@
 @using (Html.BeginForm()) {
     @Html.ValidationSummary(true)
     <fieldset>
-        <legend>Card</legend>
+        <legend>Card</legend>        
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Name)
@@ -39,19 +39,92 @@
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.CardTypeId, "Type")
-        </div>
-        <div class="editor-field">
-            @Html.DropDownList("CardTypeId", String.Empty)
-            @Html.ValidationMessageFor(model => model.CardTypeId)
-        </div>
-
-        <div class="editor-label">
             @Html.LabelFor(model => model.CardArtUrl)
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.CardArtUrl)
             @Html.ValidationMessageFor(model => model.CardArtUrl)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Crystal_Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Crystal_Name)
+            @Html.ValidationMessageFor(model => model.Crystal_Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Crystal_Url)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Crystal_Url)
+            @Html.ValidationMessageFor(model => model.Crystal_Url)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Unit_Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Unit_Name)
+            @Html.ValidationMessageFor(model => model.Unit_Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Unit_Url)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Unit_Url)
+            @Html.ValidationMessageFor(model => model.Unit_Url)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Unit_MaxHP)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Unit_MaxHP)
+            @Html.ValidationMessageFor(model => model.Unit_MaxHP)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Unit_Attack)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Unit_Attack)
+            @Html.ValidationMessageFor(model => model.Unit_Attack)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Unit_Defense)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Unit_Defense)
+            @Html.ValidationMessageFor(model => model.Unit_Defense)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Unit_Speed)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Unit_Speed)
+            @Html.ValidationMessageFor(model => model.Unit_Speed)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Unit_Awareness)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Unit_Awareness)
+            @Html.ValidationMessageFor(model => model.Unit_Awareness)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.CardTypeId)
+        </div>
+
+        
+        <div class="editor-field">            
+            @Html.DropDownList("CardTypeId")           
         </div>
 
         <p>

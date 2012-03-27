@@ -29,16 +29,16 @@ namespace DeckBuilder.Controllers
 
         public ActionResult Index()
         {
-            GeomancerState gameState = new GeomancerState();
+            /*GeomancerState gameState = new GeomancerState();
             gameState.InitializeState();
             ViewBag.Message = "Welcome to the Geomancer Deck Builder";
             
-            System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell)});
+            System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell), typeof(GeomancerPlayerContext)});
             MemoryStream ms = new MemoryStream();
             serializer.WriteObject(ms, gameState);
             string json = Encoding.Default.GetString(ms.ToArray());
 
-            ViewBag.state = new HtmlString(json);            
+            ViewBag.state = new HtmlString(json);            */
             
 
             return View();
@@ -47,7 +47,7 @@ namespace DeckBuilder.Controllers
         [HttpPost]
         public ActionResult Submit(GeomancerState state)
         {
-            foreach (GeomancerCard card in state.hand)
+            foreach (GeomancerCard card in state.playerContexts[state.activePlayerIndex].hand)
             {
                 card.used = false;                
             }
@@ -78,20 +78,24 @@ namespace DeckBuilder.Controllers
                     {
                         if (tile.spell != null)
                         {
-                            GeomancerCard sourceCard = state.hand[tile.spell.sourceCardIndex];
+                            GeomancerCard sourceCard = state.playerContexts[state.activePlayerIndex].hand[tile.spell.sourceCardIndex];
                             if (sourceCard.type == "Summon")
                             {
-                                tile.unit = state.hand[tile.spell.sourceCardIndex].castUnit;
+                                tile.unit = state.playerContexts[state.activePlayerIndex].hand[tile.spell.sourceCardIndex].castUnit;
+                                tile.unit.playerId = tile.spell.playerId;
                             }
                             if (sourceCard.type == "Crystal")
                             {
-                                tile.crystal = state.hand[tile.spell.sourceCardIndex].castCrystal;
+                                tile.crystal = state.playerContexts[state.activePlayerIndex].hand[tile.spell.sourceCardIndex].castCrystal;
+                                tile.crystal.playerId = tile.spell.playerId;
                             }
                             tile.spell = null;
                         }
                     }
                 }
             }
+            state.activePlayerIndex++;
+            state.activePlayerIndex %= state.playerContexts.Count;
             return Json(state);
         }
 

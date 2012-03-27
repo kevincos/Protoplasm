@@ -19,7 +19,6 @@
 @foreach (var item in Model) {
     <tr>
         <td>@Html.DisplayFor(modelItem => item.TableID)</td>
-        <td>@Html.DisplayFor(modelItem => item.Seats.ToList()[0].Player.Name) vs @Html.DisplayFor(modelItem => item.Seats.ToList()[1].Player.Name)</td>       
         
         <td>
             @Html.ActionLink("Edit", "Edit", new { id = item.TableID }) |

@@ -48,7 +48,7 @@ namespace DeckBuilder
             //Database.SetInitializer<DeckBuilderContext>(new Devtalk.EF.CodeFirst.DontDropDbJustCreateTablesIfModelChanged<DeckBuilderContext>());
 
             //Database.SetInitializer<DeckBuilderContext>(new DeckBuilder.App_Start.DontDropDbJustCreateTablesIfModelChanged<DeckBuilderContext>());
-            Database.SetInitializer<DeckBuilderContext>(new DeckBuilderInitializer());
+            //Database.SetInitializer<DeckBuilderContext>(new DeckBuilderInitializer());
 
             AreaRegistration.RegisterAllAreas();
 

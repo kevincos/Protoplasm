@@ -7,7 +7,9 @@ using DeckBuilder.Models;
 
 namespace DeckBuilder.DAL
 {
-    public class DeckBuilderInitializer : DeckBuilder.App_Start.DontDropDbJustCreateTablesIfModelChanged<DeckBuilderContext>
+    
+    //public class DeckBuilderInitializer : DeckBuilder.App_Start.DontDropDbJustCreateTablesIfModelChanged<DeckBuilderContext>
+    public class DeckBuilderInitializer : DropCreateDatabaseIfModelChanges<DeckBuilderContext>    
     {
         protected override void Seed(DeckBuilderContext context)
         {
@@ -40,10 +42,10 @@ namespace DeckBuilder.DAL
 
             var cards = new List<Card>
             {
-                new Card { Name = "Mana Crystal",   ManaCost = 1, Description="Basic Mana Crystal.", CardArtUrl="/content/images/ManaCrystal.png", CardType = cardTypes.Single(t => t.Name == "Crystal"),  Crystal_Name = "Mana Crystal", Crystal_Url = "/content/images/manacrystalportrait.png" },
-                new Card { Name = "Minotaur",   ManaCost = 3,     Description = "Powerful half man half bull melee warrior.", CardArtUrl="/content/images/Minotaur.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack =4, Unit_Awareness = "dad___", Unit_Defense = 2, Unit_MaxHP = 3, Unit_Speed = 2, Unit_Name = "Minotaur", Unit_Url= "/content/images/minotaurportrait.png"},
-                new Card { Name = "Hydra",   ManaCost = 6,     Description = "Multiheaded Serpant that can attack in all directions.", CardArtUrl="/content/images/hydraportrait.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack = 6, Unit_Awareness = "aaaaaa", Unit_Defense = 1, Unit_Speed = 1, Unit_MaxHP = 8, Unit_Name = "Hyrda", Unit_Url = "/content/images/hydraportrait.png"},
-                new Card { Name = "Raider",   ManaCost = 4,     Description = "Fast and deadly wolf rider.", CardArtUrl="/content/images/raiderportrait.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack = 5, Unit_Awareness = "_a____", Unit_Defense = 0, Unit_Speed = 4, Unit_Name = "Raider", Unit_MaxHP = 3, Unit_Url = "/content/images/raiderportrait.png" },
+                new Card { Name = "Mana Crystal",   ManaCost = 1, Description="Basic Mana Crystal.", CardArtUrl="/content/images/ManaCrystal.png", CardType = cardTypes.Single(t => t.Name == "Crystal"),  Crystal_Name = "Mana Crystal", Crystal_Url = "/content/images/manacrystal.png" },
+                new Card { Name = "Minotaur",   ManaCost = 3,     Description = "Powerful half man half bull melee warrior.", CardArtUrl="/content/images/Minotaur.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack =4, Unit_Awareness = "dad___", Unit_Defense = 2, Unit_MaxHP = 3, Unit_Speed = 2, Unit_Name = "Minotaur", Unit_Url= "/content/images/minotaur.png"},
+                new Card { Name = "Hydra",   ManaCost = 6,     Description = "Multiheaded Serpant that can attack in all directions.", CardArtUrl="/content/images/hydra.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack = 6, Unit_Awareness = "aaaaaa", Unit_Defense = 1, Unit_Speed = 1, Unit_MaxHP = 8, Unit_Name = "Hyrda", Unit_Url = "/content/images/hydra.png"},
+                new Card { Name = "Raider",   ManaCost = 4,     Description = "Fast and deadly wolf rider.", CardArtUrl="/content/images/raiderportrait.png", CardType = cardTypes.Single(t => t.Name == "Summon"), Unit_Attack = 5, Unit_Awareness = "_a____", Unit_Defense = 0, Unit_Speed = 4, Unit_Name = "Raider", Unit_MaxHP = 3, Unit_Url = "/content/images/raider.png" },
                 new Card { Name = "Lightning Bolt",   ManaCost = 1,     Description = "Strikes a creature with a surge of lightning.", CardArtUrl="/content/images/LightningBolt.png", CardType = cardTypes.Single(t => t.Name == "Spell") },
             };
             cards.ForEach(c => context.Cards.Add(c));

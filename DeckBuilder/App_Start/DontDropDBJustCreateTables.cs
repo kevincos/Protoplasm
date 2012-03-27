@@ -13,6 +13,7 @@ using System;
 
 namespace DeckBuilder.App_Start
 {
+    /*
     public class DontDropDbJustCreateTablesIfModelChanged<T>
                             : IDatabaseInitializer<T> where T : DbContext
     {
@@ -168,5 +169,5 @@ namespace DeckBuilder.App_Start
             @"Select COUNT(*) 
                 FROM INFORMATION_SCHEMA.TABLES T 
                 Where T.TABLE_NAME = 'EdmMetaData'";
-    }
+    }*/
 }
