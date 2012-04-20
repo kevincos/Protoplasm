@@ -15,6 +15,8 @@ using SignalR;
 using SignalR.Hosting.AspNet;
 using System.IO.Compression;
 
+using DeckBuilder.Helpers;
+using DeckBuilder.Games;
 using DeckBuilder.Async;
 
 namespace DeckBuilder.Controllers
@@ -55,74 +57,64 @@ namespace DeckBuilder.Controllers
                 return RedirectToAction("Details", "Table", new { id = id });
             }
 
-            // Case 1 - Player is active
             Seat currentSeat = table.Seats.Where(s => s.Player.Name == User.Identity.Name).Single();
 
-            ViewBag.YourTurn = currentSeat.Active;
-            ViewBag.PlayerName = User.Identity.Name;
+            if (table.Game == "Geomancer")
+            {
+                // DATABASE DECOMPRESS: decompress from database
+                GeomancerState masterState = (GeomancerState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
+                // WIRE COMPRESS : Send client specific game state                     
+                GeomancerState clientState = masterState.GetClientState(currentSeat.PlayerId);
+                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) })));
+            }
+            else if (table.Game == "RPS")
+            {
+                // DATABASE DECOMPRESS: decompress from database
+                RPSState masterState = (RPSState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) }));
+                // WIRE COMPRESS : Send client specific game state                     
+                RPSState clientState = masterState.GetClientState(currentSeat.PlayerId);
+                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) })));
+            }
+            else if (table.Game == "Onslaught")
+            {
+                // DATABASE DECOMPRESS: decompress from database
+                OnslaughtState masterState = (OnslaughtState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
+                // WIRE COMPRESS : Send client specific game state                     
+                OnslaughtState clientState = masterState.GetClientState(currentSeat.PlayerId);
+                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) })));
+            }
+            else if (table.Game == "Connect4")
+            {
+                // DATABASE DECOMPRESS: decompress from database
+                Connect4State masterState = (Connect4State)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update) }));
+                // WIRE COMPRESS : Send client specific game state                     
+                Connect4State clientState = masterState.GetClientState(currentSeat.PlayerId);
+                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update)})));
+            }
+            else if (table.Game == "CanyonConvoy")
+            {
+                // DATABASE DECOMPRESS: decompress from database
+                ConvoyState masterState = (ConvoyState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) }));
+                // WIRE COMPRESS : Send client specific game state                     
+                ConvoyState clientState = masterState.GetClientState(currentSeat.PlayerId);
+                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) })));
+            }
+            else if (table.Game == "Mechtonic")
+            {
+                // DATABASE DECOMPRESS: decompress from database
+                MechtonicState masterState = (MechtonicState)Compression.DecompressGameState(table.GameState, MechtonicState.GetSerializer());
+                // WIRE COMPRESS : Send client specific game state                     
+                MechtonicState clientState = masterState.GetClientState(currentSeat.PlayerId);
+                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, MechtonicState.GetSerializer()));
+            }
+            else
+            {
+                throw new Exception("Unknown Game: " + table.Game);
+            }
+            ViewBag.game = table.Game;
+            ViewBag.TableId = table.TableID;
             ViewBag.PlayerId = currentSeat.PlayerId;
-            ViewBag.TableId = id;
-            if (table.TotalTurns > 0)
-            {
-                ViewBag.Results = table.Results;
-            }
-            if (table.Finished)
-            {
-                ViewBag.FinalResults = table.FinalResults;
-            }
-            ViewBag.Finished = table.Finished;
-            ViewBag.PlayerScore = currentSeat.Wins;
-
-            // ASSUMES ONLY 2 PLAYERS
-            Seat opponentSeat = table.Seats.Where(s => s.Player.Name != User.Identity.Name).Single();
-            ViewBag.OpponentName = opponentSeat.Player.Name;
-            ViewBag.OpponentScore = opponentSeat.Wins;
-
-            if (table.Finished == false)
-            {
-                if (currentSeat.Active == true)
-                {
-                    ViewBag.Message = "YOUR TURN!";
-                    ViewBag.MoveList = new SelectList(new List<string> { "Rock", "Paper", "Scissors" });
-                }
-                else
-                {
-                    ViewBag.Message = "You've played " + currentSeat.LastMove + "! Waiting for opponent...";
-                }
-            }
-
-            // DATABASE DECOMPRESS: decompress from database
-            string minijson = table.GameState;
-            string json = "";            
-            using (var decomStream = new MemoryStream(Encoding.Default.GetBytes(minijson)))
-            {
-                using (var hgs = new GZipStream(decomStream, CompressionMode.Decompress))
-                {
-                    using (var reader = new StreamReader(hgs))
-                    {
-                        json = reader.ReadToEnd();
-                    }
-                }
-            }
-
-            System.Runtime.Serialization.Json.DataContractJsonSerializer deserializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
-            MemoryStream masterStream = new MemoryStream(Encoding.Default.GetBytes(json));
-            GeomancerState masterState = (GeomancerState)deserializer.ReadObject(masterStream);
-            foreach (GeomancerPlayerContext playerContext in masterState.playerContexts)
-            {
-                playerContext.deck = null;
-                if (playerContext.playerId != currentSeat.PlayerId)
-                {
-                    playerContext.hand = null;
-                }
-            }
-            System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
-            MemoryStream ms = new MemoryStream();
-            serializer.WriteObject(ms, masterState);
-            string clientJson = Encoding.Default.GetString(ms.ToArray());
-
-            // WIRE COMPRESS : Send compressed game state to clinet
-            ViewBag.state = new HtmlString(clientJson);  
+            ViewBag.PlayerName = currentSeat.Player.Name;
 
             return View(table);
         }
@@ -133,131 +125,147 @@ namespace DeckBuilder.Controllers
         {
             Table table = db.Tables.Find(id);
             
-            // DATABASE DECOMPRESS: Get and decompress master state from database
-            string minijson = table.GameState;
-            string json = "";
-            using (var decomStream = new MemoryStream(Encoding.Default.GetBytes(minijson)))
-            {
-                using (var hgs = new GZipStream(decomStream, CompressionMode.Decompress))
-                {
-                    using (var reader = new StreamReader(hgs))
-                    {
-                        json = reader.ReadToEnd();
-                    }
-                }
-            }
-            System.Runtime.Serialization.Json.DataContractJsonSerializer deserializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
-            MemoryStream masterStream = new MemoryStream(Encoding.Default.GetBytes(json));
-            GeomancerState masterState = (GeomancerState)deserializer.ReadObject(masterStream);
-
-            // WIRE DECOMPRESS: Merge state with master gamestate
-
-
-
-            for (int a = 0; a < inputState.tileList.Count(); a++)
-            {
-                for (int b = 0; b < inputState.tileList[a].Count(); b++)
-                {
-                    GeomancerTile inputTile = inputState.tileList[a][b];
-                    GeomancerTile masterTile = masterState.tileList[a][b];
-                    if (inputTile != null)
-                    {
-                        if (inputTile.moveUnit != null)
-                        {
-                            masterTile.unit = inputTile.moveUnit;
-                            if (inputState.tileList[inputTile.moveUnit.moveA][inputTile.moveUnit.moveB].unit.used == true)
-                                masterState.tileList[inputTile.moveUnit.moveA][inputTile.moveUnit.moveB].unit = null;
-                            masterTile.moveUnit = null;
-                        }
-
-                    }
-                }
-            }
-            for (int a = 0; a < inputState.tileList.Count(); a++)
-            {
-                for (int b = 0; b < inputState.tileList[a].Count(); b++)
-                {
-                    GeomancerTile inputTile = inputState.tileList[a][b];
-                    GeomancerTile masterTile = masterState.tileList[a][b];
-                    if (inputTile != null)
-                    {
-                        if (inputTile.spell != null)
-                        {
-                            GeomancerCard sourceCard = inputState.playerContexts[inputState.activePlayerIndex].hand[inputTile.spell.sourceCardIndex];
-                            if (sourceCard.type == "Summon")
-                            {
-                                masterTile.unit = inputState.playerContexts[inputState.activePlayerIndex].hand[inputTile.spell.sourceCardIndex].castUnit;
-                                masterTile.unit.playerId = inputTile.spell.playerId;
-                            }
-                            if (sourceCard.type == "Crystal")
-                            {
-                                masterTile.crystal = inputState.playerContexts[inputState.activePlayerIndex].hand[inputTile.spell.sourceCardIndex].castCrystal;
-                                masterTile.crystal.playerId = inputTile.spell.playerId;
-                            }
-                            masterTile.spell = null;
-                        }
-                    }
-                }
-            }
-
-            masterState.playerContexts[inputState.activePlayerIndex].hand = inputState.playerContexts[inputState.activePlayerIndex].hand.Where(c => c.used == false).ToList();
-            Random r = new Random();
-            masterState.DrawCard(r, masterState.playerContexts[masterState.activePlayerIndex]);
-
-            masterState.activePlayerIndex++;
-            masterState.activePlayerIndex %= masterState.playerContexts.Count;
-
-            // DATABASE COMPRESS: Compress state for database storage
-            System.Runtime.Serialization.Json.DataContractJsonSerializer serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) });
-            MemoryStream ms = new MemoryStream();
-            serializer.WriteObject(ms, masterState);
-            ms.Close();
-            MemoryStream compressStream = new MemoryStream(ms.ToArray());
-            minijson = "";
-            using (var cmpStream = new MemoryStream())
-            {
-                using (var hgs = new GZipStream(cmpStream, CompressionMode.Compress))
-                {
-                    compressStream.CopyTo(hgs);
-                }
-                minijson = Encoding.Default.GetString(cmpStream.ToArray());
-            }                                               
-            json = Encoding.Default.GetString(ms.ToArray());
-            
-            //table.GameState = json;
-            table.GameState = minijson;
+            // Get and decompress master state from database                        
+            GeomancerState masterState = (GeomancerState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
+            // Merge state with master gamestate
+            masterState.Update(inputState);          
+            // Compress state for database storage
+            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
             db.SaveChanges();
 
-            
+            // Send updated states to clients
             IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
             dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (GeomancerPlayerContext playerContext in masterState.playerContexts)
-            {
-                playerContext.deck = null;
-            }
             foreach (Seat s in table.Seats)
             {
-                List<List<GeomancerCard>> savedHands = new List<List<GeomancerCard>>();
-                foreach (GeomancerPlayerContext playerContext in masterState.playerContexts)
-                {
-                    savedHands.Add(playerContext.hand);
-                    if (s.PlayerId != playerContext.playerId)
-                    {
-                        playerContext.hand = null;
-                    }
-                    
-                }
-                // WIRE COMPRESS: Send compact version to client                   
-                clients[s.Player.Name].updateGameState(masterState);
-                for(int i = 0;i < masterState.playerContexts.Count; i++)
-                {
-                    GeomancerPlayerContext playerContext = masterState.playerContexts[i];
-                    playerContext.hand = savedHands[i];
-                }
+                clients[s.Player.Name + id].updateGameState(masterState.GetClientState(s.PlayerId));
             }
 
-            // WIRE COMPRESS: Return compact version to client
-            //return Json(masterState);
+            return View();
+        }
+
+        // Update
+        [HttpPost]
+        public ActionResult UpdateRPS(int id, RPSState inputState)
+        {
+            Table table = db.Tables.Find(id);
+
+            // Get and decompress master state from database                        
+            RPSState masterState = (RPSState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) }));
+            // Merge state with master gamestate
+            masterState.Update(inputState);
+            // Compress state for database storage
+            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) }));
+            db.SaveChanges();
+
+            // Send updated states to clients
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (Seat s in table.Seats)
+            {
+                clients[s.Player.Name+id].rps_updateGameState(masterState.GetClientState(s.PlayerId));
+            }
+
+            return View();
+        }
+
+        // Update
+        [HttpPost]
+        public ActionResult UpdateOnslaught(int id, OnslaughtUpdate inputState)
+        {
+            Table table = db.Tables.Find(id);
+
+            // Get and decompress master state from database                        
+            OnslaughtState masterState = (OnslaughtState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
+            // Merge state with master gamestate
+            masterState.Update(inputState);
+            // Compress state for database storage
+            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
+            db.SaveChanges();
+
+            // Send updated states to clients
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (Seat s in table.Seats)
+            {
+                clients[s.Player.Name + id].onslaught_updateGameState(masterState.GetClientState(s.PlayerId));
+            }
+
+            return View();
+        }
+
+        // Update
+        [HttpPost]
+        public ActionResult UpdateConnect4(int id, Connect4Update inputState)
+        {
+            Table table = db.Tables.Find(id);
+
+            // Get and decompress master state from database                        
+            Connect4State masterState = (Connect4State)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update) }));
+            // Merge state with master gamestate
+            masterState.Update(inputState);
+            // Compress state for database storage
+            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update) }));
+            db.SaveChanges();
+
+            // Send updated states to clients
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (Seat s in table.Seats)
+            {
+                clients[s.Player.Name + id].connect4_updateGameState(masterState.GetClientState(s.PlayerId));
+            }
+
+            return View();
+        }
+
+        // Update
+        [HttpPost]
+        public ActionResult UpdateConvoy(int id, ConvoyUpdate inputState)
+        {
+            Table table = db.Tables.Find(id);
+
+            // Get and decompress master state from database                        
+            ConvoyState masterState = (ConvoyState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) }));
+            // Merge state with master gamestate
+            masterState.Update(inputState);
+            // Compress state for database storage
+            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) }));
+            db.SaveChanges();
+
+            // Send updated states to clients
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (Seat s in table.Seats)
+            {
+                clients[s.Player.Name + id].convoy_updateGameState(masterState.GetClientState(s.PlayerId));
+            }
+
+            return View();
+        }
+
+        // Update
+        [HttpPost]
+        public ActionResult UpdateMechtonic(int id, MechtonicUpdate inputState)
+        {
+            Table table = db.Tables.Find(id);
+
+            // Get and decompress master state from database                        
+            MechtonicState masterState = (MechtonicState)Compression.DecompressGameState(table.GameState, MechtonicState.GetSerializer());
+            // Merge state with master gamestate
+            masterState.Update(inputState);
+            // Compress state for database storage
+            table.GameState = Compression.CompressGameState(masterState, MechtonicState.GetSerializer());
+            db.SaveChanges();
+
+            // Send updated states to clients
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (Seat s in table.Seats)
+            {
+                clients[s.Player.Name + id].mechtonic_updateGameState(masterState.GetClientState(s.PlayerId));
+            }
+
             return View();
         }
 

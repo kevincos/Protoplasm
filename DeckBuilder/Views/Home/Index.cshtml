@@ -1,3 +1,27 @@
 ﻿@{
-    ViewBag.Title = "Deck Builder";
+    ViewBag.Title = "Protoplasm";    
+}
+
+@foreach (var post in ViewBag.TopPosts)
+{
+    <div class = "PostHeader">
+        <div class="PostHeaderImage" style = "float:left">
+            <img src = @post.Player.ProfileImageUrl/>
+        </div>        
+        
+        <div class="PostHeaderInfo" >
+            <div class = "PostTitle">
+                @post.Title
+            </div>
+    
+            <span class = "PostName">
+                @post.Player.Name
+            </span>
+            <span class = "PostDate">
+                @post.Date
+            </span>
+        </div>
+    
+    </div>
+    @Html.Raw(HttpUtility.HtmlDecode(post.Content));
 }

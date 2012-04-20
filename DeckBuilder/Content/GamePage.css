@@ -1,0 +1,82 @@
+﻿.logsection
+{
+    background-color: #D3D3D3;
+    font-size: .85em;
+    font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
+    color: #000000;
+    overflow: auto;      
+    margin: 0em;  
+    padding: 1em;   
+    border: 5px ridge #a0a0a0
+}
+
+#log
+{
+    height: 16em;
+    width: 300px;          
+}
+
+#chat 
+{
+    height: 13em;    
+    width: 360px;        
+}
+
+#lobbychat 
+{
+    height: 30em;    
+    width: 600px;        
+}
+
+
+#playerList
+{
+    width: 14em;
+    height: 30em;
+}
+
+#playerCheckbox
+{
+    display:block;
+}
+
+#proposalList
+{
+    height: 15em;
+    width: 30em;
+}
+
+#chatline
+{
+}
+
+#chatinput
+{    
+    width: 24em;
+}
+
+#chatbutton
+{    
+    width: 5em;
+}
+
+#lobbychatinput
+{    
+    width: 34em;
+}
+
+#lobbychatbutton
+{    
+    width: 5em;
+}
+
+#datablock
+{
+    background-color: #A3A3A3;
+    width: 750px;
+    height: 15em;
+    padding: 20px;
+    border: 5px ridge #808080;
+    margin-top: -4px;   
+    
+}

@@ -65,6 +65,22 @@
         </div>
 
         <div class="editor-label">
+            @Html.LabelFor(model => model.Crystal_Mana)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Crystal_Mana)
+            @Html.ValidationMessageFor(model => model.Crystal_Mana)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Crystal_Range)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Crystal_Range)
+            @Html.ValidationMessageFor(model => model.Crystal_Range)
+        </div>
+
+        <div class="editor-label">
             @Html.LabelFor(model => model.Unit_Name)
         </div>
         <div class="editor-field">

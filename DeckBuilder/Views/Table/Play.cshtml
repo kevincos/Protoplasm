@@ -2,46 +2,71 @@
     ViewBag.Title = "Play";
 }
 
-<h2>Play</h2>
+<div class="gameArea">
+    <canvas id="canvas" width="800" height="600">
+    <p>Your browser does not support the canvas element.</p>
+    </canvas>
 
+    <div id="datablock">
+        <div style = "float:left">        
+            <div id="chat" class="logsection">        
+            </div>
+            <form id="chatform">
+                <input id="chatinput"/>        
+                <button id="chatbutton" type = "submit">Say</button>
+            </form>
+        </div>
 
-<canvas id="canvas" width="800" height="800">
-<p>Your browser does not support the canvas element.</p>
-</canvas>
-
-<button id = "postheta" >Rotate +</button>
-<button id = "negtheta" >Rotate -</button>
+        <div style = "float: right">
+            <div id="log" class="logsection">        
+            </div>
+        </div>
+    </div>
+</div>
 
 <button id = "submitGameMove">Submit</button>
 
-<script type="text/javascript">
-    window.onload = init(@ViewBag.state, "@ViewBag.TableId", "@ViewBag.PlayerId");    
-</script>
-
-
-<p>@ViewBag.Results</p>
-
-@if (ViewBag.Finished == true)
+@if (ViewBag.Game == "Geomancer")
 {
-    <p>@ViewBag.FinalResults</p>
-    <p>Final Score</p>
+    <script type="text/javascript">
+        window.onload = geomancer_init(@ViewBag.state);    
+    </script>
+}
+else if (ViewBag.Game == "Onslaught")
+{
+    <script type="text/javascript">
+        window.onload = onslaught_init(@ViewBag.state);    
+    </script>
+}
+else if (ViewBag.Game == "Connect4")
+{
+    <script type="text/javascript">
+        window.onload = connect4_init(@ViewBag.state);    
+    </script>
+}
+else if (ViewBag.Game == "CanyonConvoy")
+{
+    <script type="text/javascript">
+        window.onload = convoy_init(@ViewBag.state);    
+    </script>
+}
+else if (ViewBag.Game == "Mechtonic")
+{
+    <script type="text/javascript">
+        window.onload = mechtonic_init(@ViewBag.state);    
+    </script>
+}
+else if (ViewBag.Game == "RPS")
+{
+        <script type="text/javascript">
+        window.onload = rps_init(@ViewBag.state);    
+    </script>
 }
 else
 {
-    <p>Current Score (Best to 3 wins)</p>
-}
-<ul>
-<li>@ViewBag.PlayerName : @ViewBag.PlayerScore</li>
-<li>@ViewBag.OpponentName : @ViewBag.OpponentScore</li>
-</ul>
-
-
-
-@ViewBag.Message
-@if (ViewBag.YourTurn == true && ViewBag.Finished == false)
-{
-    @Html.DropDownList("MoveList")
-    <input type="button" id="playMove"/>
+    <script type="text/javascript">
+        window.onload = alert("INVALID GAME");
+    </script>
 }
 
 <script type="text/javascript">

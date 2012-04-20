@@ -10,6 +10,8 @@ namespace DeckBuilder.Models
 {
     public class DeckBuilderContext: DbContext
     {
+        public DbSet<Post> Posts { get; set; }
+
         public DbSet<Player> Players { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<CardType> CardTypes { get; set; }

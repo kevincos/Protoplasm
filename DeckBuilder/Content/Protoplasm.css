@@ -1,0 +1,145 @@
+﻿body {
+    background-color: #999999;    
+    font-size: .85em;
+    font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
+    margin: 0;
+    padding: 0;
+    color: #0;
+    background-image:url("/content/images/ui/bg2.png");
+    
+}
+
+a:link {
+    color: #034af3;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #505abc;
+}
+
+a:hover {
+    color: #1d60ff;
+    text-decoration: none;
+}
+
+a:active {
+    color: #12eb87;
+}
+
+p, ul {
+    margin-bottom: 20px;
+    line-height: 1.6em;
+}
+
+header,
+footer,
+nav,
+section {
+    display: block;
+}
+
+
+.content 
+{
+    width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #E1EAE1;
+    padding:0px;
+    padding-top:2px;
+    margin-top:5px;
+}
+
+.page {
+    width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    padding:0px;
+    margin-top:0px;
+}
+
+.gameArea 
+{
+    margin-left: auto;
+    margin-right: auto;   
+    width: 800px; 
+}
+
+.logo
+{
+    display:inline;
+    float:left;
+    text-align: left;
+    font-weight:bold;
+    font-size: 50px;
+    text-shadow: 1px 1px 2px #111;
+    margin:0px;
+    margin-top:-25px;
+    padding: 0px;
+    line-height:normal;
+}
+
+#navbar
+{
+    margin-top:20px;
+    width: 870px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#main {
+    padding: 5px 15px 15px 15px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 840px;
+    background-color: #fff;
+    border-radius: 4px 0 0 0;
+    -webkit-border-radius: 4px 0 0 0;
+    -moz-border-radius: 4px 0 0 0;
+}
+
+
+
+.PostHeader
+{
+    background-color: #CECECE;
+    height: 2cm;
+    border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+}
+
+.PostHeaderImage
+{
+    float: left;
+    padding: .2cm;
+}
+
+.PostHeaderInfo
+{    
+}
+
+.PostDate 
+{
+    font-size: 1.2em;    
+    color: Black;
+}
+
+.PostName
+{
+    font-size: 1.2em;    
+    color: Black;
+    margin:0px;
+    padding: 0px;
+}
+
+.PostTitle
+{
+    margin:0px;
+    padding: 0px;
+    font-size: 3em;    
+    font-weight: bold;
+    color: Black;
+}
+

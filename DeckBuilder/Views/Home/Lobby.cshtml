@@ -2,18 +2,31 @@
     ViewBag.Title = "Lobby";
 }
 
-<h2>Lobby</h2>
+<h2>@Html.DropDownList("LobbyRoom")</h2>
 
-<ul id="chat_messages"></ul>
+<div style = "display:block; height:30em">
+    <div style="display:inline; float:left">
+        <div id="lobbychat" class="logsection">        
+        </div>
 
-<input type="text" id="chat_text"/>
-<input type="button" id="chat_broadcast" value="Chat" />
-
-<ul id="chat_playerList"></ul>
-
-<div id="proposal" />
+        <form id="chatform">
+            <input id="lobbychatinput"/>        
+            <button id="lobbychatbutton" type = "submit">Say</button>
+        </form>
+    </div>
+    <div style="display:inline">
+        
+        <form id="playerList" class="logsection">
+        </form>
+    </div>
+</div>
 
 @Html.DropDownList("SelectedDeck")
+@Html.DropDownList("SelectedGame")
+<button id="proposalButton">Propose Game</button>    
+
+<div id="proposalList" class = "logsection">
+</div>
 
 <script type="text/javascript">
 

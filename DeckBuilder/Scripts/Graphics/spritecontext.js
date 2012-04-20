@@ -1,9 +1,13 @@
-﻿function SpriteContext(context2d) {
+﻿var blarg = 5;
+
+function SpriteContext(context2d, width, height) {
     this.context2d = context2d;
+    this.width = width;
+    this.height = height;
 };
 
 SpriteContext.prototype.clear = function () {
-    this.context2d.clearRect(0, 0, canvas.width, canvas.height);
+    this.context2d.clearRect(0, 0, this.width, this.height);
 }
 
 SpriteContext.prototype.draw = function (sprite, /*vector*/v, w, h, rotate, scale) {
@@ -17,8 +21,14 @@ SpriteContext.prototype.draw = function (sprite, /*vector*/v, w, h, rotate, scal
 }
 
 SpriteContext.prototype.text = function (text, v) {
-    this.context2d.font = '14px Verdana'
+    this.context2d.font = '14px Verdana';    
     this.context2d.fillText(text, v.x, v.y);
+}
+
+SpriteContext.prototype.formattedText = function (text, v, font, color) {
+    this.context2d.font = font;
+    this.context2d.fillStyle = color;
+    this.context2d.fillText(text, v.x - this.context2d.measureText(text).width / 2, v.y);
 }
 
 SpriteContext.prototype.textWrap = function (text, v, maxWidth, lineHeight) {
@@ -42,3 +52,5 @@ SpriteContext.prototype.textWrap = function (text, v, maxWidth, lineHeight) {
     }
     this.context2d.fillText(line, x, y);
 }
+
+

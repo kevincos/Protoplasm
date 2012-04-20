@@ -1,4 +1,6 @@
-﻿function initPlayArea(playerName, tableId) {
+﻿var logCount = 0;
+
+function initPlayArea(playerName, tableId) {
     $("document").ready(function () {
         var playConnection = $.connection.gameList;
 
@@ -7,26 +9,56 @@
         };
 
         playConnection.updateGameState = function (data) {
-            gameState = data;            
-            activePlayerId = gameState.playerContexts[gameState.activePlayerIndex].playerId;
-            for (var i = 0; i < gameState.playerContexts.length; i++) {
-                if (gameState.playerContexts[i].playerId == currentPlayerId) {
-                    currentPlayerIndex = i;
-                    playerHand = gameState.playerContexts[i].hand;
-                }
-            }
-            refreshView = true;
+            geomancer_setGameState(data);
         };
 
-        $("#playMove").click(function () {
-            var dropdowndebug = $('#MoveList');
-            var valdebug = dropdowndebug.val();
-            playConnection.submitMove(tableId, playerName, $('#MoveList').val());
-        });
+        playConnection.rps_updateGameState = function (data) {
+            rps_setGameState(data);
+        };
 
+        playConnection.onslaught_updateGameState = function (data) {
+            onslaught_setGameState(data);
+        };
+
+        playConnection.connect4_updateGameState = function (data) {
+            connect4_setGameState(data);
+        };
+
+        playConnection.convoy_updateGameState = function (data) {
+            convoy_setGameState(data);
+        };
+
+        playConnection.mechtonic_updateGameState = function (data) {
+            mechtonic_setGameState(data);
+        };
+
+        playConnection.update_chat = function (data) {
+            var chatlog = $("#chat");
+            chatlog.append("<div id='chatline'>" + data + "</div>");
+            chatlog.scrollTop(chatlog[0].scrollHeight);
+        };
+
+        $("#chatform").submit(function () {
+            if ($("#chatinput").val() != "") {
+                playConnection.chat(tableId, $("#chatinput").val());
+                $("#chatinput").val("");
+            }
+            $("#chatinput").focus();
+            return false;
+        });
 
         $.connection.hub.start(function () {
-            playConnection.enterGame(playerName);
+            playConnection.enterGame(playerName + tableId);
         });
     });
+
+};
+
+function updateLogs(logs) {
+    for (var i = logCount; i < logs.length; i++) {
+        var loglist = $("#log");
+        loglist.append("<div id='chatline'>" + logs[i] + "</div>");
+        loglist.scrollTop(loglist[0].scrollHeight);
+    }
+    logCount = logs.length;
 };

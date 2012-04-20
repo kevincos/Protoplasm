@@ -11,6 +11,8 @@ namespace DeckBuilder.Async
 {
     public class GameProposal
     {
+        public String game = "";
+
         public String player1;
         public bool player1Confirmed = false;
         public int player1Deck;
@@ -61,6 +63,90 @@ namespace DeckBuilder.Async
         }
     }
 
+    public class ProposalPlayerStatus
+    {
+        public string name { get; set; }
+        public bool ready { get; set; }        
+    }
+
+    public class Proposal
+    {
+        public static int latestID = 0;
+
+        public int ProposalID { get; set; }
+        public string game { get; set; }
+        public int hostIndex { get; set; }
+        public List<ProposalPlayerStatus> players { get; set; }
+        public List<string> withdrawnPlayers { get; set; }
+
+        public Proposal(string hostPlayer, List<string> opponents, string game)
+        {
+            this.ProposalID = latestID;
+            latestID++;
+            this.game = game;
+            this.hostIndex = 0;
+            players = new List<ProposalPlayerStatus>();
+            players.Add(new ProposalPlayerStatus { name = hostPlayer, ready = true });
+            foreach (string opponent in opponents)
+            {
+                players.Add(new ProposalPlayerStatus { name = opponent, ready = false });
+            }
+        }
+
+        public bool Involves(string playerName)
+        {
+            foreach (ProposalPlayerStatus p in players)
+            {
+                if (p.name == playerName)
+                    return true;
+            }
+            return false;
+        }
+
+        public List<String> PlayerNames
+        {
+            get
+            {
+                return players.Select(p => p.name).ToList();
+            }
+        }
+
+        public void Cancel(string name)
+        {
+            players.RemoveAll(p => p.name == name);
+            foreach (ProposalPlayerStatus player in players)
+            {
+                player.ready = false;
+            }            
+        }
+
+        public void Confirm(string name)
+        {
+            foreach (ProposalPlayerStatus player in players)
+            {
+                if (player.name == name)
+                {
+                    player.ready = true;
+                }
+            }
+        }
+
+        public bool Final
+        {
+            get
+            {
+                foreach (ProposalPlayerStatus player in players)
+                {
+                    if (player.ready == false)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+    }
+
     public class LobbyChat : Hub, IDisconnect
     {
         private DeckBuilderContext db = new DeckBuilderContext();
@@ -68,6 +154,7 @@ namespace DeckBuilder.Async
         public static Dictionary<string, int> activePlayers = new Dictionary<string,int>();
         public static Dictionary<string, string> connectionIdToName = new Dictionary<string, string>();
         public static List<GameProposal> proposals = new List<GameProposal>();
+        public static List<Proposal> activeProposals = new List<Proposal>();
 
         public void Reset()
         {
@@ -92,13 +179,39 @@ namespace DeckBuilder.Async
             Clients.addPlayer(data);         
         }
 
+        public List<Proposal> GetProposalsForPlayer(string player)
+        {
+            return activeProposals.Where(p => p.Involves(player)==true).ToList();
+        }
 
+        public void UpdateClients(Proposal p, string cancelledPlayer)
+        {
+            foreach (string name in p.PlayerNames)
+            {
+                List<Proposal> proposals = GetProposalsForPlayer(name);
+                Clients[name].updateProposals(proposals);
+            }
+            if (cancelledPlayer != null)
+            {
+                List<Proposal> proposals = GetProposalsForPlayer(cancelledPlayer);
+                Clients[cancelledPlayer].updateProposals(proposals);
+            }
+        }
 
-        public void ProposeGame(string opponent)
+        public void NewProposal(string hostPlayer, List<string> opponents, string game)
+        {
+            Proposal p = new Proposal(hostPlayer, opponents, game);
+            activeProposals.Add(p);
+            UpdateClients(p,null);
+            return;
+        }
+
+        public void ProposeGame(string opponent, string game)
         {
             if (activePlayers.ContainsKey(opponent))
             {
                 GameProposal proposal = new GameProposal();
+                proposal.game = game;
                 proposal.player1 = Caller.name;
                 proposal.player2 = opponent;
                 bool proposalExists = false;
@@ -112,6 +225,75 @@ namespace DeckBuilder.Async
 
                 Clients[opponent].proposalNotification(Caller.name);
             }
+        }
+
+        public void CancelProposal(int id, string name)
+        {
+            Proposal proposal = activeProposals.Find(p => p.ProposalID == id);
+            if (proposal != null)
+            {
+                proposal.Cancel(name);
+                if (proposal.PlayerNames.Count < 2)
+                {
+                    activeProposals.Remove(proposal);
+                }
+                UpdateClients(proposal, name);
+            }
+            return;
+        }
+
+        public void ConfirmProposal(int id, string name)
+        {
+            Proposal proposal = activeProposals.Find(p => p.ProposalID == id);
+            if (proposal != null)
+            {
+                proposal.Confirm(name);
+                if (proposal.Final == true)
+                {
+                    // Create game
+                    // NOTE: GAME CREATION DOES NOT BELONG IN LOBBY CODE
+
+                    // Create Table
+                    Table newTable = new Table();
+                    newTable = db.Tables.Add(newTable);
+                    db.SaveChanges();
+
+                    // Create Seats
+                    foreach (string playerName in proposal.PlayerNames)
+                    {
+                        Player p = db.Players.Where(pl => pl.Name == playerName).Single();
+                        
+                        Seat s = new Seat
+                        {
+                            PlayerId = p.PlayerID,
+                            TableId = newTable.TableID,
+                            DeckId = p.Decks.First().DeckID,
+                            Active = true
+                        };
+                        db.Seats.Add(s);                        
+                    }
+
+                    db.SaveChanges();
+
+                    newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
+                    newTable.Game = proposal.game;
+                    newTable.GenerateInitialState();
+                    db.SaveChanges();
+
+                    activeProposals.Remove(proposal);
+
+                    // Redirect plyaers to game
+                    foreach (string playerName in proposal.PlayerNames)
+                    {
+                        Clients[playerName].beginGame(newTable.TableID);
+                    }                                                       
+                }
+                else
+                {
+                    UpdateClients(proposal,null);
+                }
+            }
+            return;
         }
 
         public void Confirm(string opponent, int deckId)
@@ -154,7 +336,7 @@ namespace DeckBuilder.Async
                         db.SaveChanges();
 
                         newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
-
+                        newTable.Game = p.game;
                         newTable.GenerateInitialState();
                         db.SaveChanges();
 
@@ -169,11 +351,13 @@ namespace DeckBuilder.Async
             }
         }
 
-        public void Broadcast(string data)
+        public void Broadcast(string chatText)
         {
             
             // Invoke a method on the calling client
-            Clients.addMessage(Caller.name + ": " + data);            
+            //Clients.addMessage(Caller.name + ": " + data);
+
+            Clients.addMessage(DateTime.Now.Hour + ":" + DateTime.Now.Minute + "  " + Context.User.Identity.Name + ": " + chatText);
         }
 
         public void LeaveLobby()
