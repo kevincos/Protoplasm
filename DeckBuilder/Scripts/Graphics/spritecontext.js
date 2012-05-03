@@ -31,6 +31,11 @@ SpriteContext.prototype.formattedText = function (text, v, font, color) {
     this.context2d.fillText(text, v.x - this.context2d.measureText(text).width / 2, v.y);
 }
 
+SpriteContext.prototype.setTextType = function (font, color) {
+    this.context2d.font = font;
+    this.context2d.fillStyle = color;
+}
+
 SpriteContext.prototype.textWrap = function (text, v, maxWidth, lineHeight) {
     var words = text.split(" ");
     var line = "";

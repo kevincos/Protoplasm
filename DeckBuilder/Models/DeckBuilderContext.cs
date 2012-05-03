@@ -36,6 +36,8 @@ namespace DeckBuilder.Models
 
             base.OnModelCreating(modelBuilder);
         }
+
+        public DbSet<Game> Games { get; set; }
         
     }
 }

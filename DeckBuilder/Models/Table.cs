@@ -7,8 +7,15 @@ using System.Text;
 using System.IO;
 using System.IO.Compression;
 
+using DeckBuilder.Protoplasm;
 using DeckBuilder.Helpers;
 using DeckBuilder.Games;
+
+using IronPython.Hosting;
+using Microsoft.Scripting;
+using Microsoft.Scripting.Hosting;
+using System.Web.Hosting;
+using DeckBuilder.Controllers;
 
 namespace DeckBuilder.Models
 {
@@ -22,49 +29,49 @@ namespace DeckBuilder.Models
         // Serialized Game State
         public string GameState { get; set; }
 
-        public string Game { get; set; }
+        public int GameId { get; set; }
+        public virtual Game Game { get; set; }
 
         public void GenerateInitialState()
         {
-            if (Game == "Geomancer")
+            if (Game.Name == "Geomancer")
             {
                 GeomancerState gameState = new GeomancerState();  
                 gameState.InitializeState(Seats.ToList());
                 GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
             }
-            else if (Game == "RPS")
-            {
-                RPSState gameState = new RPSState();
-                gameState.InitializeState(Seats.ToList());
-                GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext)}));                
-            }
-            else if (Game == "Onslaught")
+            else if (Game.Name == "Onslaught")
             {
                 OnslaughtState gameState = new OnslaughtState();
                 gameState.InitializeState(Seats.ToList());
                 GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
             }
-            else if (Game == "Connect4")
-            {
-                Connect4State gameState = new Connect4State();
-                gameState.InitializeState(Seats.ToList());
-                GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update)}));
-            }
-            else if (Game == "CanyonConvoy")
-            {
-                ConvoyState gameState = new ConvoyState();
-                gameState.InitializeState(Seats.ToList());
-                GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) }));
-            }
-            else if (Game == "Mechtonic")
+            else if (Game.Name == "Mechtonic")
             {
                 MechtonicState gameState = new MechtonicState();
                 gameState.InitializeState(Seats.ToList());
                 GameState = Compression.CompressGameState(gameState, MechtonicState.GetSerializer());
-            }   
+            }
             else
             {
-                throw new Exception("Invalid game: " + Game);
+                TableController.InitScriptEngine();
+                TableController.LoadModules(Game.Name, Game.PythonScript);
+
+                ScriptScope runScope = TableController.engine.CreateScope();
+                runScope.ImportModule("cPickle");
+                runScope.ImportModule("gamestate");
+                runScope.ImportModule(Game.Name);
+
+                // Input array of seats.
+                Seat[] seatsArray = Seats.ToArray();
+                runScope.SetVariable("seats", seatsArray);                
+
+                ScriptSource runSource = TableController.engine.CreateScriptSourceFromString("pickledState = cPickle.dumps("+Game.Name+".Init(seats),0)", SourceCodeKind.Statements);                
+
+                runSource.Execute(runScope);
+
+
+                GameState = Compression.CompressStringState(runScope.GetVariable("pickledState"));
             }
 
         }

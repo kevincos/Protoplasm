@@ -4,6 +4,7 @@
     this.canvas = null;
     this.spriteContext = null;
     this.currentTime = 0;
+    this.infoWindows = [];
 
 
     this.refreshView = true;
@@ -13,7 +14,6 @@
     this.draw = null;
     this.update = null;
 };
-
 
 GameCore.prototype.init = function () {
     this.canvas = document.getElementById('canvas');
@@ -25,10 +25,26 @@ GameCore.prototype.init = function () {
     setInterval(function () { T.updateLoop(); }, this.SECONDS_BETWEEN_FRAMES);
 };
 
+GameCore.prototype.UpdateInfoWindow = function (name, text) {
+    for (var i = 0; i < this.infoWindows.length; i++) {
+        if (this.infoWindows[i].name == name) {
+            this.infoWindows[i].addText(text, 10);
+        }
+    }
+}
+
+GameCore.prototype.ResetInfoWindows = function () {
+    for (var i = 0; i < this.infoWindows.length; i++) {        
+        this.infoWindows[i].clear();        
+    }
+}
+
 GameCore.prototype.updateLoop = function () {
     if (vMath.mouseDown == false) {
         this.mouseDown = false;
     }
+
+    this.ResetInfoWindows();
 
     if (this.update != null) {
         this.update();

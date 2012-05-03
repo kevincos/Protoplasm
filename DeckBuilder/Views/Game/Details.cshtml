@@ -1,0 +1,30 @@
+﻿@model DeckBuilder.Models.Game
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Game</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">PythonScript</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PythonScript)
+    </div>
+
+    <div class="display-label">MaxPlayers</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.MaxPlayers)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.GameID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

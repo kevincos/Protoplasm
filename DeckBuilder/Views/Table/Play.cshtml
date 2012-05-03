@@ -26,6 +26,8 @@
 
 <button id = "submitGameMove">Submit</button>
 
+
+
 @if (ViewBag.Game == "Geomancer")
 {
     <script type="text/javascript">
@@ -38,36 +40,19 @@ else if (ViewBag.Game == "Onslaught")
         window.onload = onslaught_init(@ViewBag.state);    
     </script>
 }
-else if (ViewBag.Game == "Connect4")
-{
-    <script type="text/javascript">
-        window.onload = connect4_init(@ViewBag.state);    
-    </script>
-}
-else if (ViewBag.Game == "CanyonConvoy")
-{
-    <script type="text/javascript">
-        window.onload = convoy_init(@ViewBag.state);    
-    </script>
-}
 else if (ViewBag.Game == "Mechtonic")
 {
     <script type="text/javascript">
         window.onload = mechtonic_init(@ViewBag.state);    
     </script>
 }
-else if (ViewBag.Game == "RPS")
-{
-        <script type="text/javascript">
-        window.onload = rps_init(@ViewBag.state);    
-    </script>
-}
 else
-{
-    <script type="text/javascript">
-        window.onload = alert("INVALID GAME");
+{ 
+    <script type="text/javascript">        
+        window.onload = main_init(@ViewBag.state);   
     </script>
 }
+
 
 <script type="text/javascript">
 

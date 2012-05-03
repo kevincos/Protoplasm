@@ -256,6 +256,7 @@ namespace DeckBuilder.Async
                     // Create Table
                     Table newTable = new Table();
                     newTable = db.Tables.Add(newTable);
+                    newTable.Game = db.Games.Single(g => g.Name == proposal.game);
                     db.SaveChanges();
 
                     // Create Seats
@@ -276,7 +277,7 @@ namespace DeckBuilder.Async
                     db.SaveChanges();
 
                     newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
-                    newTable.Game = proposal.game;
+                    
                     newTable.GenerateInitialState();
                     db.SaveChanges();
 
@@ -336,7 +337,7 @@ namespace DeckBuilder.Async
                         db.SaveChanges();
 
                         newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
-                        newTable.Game = p.game;
+                        newTable.Game = db.Games.Single(g => g.Name == p.game);
                         newTable.GenerateInitialState();
                         db.SaveChanges();
 

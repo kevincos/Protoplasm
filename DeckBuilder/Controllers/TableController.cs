@@ -18,6 +18,12 @@ using System.IO.Compression;
 using DeckBuilder.Helpers;
 using DeckBuilder.Games;
 using DeckBuilder.Async;
+using DeckBuilder.Protoplasm;
+
+using IronPython.Hosting;
+using Microsoft.Scripting;
+using Microsoft.Scripting.Hosting;
+using System.Web.Hosting;
 
 namespace DeckBuilder.Controllers
 { 
@@ -59,7 +65,7 @@ namespace DeckBuilder.Controllers
 
             Seat currentSeat = table.Seats.Where(s => s.Player.Name == User.Identity.Name).Single();
 
-            if (table.Game == "Geomancer")
+            if (table.Game.Name == "Geomancer")
             {
                 // DATABASE DECOMPRESS: decompress from database
                 GeomancerState masterState = (GeomancerState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
@@ -67,15 +73,7 @@ namespace DeckBuilder.Controllers
                 GeomancerState clientState = masterState.GetClientState(currentSeat.PlayerId);
                 ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) })));
             }
-            else if (table.Game == "RPS")
-            {
-                // DATABASE DECOMPRESS: decompress from database
-                RPSState masterState = (RPSState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) }));
-                // WIRE COMPRESS : Send client specific game state                     
-                RPSState clientState = masterState.GetClientState(currentSeat.PlayerId);
-                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) })));
-            }
-            else if (table.Game == "Onslaught")
+            else if (table.Game.Name == "Onslaught")
             {
                 // DATABASE DECOMPRESS: decompress from database
                 OnslaughtState masterState = (OnslaughtState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
@@ -83,23 +81,7 @@ namespace DeckBuilder.Controllers
                 OnslaughtState clientState = masterState.GetClientState(currentSeat.PlayerId);
                 ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) })));
             }
-            else if (table.Game == "Connect4")
-            {
-                // DATABASE DECOMPRESS: decompress from database
-                Connect4State masterState = (Connect4State)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update) }));
-                // WIRE COMPRESS : Send client specific game state                     
-                Connect4State clientState = masterState.GetClientState(currentSeat.PlayerId);
-                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update)})));
-            }
-            else if (table.Game == "CanyonConvoy")
-            {
-                // DATABASE DECOMPRESS: decompress from database
-                ConvoyState masterState = (ConvoyState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) }));
-                // WIRE COMPRESS : Send client specific game state                     
-                ConvoyState clientState = masterState.GetClientState(currentSeat.PlayerId);
-                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) })));
-            }
-            else if (table.Game == "Mechtonic")
+            else if (table.Game.Name == "Mechtonic")
             {
                 // DATABASE DECOMPRESS: decompress from database
                 MechtonicState masterState = (MechtonicState)Compression.DecompressGameState(table.GameState, MechtonicState.GetSerializer());
@@ -109,9 +91,19 @@ namespace DeckBuilder.Controllers
             }
             else
             {
-                throw new Exception("Unknown Game: " + table.Game);
+                string pickledState = Compression.DecompressStringState(table.GameState);                
+                ViewBag.state = new HtmlString(GetPythonView(table, pickledState, currentSeat.PlayerId));
             }
-            ViewBag.game = table.Game;
+            /*else
+            {
+                // DATABASE DECOMPRESS: decompress from database
+                BaseGameState masterState = (BaseGameState)Compression.DecompressGameState(table.GameState, GameState<PlayerContext>.GetSerializer(table.Game.Name));
+                // WIRE COMPRESS : Send client specific game state                     
+                GameView clientState = masterState.GetClientView(currentSeat.PlayerId);
+                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, masterState.GetSerializer()));
+            }*/
+
+            ViewBag.game = table.Game.Name;
             ViewBag.TableId = table.TableID;
             ViewBag.PlayerId = currentSeat.PlayerId;
             ViewBag.PlayerName = currentSeat.Player.Name;
@@ -146,31 +138,6 @@ namespace DeckBuilder.Controllers
 
         // Update
         [HttpPost]
-        public ActionResult UpdateRPS(int id, RPSState inputState)
-        {
-            Table table = db.Tables.Find(id);
-
-            // Get and decompress master state from database                        
-            RPSState masterState = (RPSState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) }));
-            // Merge state with master gamestate
-            masterState.Update(inputState);
-            // Compress state for database storage
-            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(RPSState), new Type[] { typeof(RPSPlayerContext) }));
-            db.SaveChanges();
-
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
-            {
-                clients[s.Player.Name+id].rps_updateGameState(masterState.GetClientState(s.PlayerId));
-            }
-
-            return View();
-        }
-
-        // Update
-        [HttpPost]
         public ActionResult UpdateOnslaught(int id, OnslaughtUpdate inputState)
         {
             Table table = db.Tables.Find(id);
@@ -194,55 +161,6 @@ namespace DeckBuilder.Controllers
             return View();
         }
 
-        // Update
-        [HttpPost]
-        public ActionResult UpdateConnect4(int id, Connect4Update inputState)
-        {
-            Table table = db.Tables.Find(id);
-
-            // Get and decompress master state from database                        
-            Connect4State masterState = (Connect4State)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update) }));
-            // Merge state with master gamestate
-            masterState.Update(inputState);
-            // Compress state for database storage
-            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Connect4State), new Type[] { typeof(Connect4PlayerContext), typeof(Connect4Update) }));
-            db.SaveChanges();
-
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
-            {
-                clients[s.Player.Name + id].connect4_updateGameState(masterState.GetClientState(s.PlayerId));
-            }
-
-            return View();
-        }
-
-        // Update
-        [HttpPost]
-        public ActionResult UpdateConvoy(int id, ConvoyUpdate inputState)
-        {
-            Table table = db.Tables.Find(id);
-
-            // Get and decompress master state from database                        
-            ConvoyState masterState = (ConvoyState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) }));
-            // Merge state with master gamestate
-            masterState.Update(inputState);
-            // Compress state for database storage
-            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(ConvoyPiece), typeof(ConvoyTile), typeof(ConvoyUpdate) }));
-            db.SaveChanges();
-
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
-            {
-                clients[s.Player.Name + id].convoy_updateGameState(masterState.GetClientState(s.PlayerId));
-            }
-
-            return View();
-        }
 
         // Update
         [HttpPost]
@@ -268,6 +186,135 @@ namespace DeckBuilder.Controllers
 
             return View();
         }
+
+        public static ScriptEngine engine = null;
+        public static List<string> loadedModules = null;
+        public static List<string> errors = null;
+
+        public static void InitScriptEngine()
+        {
+            if (engine == null || loadedModules == null || errors == null)
+            {
+                engine = Python.CreateEngine();
+                var paths = engine.GetSearchPaths();
+                paths.Add(HostingEnvironment.MapPath(@"~/Python"));
+                engine.SetSearchPaths(paths);
+                loadedModules = new List<string>();
+                errors = new List<string>();
+            }            
+        }
+        public static void LoadModules(string moduleName, string code)
+        {
+            if (!loadedModules.Contains(moduleName))
+            {
+                ScriptScope moduleScope = engine.CreateModule(moduleName);
+                ScriptSource moduleSource = engine.CreateScriptSourceFromString(code, SourceCodeKind.File);
+                moduleSource.Execute(moduleScope);
+            }
+        }
+
+        public string GetPythonView(Table table, string pickledState, int playerId)
+        {
+            InitScriptEngine();
+            LoadModules(table.Game.Name, table.Game.PythonScript);
+            
+            ScriptScope runScope = engine.CreateScope();
+            runScope.ImportModule("cPickle");
+            
+            // Output state
+            JSONContainer jsonContainer = new JSONContainer { json = "ERROR" };
+            runScope.SetVariable("jsonContainer", jsonContainer);
+
+            // Input state                                                                                                              
+            runScope.SetVariable("inputState", pickledState);
+
+            // Input playerId
+            runScope.SetVariable("playerId", playerId);
+
+            ScriptSource runSource = engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.View(playerId))", SourceCodeKind.Statements);
+
+            for (int attempts = 0; attempts < 3; attempts++)
+            {
+                try
+                {
+                    runSource.Execute(runScope);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    errors.Add(e.ToString());
+                    runSource.Execute(runScope);
+                }
+            }
+
+            return runScope.GetVariable("jsonString");            
+        }
+
+        // Update
+        [HttpPost]
+        public ActionResult UpdateMain(int id, GameUpdate update)
+        {
+            Table table = db.Tables.Find(id);
+
+            InitScriptEngine();
+            LoadModules(table.Game.Name, table.Game.PythonScript);
+
+            ScriptScope runScope = engine.CreateScope();
+            runScope.ImportModule("cPickle");
+
+            string init_pickledState = Compression.DecompressStringState(table.GameState);     
+
+
+            // PYTHON UPDATE
+
+            // Input state                                                                                                              
+            runScope.SetVariable("inputState", init_pickledState);
+            runScope.SetVariable("update", update);
+
+            ScriptSource runSource = engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.Update(update);finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
+            runSource.Execute(runScope);
+
+            string final_pickledState = runScope.GetVariable("finalState");
+            table.GameState = Compression.CompressStringState(final_pickledState);
+            db.SaveChanges();
+
+            // Send updated states to clients
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (Seat s in table.Seats)
+            {
+                string viewJson = GetPythonView(table, final_pickledState, s.PlayerId);
+                clients[s.Player.Name + id].main_updateGameState(viewJson);
+            }
+
+            return View();
+        }
+
+        /*
+        // Update
+        [HttpPost]
+        public ActionResult UpdateMain(int id, GameUpdate inputState)
+        {
+            Table table = db.Tables.Find(id);
+
+            // Get and decompress master state from database                        
+            BaseGameState masterState = (BaseGameState)Compression.DecompressGameState(table.GameState, BaseGameState.GetSerializer(table.Game.Name));
+            // Merge state with master gamestate
+            masterState.Update(inputState);
+            // Compress state for database storage
+            table.GameState = Compression.CompressGameState(masterState, masterState.GetSerializer());
+            db.SaveChanges();
+
+            // Send updated states to clients
+            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+            dynamic clients = connectionManager.GetClients<GameList>();
+            foreach (Seat s in table.Seats)
+            {
+                clients[s.Player.Name + id].main_updateGameState(masterState.GetClientView(s.PlayerId));
+            }
+
+            return View();
+        }*/
 
         //
         // GET: /Table/Create
@@ -334,6 +381,12 @@ namespace DeckBuilder.Controllers
         {            
             Table table = db.Tables.Find(id);
             db.Tables.Remove(table);
+
+            //foreach (Table t in db.Tables)
+            //{
+              //  db.Tables.Remove(t);
+            //}
+
             db.SaveChanges();
             return RedirectToAction("Index");
         }

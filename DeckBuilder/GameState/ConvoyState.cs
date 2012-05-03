@@ -4,68 +4,43 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using DeckBuilder.Models;
+using DeckBuilder.Protoplasm;
 
 namespace DeckBuilder.Games
 {
-    public class ConvoyPlayerContext
+    public class ConvoyPlayerContext : PlayerContext
     {
         public string side { get; set; }
-        public int playerId { get; set; }
-        public string name { get; set; }
 
-        public List<ConvoyPiece> hand { get; set; }
-        public List<ConvoyPiece> draftHand { get; set; }
-        public int draftIndex { get; set; }
-        public bool draftReady { get; set; }
-
+        public Hand<ConvoyPiece> hand { get; set; }
+        public Hand<ConvoyPiece> draftHand { get; set; }
+        
         public int score { get; set; }
     }
 
-    public class ConvoyUpdate
+    
+    public class ConvoyPiece : GamePiece
     {
-        public int playerId { get; set; }
-        public int selectedTileX { get; set; }
-        public int selectedTileY { get; set; }
-        public int selectedCardIndex { get; set; }
-
-    }
-
-    public class ConvoyPiece
-    {
-        public string name {get;set;}
-        public string url {get;set;}
         public int hits {get;set;}
         public string targetType { get; set; }
         public string side { get; set; }
         public int direction { get; set; }
+
+        public new ConvoyPiece View()
+        {
+            return new ConvoyPiece {hits = hits, targetType = targetType, side = side, direction = direction, url = url, name = name};            
+        }
     }
 
-    public class ConvoyTile
-    {
-        public string type {get;set;}
-        public string url {get;set;}
-        public ConvoyPiece unit { get; set; }
-        public bool selectable { get; set; }        
-    }
-    
-    public class ConvoyState
-    {
-        public List<ConvoyPlayerContext> playerContexts { get; set; }
-        public int sourcePlayerId { get; set; }
-        public int activePlayerId { get; set; }
-        public int activePlayerIndex { get; set; }
-        public int tableId { get; set; }
-        public List<string> logs { get; set; }
-
-        public bool gameOver { get; set; }
-        public string state { get; set; }
+    public class ConvoyState: GameState<ConvoyPlayerContext>
+    {        
         public int primaryPlayerId { get; set; }
 
-        public List<List<ConvoyTile>> board { get; set; }
-        public List<ConvoyPiece> deck { get; set; }
-        public List<ConvoyPiece> discard { get; set; }
+        public SquareBoard<ConvoyPiece> board { get; set; }
+        public Protoplasm.Deck<ConvoyPiece> deck { get; set; }
+        public Protoplasm.Pile<ConvoyPiece> discard { get; set; }
 
-        
+
         public ConvoyPiece playedPiece { get; set; }
         public bool dudPiece { get; set; }
         public int selectX { get; set; }
@@ -73,26 +48,39 @@ namespace DeckBuilder.Games
         public int targetX { get; set; }
         public int targetY { get; set; }
 
-
-        public void InitializeState(List<Seat> seats)
+        public string GetTargetType(string name)
         {
-            tableId = seats[0].TableId;
-            playerContexts = new List<ConvoyPlayerContext>();
+            if (name == "Fire All" || name.Contains("Advance"))
+                return "None";
+            if (name == "Fire 1")
+                return "Unit";
+            if(name.Contains("Move"))
+                return "Unit-Tile";
+            return "Tile";
+
+        }
+
+        public override System.Runtime.Serialization.Json.DataContractJsonSerializer GetSerializer()
+        {
+            return new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ConvoyState), new Type[] { typeof(ConvoyPlayerContext), typeof(PlayerContext), typeof(GameObject), typeof(GameUpdate), typeof(GameView), typeof(SquareBoard<ConvoyPiece>), typeof(GamePiece), typeof(SquareTile<ConvoyPiece>) });
+        }
+
+        public override void InitializeState(List<Seat> seats)
+        {
+            base.InitializeState(seats);
+
             foreach (Seat seat in seats)
             {
                 ConvoyPlayerContext playerContext = new ConvoyPlayerContext();
                 playerContext.playerId = seat.PlayerId;
                 playerContext.name = seat.Player.Name;
                 playerContexts.Add(playerContext);
-                playerContext.hand = new List<ConvoyPiece>();
-                playerContext.draftHand = new List<ConvoyPiece>();
+                playerContext.hand = new Hand<ConvoyPiece>();
+                playerContext.draftHand = new Hand<ConvoyPiece>();
             }
             playerContexts[0].side = "Left";
             playerContexts[1].side = "Right";
-            activePlayerIndex = 0;
-            activePlayerId = playerContexts[activePlayerIndex].playerId;
-
-            logs = new List<string>();
+            
             logs.Add("Convoy Canyon Initialized at table " + tableId);
             logs.Add(playerContexts[0].name + " vs " + playerContexts[1].name);
 
@@ -100,60 +88,80 @@ namespace DeckBuilder.Games
             
             #region intialize_board
             ConvoyPiece rock = new ConvoyPiece { name = "Rock", url = "/content/images/canyon/unit_rock.png" };
-            board = new List<List<ConvoyTile>>();
+            board = new SquareBoard<ConvoyPiece>("CanyonBoard", 11, 12);
             for (int x = 0; x < 11; x++)
             {
-                board.Add(new List<ConvoyTile>());
                 for (int y = 0; y < 12; y++)
                 {
                     if(x == 4)
-                        board[x].Add(new ConvoyTile { type = "Canyon", url = "/content/images/canyon/tile_leftedge.png", unit = null });
-                    else if(x == 6)
-                        board[x].Add(new ConvoyTile { type = "Canyon", url = "/content/images/canyon/tile_rightedge.png", unit = null });
-                    else if(x == 5)
-                        board[x].Add(new ConvoyTile { type = "Canyon", url = "/content/images/canyon/tile_canyon.png", unit = null });
+                    {
+                        board[x, y].url = "/content/images/canyon/tile_leftedge.png";
+                        board[x, y].type = "Canyon";
+                    }
+                    else if (x == 6)
+                    {
+                        board[x,y].url = "/content/images/canyon/tile_rightedge.png";
+                        board[x,y].type = "Canyon";
+                    }
+                    else if (x == 5)
+                    {
+                        board[x, y].url = "/content/images/canyon/tile_canyon.png";
+                        board[x, y].type = "Canyon";                        
+                    }
                     else if (x == 0)
-                        board[x].Add(new ConvoyTile { type = "Canyon", url = "/content/images/canyon/tile_leftcliff.png", unit = null });
+                    {
+                        board[x, y].url = "/content/images/canyon/tile_leftcliff.png";
+                        board[x, y].type = "Canyon";                        
+                    }
                     else if (x == 10)
-                        board[x].Add(new ConvoyTile { type = "Canyon", url = "/content/images/canyon/tile_rightcliff.png", unit = null });
+                    {
+                        board[x, y].url = "/content/images/canyon/tile_rightcliff.png";
+                        board[x, y].type = "Canyon";
+                    }
                     else if (x < 4)
                     {
-                        if(y<=1)
+                        if (y <= 1)
                         {
-                            board[x].Add(new ConvoyTile { type = "Start-Left", url = "/content/images/canyon/tile_bluesrc.png", unit = null });
+                            board[x, y].url = "/content/images/canyon/tile_bluesrc.png";
+                            board[x, y].type = "Start-Left";                            
                         }
                         else if (y >= 10)
                         {
-                            board[x].Add(new ConvoyTile { type = "End-Left", url = "/content/images/canyon/tile_bluedest.png", unit = null });
+                            board[x, y].url = "/content/images/canyon/tile_bluedest.png";
+                            board[x, y].type = "End-Left";                            
                         }
                         else
                         {
-                            board[x].Add(new ConvoyTile { type = "Left", url = "/content/images/canyon/tile_path.png", unit = null });
+                            board[x, y].url = "/content/images/canyon/tile_path.png";
+                            board[x, y].type = "Left";                            
                         }
                     }
                     else if (x > 6)
                     {
                         if (y <= 1)
                         {
-                            board[x].Add(new ConvoyTile { type = "End-Right", url = "/content/images/canyon/tile_reddest.png", unit = null });
+                            board[x, y].url = "/content/images/canyon/tile_reddest.png";
+                            board[x, y].type = "End-Right";                                 
                         }
                         else if (y >= 10)
                         {
-                            board[x].Add(new ConvoyTile { type = "Start-Right", url = "/content/images/canyon/tile_redsrc.png", unit = null });
+                            board[x, y].url = "/content/images/canyon/tile_redsrc.png";
+                            board[x, y].type = "Start-Right";                            
                         }
                         else
                         {
-                            board[x].Add(new ConvoyTile { type = "Right", url = "/content/images/canyon/tile_path.png", unit = null });
-                        }                        
+                            board[x, y].url = "/content/images/canyon/tile_path.png";
+                            board[x, y].type = "Right";                            
+                        }
                     }
                 }
             }
-            board[1][3].unit = rock;
-            board[2][7].unit = rock;
-            board[3][5].unit = rock;
-            board[9][8].unit = rock;
-            board[8][4].unit = rock;
-            board[7][6].unit = rock;
+            board[1, 3].pieces.Add(rock);
+            board[2, 7].pieces.Add(rock);
+            board[3, 5].pieces.Add(rock);
+            board[9, 8].pieces.Add(rock);
+            board[8, 4].pieces.Add(rock);
+            board[7, 6].pieces.Add(rock);
             #endregion
 
             #region initialize_deck
@@ -176,47 +184,56 @@ namespace DeckBuilder.Games
             int landmines_count = 2;
             int missileLauncher_count = 2;
             int railgun_count = 2;
+            int advance_one_count = 5;
+            int advance_two_count = 4;
+            int advance_three_count = 3;
 
-            deck = new List<ConvoyPiece>();
-            discard = new List<ConvoyPiece>();
-            ConvoyPiece move_one = new ConvoyPiece { name = "Move 1", url = "/content/images/canyon/move_one.png", targetType = "Unit-Tile" };
+            deck = new Protoplasm.Deck<ConvoyPiece>();
+            discard = new Protoplasm.Pile<ConvoyPiece>();
+            ConvoyPiece move_one = new ConvoyPiece { name = "Move 1", url = "/content/images/canyon/move_one.png"};
             for (int i = 0; i < move_one_count; i++) deck.Add(move_one);
-            ConvoyPiece move_two = new ConvoyPiece { name = "Move 2", url = "/content/images/canyon/move_two.png", targetType = "Unit-Tile" };
+            ConvoyPiece move_two = new ConvoyPiece { name = "Move 2", url = "/content/images/canyon/move_two.png"};
             for (int i = 0; i < move_two_count; i++) deck.Add(move_two);
-            ConvoyPiece move_three = new ConvoyPiece { name = "Move 3", url = "/content/images/canyon/move_three.png", targetType = "Unit-Tile" };
+            ConvoyPiece move_three = new ConvoyPiece { name = "Move 3", url = "/content/images/canyon/move_three.png"};
             for (int i = 0; i < move_three_count; i++) deck.Add(move_three);
-            ConvoyPiece fire_one = new ConvoyPiece { name = "Fire 1", url = "/content/images/canyon/fire_one.png", targetType = "Unit" };
+            ConvoyPiece fire_one = new ConvoyPiece { name = "Fire 1", url = "/content/images/canyon/fire_one.png"};
             for (int i = 0; i < fire_one_count; i++) deck.Add(fire_one);
-            ConvoyPiece fire_all = new ConvoyPiece { name = "Fire All", url = "/content/images/canyon/fire_all.png", targetType = "None" };
+            ConvoyPiece fire_all = new ConvoyPiece { name = "Fire All", url = "/content/images/canyon/fire_all.png"};
             for (int i = 0; i < fire_all_count; i++) deck.Add(fire_all);
-            ConvoyPiece movefire_one = new ConvoyPiece { name = "Move Fire 1", url = "/content/images/canyon/movefire_one.png", targetType = "Unit-Tile" };
+            ConvoyPiece movefire_one = new ConvoyPiece { name = "Move Fire 1", url = "/content/images/canyon/movefire_one.png"};
             for (int i = 0; i < movefire_one_count; i++) deck.Add(movefire_one);
-            ConvoyPiece movefire_two = new ConvoyPiece { name = "Move Fire 2", url = "/content/images/canyon/movefire_two.png", targetType = "Unit-Tile" };
+            ConvoyPiece movefire_two = new ConvoyPiece { name = "Move Fire 2", url = "/content/images/canyon/movefire_two.png"};
             for (int i = 0; i < movefire_two_count; i++) deck.Add(movefire_two);
-            ConvoyPiece armoredconvoy_one = new ConvoyPiece { name = "Armored Convoy 1", url = "/content/images/canyon/unit_armoredconvoy1.png", targetType = "Tile" };
+            ConvoyPiece armoredconvoy_one = new ConvoyPiece { name = "Armored Convoy 1", url = "/content/images/canyon/unit_armoredconvoy1.png"};
             for (int i = 0; i < armoredconvoy_one_count; i++) deck.Add(armoredconvoy_one);
-            ConvoyPiece armoredconvoy_three = new ConvoyPiece { name = "Armored Convoy 3", url = "/content/images/canyon/unit_armoredconvoy3.png", targetType = "Tile" };
+            ConvoyPiece armoredconvoy_three = new ConvoyPiece { name = "Armored Convoy 3", url = "/content/images/canyon/unit_armoredconvoy3.png"};
             for (int i = 0; i < armoredconvoy_three_count; i++) deck.Add(armoredconvoy_three);
-            ConvoyPiece artillery = new ConvoyPiece { name = "Artillery", url = "/content/images/canyon/unit_artillery.png", targetType = "Tile" };
+            ConvoyPiece artillery = new ConvoyPiece { name = "Artillery", url = "/content/images/canyon/unit_artillery.png"};
             for (int i = 0; i < artillery_count; i++) deck.Add(artillery);
-            ConvoyPiece convoy_one = new ConvoyPiece { name = "Convoy 1", url = "/content/images/canyon/unit_convoy1.png", targetType = "Tile" };
+            ConvoyPiece convoy_one = new ConvoyPiece { name = "Convoy 1", url = "/content/images/canyon/unit_convoy1.png"};
             for (int i = 0; i < convoy_one_count; i++) deck.Add(convoy_one);
-            ConvoyPiece convoy_three = new ConvoyPiece { name = "Convoy 3", url = "/content/images/canyon/unit_convoy3.png", targetType = "Tile" };
+            ConvoyPiece convoy_three = new ConvoyPiece { name = "Convoy 3", url = "/content/images/canyon/unit_convoy3.png" };
             for (int i = 0; i < convoy_three_count; i++) deck.Add(convoy_three);
-            ConvoyPiece convoy_five = new ConvoyPiece { name = "Convoy 5", url = "/content/images/canyon/unit_convoy5.png", targetType = "Tile" };
+            ConvoyPiece convoy_five = new ConvoyPiece { name = "Convoy 5", url = "/content/images/canyon/unit_convoy5.png" };
             for (int i = 0; i < convoy_five_count; i++) deck.Add(convoy_five);
-            ConvoyPiece gunship = new ConvoyPiece { name = "Gunship", url = "/content/images/canyon/unit_gunship.png", targetType = "Tile" };
+            ConvoyPiece gunship = new ConvoyPiece { name = "Gunship", url = "/content/images/canyon/unit_gunship.png" };
             for (int i = 0; i < gunship_count; i++) deck.Add(gunship);
-            ConvoyPiece heavytank = new ConvoyPiece { name = "Heavy Tank", url = "/content/images/canyon/unit_heavytank.png", targetType = "Tile" };
+            ConvoyPiece heavytank = new ConvoyPiece { name = "Heavy Tank", url = "/content/images/canyon/unit_heavytank.png" };
             for (int i = 0; i < heavytank_count; i++) deck.Add(heavytank);
-            ConvoyPiece landmines = new ConvoyPiece { name = "Land Mines", url = "/content/images/canyon/unit_mines.png", targetType = "Tile" };
+            ConvoyPiece landmines = new ConvoyPiece { name = "Land Mines", url = "/content/images/canyon/unit_mines.png"};
             for (int i = 0; i < landmines_count; i++) deck.Add(landmines);
-            ConvoyPiece missileLauncher = new ConvoyPiece { name = "Missile Launcher", url = "/content/images/canyon/unit_missilelauncher.png", targetType = "Tile" };
+            ConvoyPiece missileLauncher = new ConvoyPiece { name = "Missile Launcher", url = "/content/images/canyon/unit_missilelauncher.png"};
             for (int i = 0; i < missileLauncher_count; i++) deck.Add(missileLauncher);
-            ConvoyPiece railgun = new ConvoyPiece { name = "Rail Gun", url = "/content/images/canyon/unit_railgun.png", targetType = "Tile" };
+            ConvoyPiece railgun = new ConvoyPiece { name = "Rail Gun", url = "/content/images/canyon/unit_railgun.png"};
             for (int i = 0; i < railgun_count; i++) deck.Add(railgun);
-            ConvoyPiece tank = new ConvoyPiece { name = "Tank", url = "/content/images/canyon/unit_tank.png", targetType = "Tile" };
+            ConvoyPiece tank = new ConvoyPiece { name = "Tank", url = "/content/images/canyon/unit_tank.png" };
             for (int i = 0; i < tank_count; i++) deck.Add(tank);
+            ConvoyPiece advance_one = new ConvoyPiece { name = "Advance 1", url = "/content/images/canyon/advance_one.png" };
+            for (int i = 0; i < advance_one_count; i++) deck.Add(advance_one);
+            ConvoyPiece advance_two = new ConvoyPiece { name = "Advance 2", url = "/content/images/canyon/advance_two.png" };
+            for (int i = 0; i < advance_two_count; i++) deck.Add(advance_two);
+            ConvoyPiece advance_three = new ConvoyPiece { name = "Advance 3", url = "/content/images/canyon/advance_three.png" };
+            for (int i = 0; i < advance_three_count; i++) deck.Add(advance_three);
             #endregion
 
             DraftDraw();
@@ -227,20 +244,11 @@ namespace DeckBuilder.Games
         {
             Random r = new Random();
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
                 foreach (ConvoyPlayerContext context in playerContexts)
                 {
-                    if (deck.Count == 0)
-                    {
-                        deck = discard;
-                        discard = new List<ConvoyPiece>();
-                    }
-
-                    int randomIndex = r.Next(0, deck.Count);
-                    ConvoyPiece piece = deck.ElementAt(randomIndex);
-                    deck.RemoveAt(randomIndex);
-                    context.draftHand.Add(piece);
+                    context.draftHand.Add(deck.DrawWithDiscard(discard));
                 }
             }
         }
@@ -249,11 +257,11 @@ namespace DeckBuilder.Games
         {
             if (x < 0 || y < 0 || x > 10 || y > 11)
                 return;
-            if (board[x][y].unit == null || board[x][y].unit.name == "Land Mines")
+            if (board[x,y].pieces.Count == 0 || board[x,y].TopPiece.name == "Land Mines")
             {
-                board[x][y].selectable = true;
+                board[x,y].selectable = true;
             }
-            if (range > 0 && ((board[x][y].unit == null && board[x][y].type != "Canyon") || ((board[x][y].unit == null || board[x][y].unit.name != "Land Mines") && flying == true && (board[x][y].type.Contains("Side") || board[x][y].type=="Canyon") )))
+            if (range > 0 && ((board[x,y].IsEmpty && board[x,y].type != "Canyon") || ((board[x,y].IsEmpty || board[x,y].TopPiece.name != "Land Mines") && flying == true && (board[x,y].type.Contains("Side") || board[x,y].type=="Canyon") )))
             {
                 PathfindingHelper(x, y - 1, range - 1, flying, side);
                 PathfindingHelper(x, y + 1, range - 1, flying, side);
@@ -273,12 +281,12 @@ namespace DeckBuilder.Games
             if (playedPiece.name.Contains("3"))
                 moveRange = 3;
 
-            board[selectX][selectY].selectable = true;
+            board[selectX,selectY].selectable = true;
 
-            PathfindingHelper(selectX, selectY - 1, moveRange-1, board[selectX][selectY].unit.name == "Gunship", context.side);
-            PathfindingHelper(selectX, selectY + 1, moveRange - 1, board[selectX][selectY].unit.name == "Gunship", context.side);
-            PathfindingHelper(selectX - 1, selectY, moveRange - 1, board[selectX][selectY].unit.name == "Gunship", context.side);
-            PathfindingHelper(selectX + 1, selectY, moveRange - 1, board[selectX][selectY].unit.name == "Gunship", context.side);
+            PathfindingHelper(selectX, selectY - 1, moveRange - 1, board[selectX, selectY].TopPiece.name == "Gunship", context.side);
+            PathfindingHelper(selectX, selectY + 1, moveRange - 1, board[selectX, selectY].TopPiece.name == "Gunship", context.side);
+            PathfindingHelper(selectX - 1, selectY, moveRange - 1, board[selectX, selectY].TopPiece.name == "Gunship", context.side);
+            PathfindingHelper(selectX + 1, selectY, moveRange - 1, board[selectX,selectY].TopPiece.name == "Gunship", context.side);
         }
 
         public void ClearSelections()
@@ -287,7 +295,7 @@ namespace DeckBuilder.Games
             {
                 for (int y = 0; y < 12; y++)
                 {
-                    board[x][y].selectable = false;
+                    board[x,y].selectable = false;
                 }
             }
         }
@@ -302,42 +310,42 @@ namespace DeckBuilder.Games
                 {
                     for (int y = 1; y < 11; y++)
                     {
-                        if (!board[x][y].type.Contains(context.side) && board[x][y].type != "Canyon")
+                        if (!board[x,y].type.Contains(context.side) && board[x,y].type != "Canyon")
                         {
-                            if (board[x][y].unit == null)
+                            if (board[x,y].IsEmpty == null)
                             {
-                                board[x][y].selectable = true;
+                                board[x,y].selectable = true;
                             }
                         }
                     }
                 }
             }
-            if(playedPiece.targetType.Contains("Unit"))
+            if(GetTargetType(playedPiece.name).Contains("Unit"))
             {
                 // Any friendly piece except land mines
                 for (int x = 1; x < 10; x++)
                 {
                     for (int y = 0; y < 12; y++)
                     {
-                        if (board[x][y].unit != null && board[x][y].unit.side == context.side && board[x][y].unit.name != "Land Mines")
+                        if (board[x,y].IsEmpty == false && board[x,y].TopPiece.side == context.side && board[x,y].TopPiece.name != "Land Mines")
                         {
-                            if (playedPiece.name.Contains("Fire") && (board[x][y].unit.name.Contains("Convoy") || board[x][y].unit.name == "Heavy Tank"))
+                            if (playedPiece.name.Contains("Fire") && (board[x, y].TopPiece.name.Contains("Convoy") || board[x, y].TopPiece.name == "Heavy Tank"))
                                 continue;
-                            board[x][y].selectable = true;
+                            board[x,y].selectable = true;
                         }
                     }
                 }
             }
-            if (playedPiece.targetType == "Tile")
+            if (GetTargetType(playedPiece.name) == "Tile")
             {
                 // Start tile on friendly side
                 for (int x = 1; x < 10; x++)
                 {
                     for (int y = 0; y < 12; y++)
                     {
-                        if (board[x][y].type.Contains("Start") && board[x][y].type.Contains(context.side) && board[x][y].unit == null)
+                        if (board[x,y].type.Contains("Start") && board[x,y].type.Contains(context.side) && board[x,y].IsEmpty)
                         {
-                            board[x][y].selectable = true;
+                            board[x,y].selectable = true;
                         }
                     }
                 }
@@ -351,7 +359,7 @@ namespace DeckBuilder.Games
             {
                 for (int y = 0; y < 12; y++)
                 {
-                    if (board[x][y].selectable == true) count++;
+                    if (board[x,y].selectable == true) count++;
                 }
             }
             return count;
@@ -367,7 +375,7 @@ namespace DeckBuilder.Games
 
         public void UnitFire(int x, int y)
         {
-            ConvoyPiece unit = board[x][y].unit;
+            ConvoyPiece unit = board[x, y].TopPiece;
             if (unit == null || unit.name == "Land Mines" || unit.name == "Heavy Tank" || unit.name.Contains("Convoy")) return;
 
             int fireDir = 0;
@@ -380,12 +388,12 @@ namespace DeckBuilder.Games
             {
                 for (int i = x + fireDir; i < 9 && i >= 0; i += fireDir)
                 {
-                    if (board[i][y].unit != null)
+                    if (board[i,y].IsEmpty == false)
                     {
-                        if(board[i][y].unit.name != "Rock" && board[i][y].unit.name != "Gunship")
-                            board[i][y].unit.hits++;
+                        if (board[i, y].TopPiece.name != "Rock" && board[i,y].TopPiece.name != "Gunship")
+                            board[i, y].TopPiece.hits++;
 
-                        if (unit.name == "Tank" && board[i][y].unit.name != "Gunship")
+                        if (unit.name == "Tank" && board[i,y].TopPiece.name != "Gunship")
                             return;
                     }
                 }
@@ -394,9 +402,9 @@ namespace DeckBuilder.Games
             {
                 for (int i = x + fireDir; i < 9 && i >= 0 && i < x + 3 && i > x - 3; i += fireDir)
                 {
-                    if (board[i][y].unit != null && board[i][y].unit.name != "Rock" && board[i][y].unit.name != "Gunship")
+                    if (board[i,y].IsEmpty == false && board[i,y].TopPiece.name != "Rock" && board[i,y].TopPiece.name != "Gunship")
                     {
-                        board[i][y].unit.hits++;
+                        board[i, y].TopPiece.hits++;
                     }
                 }
             }
@@ -409,9 +417,9 @@ namespace DeckBuilder.Games
                     farX = 0;
                 for (int i = farX; i < 9 && i >= 0 && i!=4; i -= fireDir)
                 {
-                    if (board[i][y].unit != null && board[i][y].unit.name != "Rock" && board[i][y].unit.name != "Gunship")
+                    if (board[i, y].TopPiece != null && board[i, y].TopPiece.name != "Rock" && board[i, y].TopPiece.name != "Gunship")
                     {
-                        board[i][y].unit.hits++;                        
+                        board[i, y].TopPiece.hits++;                        
                         return;
                     }
                 }
@@ -422,9 +430,9 @@ namespace DeckBuilder.Games
                 {
                     for (int ty = 0; ty < 12; ty++)
                     {
-                        if (board[tx][ty].unit != null && board[tx][ty].unit.name == "Gunship" && board[tx][ty].unit.side != unit.side && Math.Abs(tx - x) + Math.Abs(ty - y) <= 4)
+                        if (board[tx, ty].TopPiece != null && board[tx,ty].TopPiece.name == "Gunship" && board[tx,ty].TopPiece.side != unit.side && Math.Abs(tx - x) + Math.Abs(ty - y) <= 4)
                         {
-                            board[tx][ty].unit.hits++;
+                            board[tx, ty].TopPiece.hits++;
                         }
                     }
                 }
@@ -439,50 +447,46 @@ namespace DeckBuilder.Games
         }
 
 
-        public void Update(ConvoyUpdate update)
+        public override void Update(GameUpdate update)
         {
             if (state == "Draft")
             {
                 // Set draft selection for player
-                foreach (ConvoyPlayerContext context in playerContexts)
-                {
-                    if (update.playerId == context.playerId)
-                    {
-                        context.draftReady = true;
-                        context.draftIndex = update.selectedCardIndex;
-                    }
-                }
+                ConvoyPlayerContext updateContext = playerContexts.First(pc => pc.playerId == update.playerId);                
+                updateContext.hand.Select(update.selectIndex);
+
                 // If both players have selected card, move cards to hands
                 bool draftRoundOver = true;                
                 foreach (ConvoyPlayerContext context in playerContexts)
                 {
-                    if (context.draftReady == false)
+                    if (context.draftHand.SelectedCard != null)
                     {
-                        logs.Add("Draft round complete. Swapping hands.");
                         draftRoundOver = false;
                     }
                 }
                 if (draftRoundOver == true)
                 {
+                    logs.Add("Draft round complete. Swapping hands.");
+                        
                     foreach (ConvoyPlayerContext context in playerContexts)
                     {
-                        ConvoyPiece draftedPiece = context.draftHand[context.draftIndex];
-                        context.draftHand.RemoveAt(context.draftIndex);
-                        context.draftReady = false;
+                        ConvoyPiece draftedPiece = context.draftHand.SelectedCard;
+                        context.draftHand.cards.RemoveAt(context.draftHand.selectedIndex);
+                        context.draftHand.Deselect();
                         context.hand.Add(draftedPiece);
                     }
-                    List<ConvoyPiece> tempPieces = playerContexts[0].draftHand;
+                    Hand<ConvoyPiece> tempHand = playerContexts[0].draftHand;
                     playerContexts[0].draftHand = playerContexts[1].draftHand;
-                    playerContexts[1].draftHand = tempPieces;
+                    playerContexts[1].draftHand = tempHand;
                 }
                 // If draft hands single pieces, put them in hand and advance to next phase
-                if (playerContexts[0].draftHand.Count == 1)
+                if (playerContexts[0].draftHand.cards.Count == 1)
                 {
                     logs.Add("Only one remaining card in draft. Draft complete.");
                     foreach (ConvoyPlayerContext context in playerContexts)
                     {
-                        context.hand.Add(context.draftHand[0]);
-                        context.draftHand.RemoveAt(0);
+                        context.hand.Add(context.draftHand.cards[0]);
+                        context.draftHand.cards.RemoveAt(0);
                     }
 
                     activePlayerId = primaryPlayerId;
@@ -491,7 +495,8 @@ namespace DeckBuilder.Games
                         if (playerContexts[i].playerId == activePlayerId)
                             activePlayerIndex = i;
                     }
-                    playedPiece = new ConvoyPiece { name = "Bonus Move 2", url = "/content/images/canyon/move_two.png", targetType = "Unit-Tile" };
+
+                    playedPiece = new ConvoyPiece { name = "Bonus Move 2", url = "/content/images/canyon/move_two.png" };
                     MarkValidSelections(playerContexts[activePlayerIndex]);
                     if (ValidTargetCount() == 0)
                     {
@@ -522,14 +527,14 @@ namespace DeckBuilder.Games
                         if (state == "PlayCard")
                         {
                             // Move chosen card to play area.
-                            playedPiece = context.hand[update.selectedCardIndex];
-                            context.hand.RemoveAt(update.selectedCardIndex);
+                            playedPiece = context.hand[update.selectIndex];
+                            context.hand.cards.RemoveAt(update.selectIndex);
                             // Advance to select if necessary, marking valid tiles 
                             MarkValidSelections(playerContexts[activePlayerIndex]);
 
                             logs.Add(playerContexts[activePlayerIndex].name + " played " + playedPiece + ".");
 
-                            if (playedPiece.targetType == "None")
+                            if (GetTargetType(playedPiece.name) == "None")
                             {
                                 state = "Execute";
                             }
@@ -547,12 +552,12 @@ namespace DeckBuilder.Games
                         else if (state == "Select")
                         {
                             // Update selectedX, selectY
-                            selectX = update.selectedTileX;
-                            selectY = update.selectedTileY;
+                            selectX = update.selectX;
+                            selectY = update.selectY;
 
                             logs.Add(playerContexts[activePlayerIndex].name + " selected tile " + selectX + "," + selectY + ".");
                             // Advance to target if necessary, marking valid tiles                            
-                            if (playedPiece.targetType == "Tile" || playedPiece.targetType == "Unit")
+                            if (GetTargetType(playedPiece.name) == "Tile" || GetTargetType(playedPiece.name) == "Unit")
                             {
                                 state = "Execute";
                             }
@@ -574,8 +579,8 @@ namespace DeckBuilder.Games
                         else if (state == "Target")
                         {
                             // Update targetX, targetY
-                            targetX = update.selectedTileX;
-                            targetY = update.selectedTileY;
+                            targetX = update.selectX;
+                            targetY = update.selectY;
                             logs.Add(playerContexts[activePlayerIndex].name + " selected tile " + targetX + "," + targetY + ".");
                             // Advance to execute
                             state = "Execute";
@@ -610,23 +615,23 @@ namespace DeckBuilder.Games
                 }
                 else if (playedPiece.name.Contains("Move"))
                 {
-                    logs.Add(playerContexts[activePlayerIndex].name + " moved " + board[selectX][selectY].unit.name + " to " + targetX + "," + targetY);
+                    logs.Add(playerContexts[activePlayerIndex].name + " moved " + board[selectX, selectY].TopPiece.name + " to " + targetX + "," + targetY);
                     // Move piece from selectXY to targetXY
-                    if (board[targetX][targetY].unit!= null && board[targetX][targetY].unit.name == "Land Mines")
+                    if (board[targetX, targetY].TopPiece != null && board[targetX, targetY].TopPiece.name == "Land Mines")
                     {
-                        logs.Add("Land Mines detonate, damaging " + board[selectX][selectY].unit.name);
-                        logs.Add(playerContexts[activePlayerIndex].name + " discards " + board[targetX][targetY].unit.name);
-                        discard.Add(board[targetX][targetY].unit);
-                        board[selectX][selectY].unit.hits++;
-                    }                    
-                    board[targetX][targetY].unit = board[selectX][selectY].unit;
+                        logs.Add("Land Mines detonate, damaging " + board[selectX, selectY].TopPiece.name);
+                        logs.Add(playerContexts[activePlayerIndex].name + " discards " + board[targetX, targetY].TopPiece.name);
+                        discard.Add(board[targetX, targetY].TopPiece);
+                        board[selectX, selectY].TopPiece.hits++;
+                    }
+                    board[targetX, targetY].pieces.Add(board[selectX, selectY].TopPiece);
                     if(selectX != targetX || selectY != targetY)
-                        board[selectX][selectY].unit = null;
+                        board[selectX, selectY].pieces.Clear();
 
                     if (playedPiece.name.Contains("Fire"))
                     {
                         // Fire piece at targetXY
-                        if (IsUnitFunctioning(board[targetX][targetY].unit))
+                        if (IsUnitFunctioning(board[targetX, targetY].TopPiece))
                         {
                             UnitFire(targetX, targetY);
                         }
@@ -647,27 +652,27 @@ namespace DeckBuilder.Games
                 else
                 {
                     // Place piece at selectXY
-                    board[selectX][selectY].unit = playedPiece;                    
-                    board[selectX][selectY].unit.hits = 0;
-                    board[selectX][selectY].unit.side = playerContexts[activePlayerIndex].side;
+                    board[selectX, selectY].pieces.Add(playedPiece);
+                    board[selectX, selectY].TopPiece.hits = 0;
+                    board[selectX, selectY].TopPiece.side = playerContexts[activePlayerIndex].side;
                     logs.Add(playerContexts[activePlayerIndex].name + " places " + playedPiece.name + " at " + selectX + "," + selectY);
 
-                    board[selectX][selectY].unit.direction = 0;
-                    if (board[selectX][selectY].unit.side == "Left")
+                    board[selectX, selectY].TopPiece.direction = 0;
+                    if (board[selectX, selectY].TopPiece.side == "Left")
                     {
-                        board[selectX][selectY].unit.direction += 2;
+                        board[selectX, selectY].TopPiece.direction += 2;
                     }
-                    if (board[selectX][selectY].unit.name == "Tank" || board[selectX][selectY].unit.name == "Rail Gun" || board[selectX][selectY].unit.name == "Gunship" || board[selectX][selectY].unit.name == "Artillery")
+                    if (board[selectX, selectY].TopPiece.name == "Tank" || board[selectX, selectY].TopPiece.name == "Rail Gun" || board[selectX, selectY].TopPiece.name == "Gunship" || board[selectX, selectY].TopPiece.name == "Artillery")
                     {
-                        board[selectX][selectY].unit.direction +=3;                        
+                        board[selectX, selectY].TopPiece.direction += 3;                        
                     }
-                    board[selectX][selectY].unit.direction %= 4;
+                    board[selectX, selectY].TopPiece.direction %= 4;
                     
                 }
                 // Increment activeplayer
                 IncrementActivePlayer();
                 ClearSelections();
-                if (playerContexts[activePlayerIndex].hand.Count == 0)
+                if (playerContexts[activePlayerIndex].hand.cards.Count == 0)
                 {
                     // If hands empty, increment primary player and go to draft
                     primaryPlayerId = activePlayerId;
@@ -691,40 +696,40 @@ namespace DeckBuilder.Games
             {
                 for (int y = 0; y < 12; y++)
                 {
-                    if (board[x][y].unit != null)
+                    if (board[x, y].TopPiece != null)
                     {
-                        if (IsUnitFunctioning(board[x][y].unit) == false)
+                        if (IsUnitFunctioning(board[x, y].TopPiece) == false)
                         {
-                            discard.Add(board[x][y].unit);
-                            board[x][y].unit = null;
+                            discard.Add(board[x, y].TopPiece);
+                            board[x, y].pieces.Clear();
                         }
-                        if (board[x][y].type == "Canyon" && board[x][y].unit != null && board[x][y].unit.name != "Gunship")
+                        if (board[x, y].type == "Canyon" && board[x, y].TopPiece != null && board[x, y].TopPiece.name != "Gunship")
                         {
-                            discard.Add(board[x][y].unit);
-                            board[x][y].unit = null;
+                            discard.Add(board[x, y].TopPiece);
+                            board[x,y].pieces.Clear();
                         }
-                        if (board[x][y].type.Contains("End") && board[x][y].unit.name.Contains("Convoy"))
+                        if (board[x, y].type.Contains("End") && board[x, y].TopPiece.name.Contains("Convoy"))
                         {
                             foreach (ConvoyPlayerContext context in playerContexts)
                             {
-                                if (context.side == board[x][y].unit.side)
+                                if (context.side == board[x, y].TopPiece.side)
                                 {
-                                    if (board[x][y].unit.name.Contains("1"))
+                                    if (board[x, y].TopPiece.name.Contains("1"))
                                     {
                                         context.score++;
                                     }
-                                    if (board[x][y].unit.name.Contains("3"))
+                                    if (board[x, y].TopPiece.name.Contains("3"))
                                     {
                                         context.score+=3;
                                     }
-                                    if (board[x][y].unit.name.Contains("5"))
+                                    if (board[x, y].TopPiece.name.Contains("5"))
                                     {
                                         context.score+=5;
                                     }
                                 }
                             }
-                            discard.Add(board[x][y].unit);
-                            board[x][y].unit = null;
+                            discard.Add(board[x, y].TopPiece);
+                            board[x, y].pieces.Clear();
                         }
                     }
                 }
@@ -738,8 +743,9 @@ namespace DeckBuilder.Games
             }
         }
 
-        public ConvoyState GetClientState(int playerId)
+        public override GameView GetClientView(int playerId)
         {
+            GameView view = new GameView();
             this.sourcePlayerId = playerId;
             ConvoyState clientState = new ConvoyState();
             clientState.board = this.board;
@@ -770,13 +776,11 @@ namespace DeckBuilder.Games
                 if (clientContext.playerId == playerId)
                 {
                     clientContext.hand = context.hand;
-                    clientContext.draftIndex = context.draftIndex;
-                    clientContext.draftHand = context.draftHand;
-                    clientContext.draftReady = context.draftReady;
+                    clientContext.draftHand = context.draftHand;                    
                 }
                 clientState.playerContexts.Add(clientContext);
             }
-            return clientState;
+            return view;
         }
     }
 }

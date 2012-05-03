@@ -12,16 +12,8 @@ function initPlayArea(playerName, tableId) {
             geomancer_setGameState(data);
         };
 
-        playConnection.rps_updateGameState = function (data) {
-            rps_setGameState(data);
-        };
-
         playConnection.onslaught_updateGameState = function (data) {
             onslaught_setGameState(data);
-        };
-
-        playConnection.connect4_updateGameState = function (data) {
-            connect4_setGameState(data);
         };
 
         playConnection.convoy_updateGameState = function (data) {
@@ -30,6 +22,10 @@ function initPlayArea(playerName, tableId) {
 
         playConnection.mechtonic_updateGameState = function (data) {
             mechtonic_setGameState(data);
+        };
+
+        playConnection.main_updateGameState = function (data) {
+            main_setGameState(JSON.parse(data));
         };
 
         playConnection.update_chat = function (data) {

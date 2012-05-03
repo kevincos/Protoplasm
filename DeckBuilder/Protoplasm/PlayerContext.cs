@@ -9,5 +9,9 @@ namespace DeckBuilder.Protoplasm
     {
         public int playerId { get; set; }
         public string name { get; set; }
+
+        public PlayerContext()
+        {
+        }
     }
 }

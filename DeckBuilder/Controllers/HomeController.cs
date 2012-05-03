@@ -43,9 +43,9 @@ namespace DeckBuilder.Controllers
             ViewBag.PlayerName = player.Name;
             SelectList deckDropdown = new SelectList(player.Decks, "DeckID", "Name");
 
-            SelectList gameDropdown = new SelectList(new List<string> {"Mechtonic", "CanyonConvoy", "Connect4", "Onslaught", "Geomancer", "RPS" });
+            SelectList gameDropdown = new SelectList(db.Games.Select(g => g.Name).ToList());
 
-            SelectList roomDropdown = new SelectList(new List<string> { "General", "Mechtonic", "CanyonConvoy", "Onslaught", "Geomancer", "Classic", "Prototype" });
+            SelectList roomDropdown = new SelectList(new List<string> { "General", "Classic", "Prototype" });
             
             
             ViewBag.SelectedDeck = deckDropdown;
