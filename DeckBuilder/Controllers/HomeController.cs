@@ -20,7 +20,9 @@ namespace DeckBuilder.Controllers
         private DeckBuilderContext db = new DeckBuilderContext();
 
         public ActionResult Index()
-        {            
+        {
+            db.SaveChanges();
+
             ViewBag.TopPosts = db.Posts.Include(p=>p.Player).OrderByDescending(p => p.Date).Take(2);
             return View();
         }

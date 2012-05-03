@@ -6,6 +6,7 @@ using System.Data.Entity;
 using DeckBuilder.Models;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Data.Entity.Migrations;
+using DeckBuilder.Migrations;
 
 namespace DeckBuilder.Models
 {
@@ -23,6 +24,14 @@ namespace DeckBuilder.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Seat>()
+                .HasRequired(s => s.Deck)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Card>()
+                    .HasRequired(c => c.CardType);
+            base.OnModelCreating(modelBuilder);
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<DeckBuilderContext, Configuration>());
         }
 

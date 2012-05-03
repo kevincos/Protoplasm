@@ -382,10 +382,6 @@ namespace DeckBuilder.Controllers
             Table table = db.Tables.Find(id);
             db.Tables.Remove(table);
 
-            //foreach (Table t in db.Tables)
-            //{
-              //  db.Tables.Remove(t);
-            //}
 
             db.SaveChanges();
             return RedirectToAction("Index");

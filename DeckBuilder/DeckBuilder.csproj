@@ -167,7 +167,6 @@
     <Compile Include="Models\DeckBuilderContext.cs" />
     <Compile Include="GameState\GeomancerState.cs" />
     <Compile Include="Models\Game.cs" />
-    <Compile Include="Models\Persistence.cs" />
     <Compile Include="Models\PersonInputModel.cs" />
     <Compile Include="Models\PlayerIdentity.cs" />
     <Compile Include="GameState\RPSState.cs" />
