@@ -5,7 +5,7 @@ namespace DeckBuilder.Migrations
     public partial class LinkTableToGame : DbMigration
     {
         public override void Up()
-        {
+        {                        
             AddColumn("Tables", "GameId", c => c.Int(nullable: false));
             AddForeignKey("Tables", "GameId", "Games", "GameID", cascadeDelete: true);
             CreateIndex("Tables", "GameId");

@@ -5,6 +5,7 @@ using System.Web;
 using System.Data.Entity;
 using DeckBuilder.Models;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Data.Entity.Migrations;
 
 namespace DeckBuilder.Models
 {
@@ -22,6 +23,11 @@ namespace DeckBuilder.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<DeckBuilderContext, Configuration>());
+        }
+
+        /*protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Seat>()
                     .HasRequired(s => s.Deck)
                     .WithMany()
@@ -35,7 +41,7 @@ namespace DeckBuilder.Models
                 
 
             base.OnModelCreating(modelBuilder);
-        }
+        }*/
 
         public DbSet<Game> Games { get; set; }
         
