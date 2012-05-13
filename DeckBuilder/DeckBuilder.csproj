@@ -539,6 +539,7 @@
     <Content Include="README.jQuery.vsdoc.txt" />
     <Content Include="Scripts\Connect4\connect4.main.js" />
     <Content Include="Scripts\Convoy\convoy.main.js" />
+    <Content Include="Scripts\GameCore\gamecore.hexboard2.js" />
     <Content Include="Scripts\GameCore\gamecore.infowindow2.js" />
     <Content Include="Scripts\GameCore\gamecore.hand2.js" />
     <Content Include="Scripts\GameCore\gamecore.hand.js" />

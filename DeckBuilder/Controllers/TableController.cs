@@ -81,14 +81,6 @@ namespace DeckBuilder.Controllers
                 OnslaughtState clientState = masterState.GetClientState(currentSeat.PlayerId);
                 ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) })));
             }
-            else if (table.Game.Name == "Mechtonic")
-            {
-                // DATABASE DECOMPRESS: decompress from database
-                MechtonicState masterState = (MechtonicState)Compression.DecompressGameState(table.GameState, MechtonicState.GetSerializer());
-                // WIRE COMPRESS : Send client specific game state                     
-                MechtonicState clientState = masterState.GetClientState(currentSeat.PlayerId);
-                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, MechtonicState.GetSerializer()));
-            }
             else
             {
                 string pickledState = Compression.DecompressStringState(table.GameState);                

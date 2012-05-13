@@ -39,6 +39,11 @@ function main_setGameState(view) {
             //squareBoards.push(board);
             viewObjects.push(board);
         }
+        if (view.drawList[i].type == "HexBoard") {
+            var board = new HexBoard2(gameCore, view.drawList[i]);
+            //squareBoards.push(board);
+            viewObjects.push(board);
+        }
         if (view.drawList[i].type == "Hand") {
             var hand = new HandInstance2(gameCore, view.drawList[i]);
             //hands.push(hand);
@@ -77,7 +82,7 @@ function main_init(state) {
 
 function main_update() {
     for (var i = 0; i < viewObjects.length; i++) {
-        if (viewObjects[i].type == "SquareBoard" || viewObjects[i].type == "Hand")
+        if (viewObjects[i].type == "SquareBoard" || viewObjects[i].type == "Hand" || viewObjects[i].type == "HexBoard")
             viewObjects[i].update();
     }
 }
@@ -89,7 +94,7 @@ function main_draw() {
         gameCore.spriteContext.draw(new Sprite(frameUrl), new vMath.vector2(400, 300), 800, 600);
 
     for (var i = 0; i < viewObjects.length; i++) {
-        if (viewObjects[i].type == "SquareBoard" || viewObjects[i].type == "Hand" || viewObjects[i].type == "InfoWindow")
+        if (viewObjects[i].type == "SquareBoard" || viewObjects[i].type == "Hand" || viewObjects[i].type == "InfoWindow" || viewObjects[i].type == "HexBoard")
             viewObjects[i].draw();
         if (viewObjects[i].type == "TextBox")
             gameCore.spriteContext.formattedText(viewObjects[i].text, new vMath.vector2(viewObjects[i].x, viewObjects[i].y), viewObjects[i].font, viewObjects[i].color);

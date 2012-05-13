@@ -78,9 +78,10 @@ class Token(GameObject):
 class GamePiece(GameObject):
     def __init__(self, name, url):
         GameObject.__init__(self)
-        self.url = url;
-        self.name = name;
-        self.type = "Piece";
+        self.url = url
+        self.baseUrls = []
+        self.name = name
+        self.type = "Piece"
 
     def __str__(self):
         return self.name + "(" +self.type + ") url:" + self.url
@@ -97,6 +98,8 @@ class GamePiece(GameObject):
         view["type"] = self.type
         view["name"] = self.name
         view["url"] = self.url
+        if len(self.baseUrls) > 0:
+            view["baseUrls"] = self.baseUrls
         try:
             view["selectable"] = self.selectable
         except AttributeError:
@@ -146,6 +149,11 @@ class SquareTile(GameObject):
         else:
             return self.name + "(" + self.type + ") <" + self.pieces[0].name + "> SELECT: " + str(self.selectable)
 
+    def TopPiece(self):
+        if len(self.pieces) == 0:
+            return None
+        return self.pieces[0]
+
     def View(self):
         view = {}
         view["type"] = self.type
@@ -159,7 +167,100 @@ class SquareTile(GameObject):
 
         return view;
 
+class Tile(GameObject):
+    def __init__(self):
+        GameObject.__init__(self)
+        self.pieces = []
+        self.url = ""
+        self.highlightUrl = ""
+        self.selectable = False
 
+    def __str__(self):
+        if len(self.pieces) == 0:
+            return self.name + "(" + self.type + ") EMPTY  SELECT: " + str(self.selectable)
+        else:
+            return self.name + "(" + self.type + ") <" + self.pieces[0].name + "> SELECT: " + str(self.selectable)
+
+    def TopPiece(self):
+        if len(self.pieces) == 0:
+            return None
+        return self.pieces[0]
+
+    def View(self):
+        view = {}
+        view["type"] = self.type
+        view["url"] = self.url
+        view["highlightUrl"] = self.highlightUrl
+        view["selectable"]=self.selectable
+        view["name"]=self.name
+        view["pieces"] = []
+        for i in range(0,len(self.pieces)):
+            view["pieces"].append(self.pieces[i].View())
+        return view
+
+
+class HexBoard(GameObject):
+    def __init__(self,name,sideLength, radius):
+        GameObject.__init__(self)
+        self.name = name
+        self.x = 400
+        self.y = 300
+        self.sideLength = sideLength;
+        self.radius = radius
+        self.imageSize = .8*radius
+        self.grid = []
+        self.type = "HexBoard";
+
+        self.aMin = sideLength - 1;
+        self.bMin = sideLength - 1;
+        self.cMin = sideLength - 1;
+        self.aMax = 3*sideLength - 2;
+        self.bMax = 3 * sideLength - 2;
+        self.cMax = 3 * sideLength - 2;
+        self.cBoundary = 6*(sideLength-1);
+        for a in range(0,self.aMax):
+            self.grid.append([])
+            for b in range(0,self.bMax):
+                self.grid[a].append(None)
+
+        for a in range(self.aMin, self.aMax):
+            for b in range(self.bMin, self.bMax):
+                c = self.cBoundary - a - b;
+                if c >= self.cMin and c < self.cMax:
+                    self.grid[a][b] = Tile()
+
+    def TopPiece(self, a,b):
+        if len(self.grid[a][b].pieces) == 0:
+            return None
+        return self.grid[a][b].pieces[0]
+
+    def Tile(self, a,b):
+        return self.grid[a][b]
+
+    def ClearSelection(self):
+        for a in range(self.aMin, self.aMax):
+            for b in range(self.bMin, self.bMax):
+                c = self.cBoundary - a - b;
+                if c >= self.cMin and c < self.cMax:
+                    self.grid[a][b].selectable = False
+
+    def View(self, x, y, radius):
+        view = {}
+        view["name"]=self.name
+        view["type"]=self.type
+        view["sideLength"]=self.sideLength
+        view["x"]=x
+        view["y"]=y
+        view["radius"]=radius
+        view["grid"] = []
+        for a in range(self.aMax):
+            view["grid"].append([])
+            for b in range(self.bMax):
+                if self.grid[a][b] is None:
+                    view["grid"][a].append({})
+                else:
+                    view["grid"][a].append(self.grid[a][b].View())
+        return view;
 
 
 class SquareBoard(GameObject):

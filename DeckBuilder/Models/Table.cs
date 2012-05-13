@@ -46,12 +46,6 @@ namespace DeckBuilder.Models
                 gameState.InitializeState(Seats.ToList());
                 GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
             }
-            else if (Game.Name == "Mechtonic")
-            {
-                MechtonicState gameState = new MechtonicState();
-                gameState.InitializeState(Seats.ToList());
-                GameState = Compression.CompressGameState(gameState, MechtonicState.GetSerializer());
-            }
             else
             {
                 TableController.InitScriptEngine();
