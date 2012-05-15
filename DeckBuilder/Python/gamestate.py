@@ -196,6 +196,23 @@ class Tile(GameObject):
         view["pieces"] = []
         for i in range(0,len(self.pieces)):
             view["pieces"].append(self.pieces[i].View())
+
+
+        try:
+            view["hoverText"] = self.hoverText
+        except AttributeError:
+            pass
+
+        try:
+            view["direction"] = self.direction
+        except AttributeError:
+            pass
+
+        try:
+            view["hoverWindow"] = self.hoverWindow
+        except AttributeError:
+            pass
+
         return view
 
 
@@ -228,6 +245,9 @@ class HexBoard(GameObject):
                 c = self.cBoundary - a - b;
                 if c >= self.cMin and c < self.cMax:
                     self.grid[a][b] = Tile()
+
+    def GetABCCoords(self,a,b):
+        return (a,b,self.cBoundary - a- b)
 
     def TopPiece(self, a,b):
         if len(self.grid[a][b].pieces) == 0:
@@ -432,6 +452,8 @@ class GameState:
         self.logs = []
         self.tableId = seats[0].TableId
 
+    def Log(self, msg):
+        self.logs.append(msg)
 
     def GetPlayerContext(self, playerId):
         return filter(lambda pc: pc.playerId == playerId,self.playerContexts)[0]

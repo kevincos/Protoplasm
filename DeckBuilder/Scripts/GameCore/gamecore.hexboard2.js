@@ -185,9 +185,34 @@ HexBoard2.prototype.draw = function (location, elevation, hover, select, inactiv
         var tile = this.board[this.hoverA][this.hoverB];
         var height = 0;
 
+        if (tile.hoverWindow != undefined) {
+            gameCore.UpdateInfoWindow(tile.hoverWindow, tile.hoverText);
+        }
         this.gameCore.spriteContext.draw(new Sprite(tile.url), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileRadius * this.expandFactor, this.tileRadius * this.expandFactor, hexMath.theta, 1);
 
+        for (var i = 0; i < tile.pieces.length; i++) {
+            height = i * 10;
+            direction = 0;
+            if (tile.pieces[i].direction != undefined) {
+                direction = tile.pieces[i].direction;
+            }
+            if (tile.pieces[i].baseUrls != undefined) {
+                for (var j = 0; j < tile.pieces[i].baseUrls.length; j++) {
+                    this.gameCore.spriteContext.draw(new Sprite(tile.pieces[i].baseUrls[j]), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileRadius * this.expandFactor, this.tileRadius * this.expandFactor, hexMath.theta, 1);
+                }
+            }            
+            if (tile.pieces[i].hoverWindow != undefined) {
+                gameCore.UpdateInfoWindow(tile.pieces[i].hoverWindow, tile.pieces[i].hoverText);
+            }
+            this.gameCore.spriteContext.draw(new Sprite(tile.pieces[i].url), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileRadius * this.expandFactor, this.tileRadius * this.expandFactor, hexMath.theta, 1);
+            if (tile.pieces[i].tokens != undefined) {
+                for (var j = 0; j < tile.pieces[i].tokens.length; j++) {
+                    this.gameCore.spriteContext.draw(new Sprite(tile.pieces[i].tokens[j].url), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileRadius * this.expandFactor, this.tileRadius * this.expandFactor, hexMath.theta, 1);
+                }
+            }
+        }
+
         if (tile.selectable == true && tile.highlightUrl != "")
-            this.gameCore.spriteContext.draw(new Sprite(tile.highlightUrl), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileRadius, this.tileRadius, hexMath.theta, 1);
+            this.gameCore.spriteContext.draw(new Sprite(tile.highlightUrl), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileRadius * this.expandFactor, this.tileRadius * this.expandFactor, hexMath.theta, 1);
     }
 };

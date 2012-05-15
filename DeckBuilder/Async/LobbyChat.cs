@@ -268,7 +268,7 @@ namespace DeckBuilder.Async
                         {
                             PlayerId = p.PlayerID,
                             TableId = newTable.TableID,
-                            DeckId = p.Decks.First().DeckID,
+                            DeckId = db.Decks.First().DeckID,
                             Active = true
                         };
                         db.Seats.Add(s);                        
