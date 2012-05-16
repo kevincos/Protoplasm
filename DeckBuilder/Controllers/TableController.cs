@@ -208,7 +208,7 @@ namespace DeckBuilder.Controllers
         public string GetPythonView(Table table, string pickledState, int playerId)
         {
             InitScriptEngine();
-            LoadModules(table.Game.Name, table.Game.PythonScript);
+            LoadModules(table.Game.Name, table.Version.PythonScript);
             
             ScriptScope runScope = engine.CreateScope();
             runScope.ImportModule("cPickle");
@@ -249,7 +249,7 @@ namespace DeckBuilder.Controllers
             Table table = db.Tables.Find(id);
 
             InitScriptEngine();
-            LoadModules(table.Game.Name, table.Game.PythonScript);
+            LoadModules(table.Game.Name, table.Version.PythonScript);
 
             ScriptScope runScope = engine.CreateScope();
             runScope.ImportModule("cPickle");

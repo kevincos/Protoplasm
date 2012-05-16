@@ -1,0 +1,35 @@
+﻿@model DeckBuilder.Models.GameVersion
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>GameVersion</legend>
+
+    <div class="display-label">VersionString</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.VersionString)
+    </div>
+
+    <div class="display-label">PythonScript</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PythonScript)
+    </div>
+
+    <div class="display-label">MaxPlayers</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.MaxPlayers)
+    </div>
+
+    <div class="display-label">CreationDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CreationDate)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.GameVersionID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

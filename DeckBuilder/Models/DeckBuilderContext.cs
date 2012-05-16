@@ -53,6 +53,7 @@ namespace DeckBuilder.Models
         }*/
 
         public DbSet<Game> Games { get; set; }
+        public DbSet<GameVersion> Versions { get; set; }
         
     }
 }

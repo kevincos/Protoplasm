@@ -9,8 +9,8 @@ using DeckBuilder.Models;
 using DeckBuilder.ViewModels;
 
 namespace DeckBuilder.Controllers
-{ 
-    public class GameController : Controller
+{
+    public class GameVersionController : Controller
     {
         private DeckBuilderContext db = new DeckBuilderContext();
 
@@ -27,23 +27,8 @@ namespace DeckBuilder.Controllers
 
         public ViewResult Details(int id)
         {
-            Game game = db.Games.Find(id);
-            var viewModel = new GameDetailsViewModel
-            {
-                GameId = id,
-                Creator = game.Creator,
-                Name = game.Name,
-                Versions = game.Versions.ToList()
-            };
-            return View(viewModel);
-        }
-
-        public ActionResult CreateVersion(int id)
-        {
-            Game game = db.Games.Find(id);
-            game.Versions.Add(new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = "", CreationDate = DateTime.Now });
-            db.SaveChanges();
-            return RedirectToAction("Details", id); 
+            GameVersion version = db.Versions.Find(id);
+            return View(version);
         }
 
         //
@@ -52,55 +37,55 @@ namespace DeckBuilder.Controllers
         public ActionResult Create()
         {
             return View();
-        } 
+        }
 
         //
         // POST: /Game/Create
 
         [HttpPost]
-        public ActionResult Create(Game game)
+        public ActionResult Create(GameVersion version)
         {
             if (ModelState.IsValid)
             {
-                db.Games.Add(game);
+                db.Versions.Add(version);
                 db.SaveChanges();
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
-            return View(game);
+            return View(version);
         }
-        
+
         //
         // GET: /Game/Edit/5
- 
+
         public ActionResult Edit(int id)
         {
-            Game game = db.Games.Find(id);
-            return View(game);
+            GameVersion version = db.Versions.Find(id);
+            return View(version);
         }
 
         //
         // POST: /Game/Edit/5
 
         [HttpPost]
-        public ActionResult Edit(Game game)
+        public ActionResult Edit(GameVersion version)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(game).State = EntityState.Modified;
+                db.Entry(version).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(game);
+            return View(version);
         }
 
         //
         // GET: /Game/Delete/5
- 
+
         public ActionResult Delete(int id)
         {
-            Game game = db.Games.Find(id);
-            return View(game);
+            GameVersion version = db.Versions.Find(id);
+            return View(version);
         }
 
         //
@@ -108,9 +93,9 @@ namespace DeckBuilder.Controllers
 
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
-        {            
-            Game game = db.Games.Find(id);
-            db.Games.Remove(game);
+        {
+            GameVersion version = db.Versions.Find(id);
+            db.Versions.Remove(version);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

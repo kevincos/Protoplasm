@@ -23,17 +23,13 @@ namespace DeckBuilder.Models
         public virtual ICollection<Deck> Decks { get; set; }
         public virtual ICollection<Table> Tables { get; set; }
 
-        public int gamesPlayed { get; set; }
-        public int gamesWon { get; set; }        
+        public virtual ICollection<Player> Friends { get; set; }
+        public virtual ICollection<Table> ProposedGames { get; set; }
+        public virtual ICollection<Table> ActiveGames { get; set; }
+        public virtual ICollection<Table> CompletedGames { get; set; }
 
-        [Display(Name = "Win Ratio")]
-        public float WinRatio {
-            get
-            {
-                if (gamesPlayed == 0) return 0f;
-                return (1f*gamesWon) / (1f*gamesPlayed);
-            }
-        }
+        public virtual ICollection<Game> CreatedGames { get; set; }
+
         
     }
 }

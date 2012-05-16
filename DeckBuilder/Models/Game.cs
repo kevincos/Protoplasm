@@ -11,8 +11,11 @@ namespace DeckBuilder.Models
 
         public string Name { get; set; }
 
-        public string PythonScript { get; set; }
+        public int CreatorId { get; set; }
+        public virtual Player Creator { get; set; }
 
-        public int MaxPlayers { get; set; }
+        public virtual ICollection<Player> Testers { get; set; }
+
+        public virtual ICollection<GameVersion> Versions { get; set; }
     }
 }

@@ -21,6 +21,14 @@ namespace DeckBuilder.Controllers
 
         public ActionResult Index()
         {
+            foreach (Table t in db.Tables)
+            {
+                db.Tables.Remove(t);
+            }
+            //foreach (Game g in db.Games)
+            //{
+                //db.Games.Remove(g);
+            //}
             db.SaveChanges();
 
             ViewBag.TopPosts = db.Posts.Include(p=>p.Player).OrderByDescending(p => p.Date).Take(2);

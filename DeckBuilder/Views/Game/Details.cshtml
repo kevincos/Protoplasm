@@ -1,30 +1,45 @@
-﻿@model DeckBuilder.Models.Game
+﻿@model DeckBuilder.ViewModels.GameDetailsViewModel
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = @Model.Name;
 }
 
-<h2>Details</h2>
+<h2>@Model.Name</h2>
 
-<fieldset>
-    <legend>Game</legend>
 
-    <div class="display-label">Name</div>
-    <div class="display-field">
-        @Html.DisplayFor(model => model.Name)
-    </div>
+@Html.ActionLink("Add Version", "CreateVersion/"+Model.GameId)
 
-    <div class="display-label">PythonScript</div>
-    <div class="display-field">
-        @Html.DisplayFor(model => model.PythonScript)
-    </div>
+<table>
+    <tr>
+        <th>
+            Version
+        </th>
+        <th>
+            MaxPlayers
+        </th>
+        <th>
+            Dev Stage
+        </th>
+        <th></th>
+    </tr>
 
-    <div class="display-label">MaxPlayers</div>
-    <div class="display-field">
-        @Html.DisplayFor(model => model.MaxPlayers)
-    </div>
-</fieldset>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id=Model.GameID }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+@foreach (var item in Model.Versions) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.VersionString)
+        </td>        
+        <td>
+            @Html.DisplayFor(modelItem => item.MaxPlayers)
+        </td>  
+        <td>
+            @Html.DisplayFor(modelItem => item.DevStage)
+        </td>  
+        <td>
+            @Html.ActionLink("Edit", "Edit", "GameVersion", new { id=item.GameVersionID }, null) |
+            @Html.ActionLink("Details", "Details", "GameVersion", new { id=item.GameVersionID }, null) |
+            @Html.ActionLink("Delete", "Delete", "GameVersion", new { id = item.GameVersionID }, null)
+        </td>
+    </tr>
+}
+
+</table>

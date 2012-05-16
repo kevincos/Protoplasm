@@ -19,6 +19,14 @@ using DeckBuilder.Controllers;
 
 namespace DeckBuilder.Models
 {
+    public enum TableState
+    {
+        Proposed,
+        Cancelled,
+        InPlay,
+        Complete
+    }
+
     public class Table
     {
         public int TableID { get; set; }
@@ -31,6 +39,10 @@ namespace DeckBuilder.Models
 
         public int GameId { get; set; }
         public virtual Game Game { get; set; }
+
+        public virtual GameVersion Version { get; set; }
+
+        public TableState TableState { get; set; }
 
         public void GenerateInitialState()
         {
@@ -49,7 +61,7 @@ namespace DeckBuilder.Models
             else
             {
                 TableController.InitScriptEngine();
-                TableController.LoadModules(Game.Name, Game.PythonScript);
+                TableController.LoadModules(Game.Name, Version.PythonScript);
 
                 ScriptScope runScope = TableController.engine.CreateScope();
                 runScope.ImportModule("cPickle");

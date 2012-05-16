@@ -24,29 +24,13 @@
             @Html.EditorFor(model => model.Name)
             @Html.ValidationMessageFor(model => model.Name)
         </div>
-
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.PythonScript)
-        </div>
-        <div class="editor-field">
-            @Html.TextAreaFor(model => model.PythonScript, 20, 80, null)
-            @Html.ValidationMessageFor(model => model.PythonScript)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.MaxPlayers)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.MaxPlayers)
-            @Html.ValidationMessageFor(model => model.MaxPlayers)
-        </div>
-
+        
         <p>
             <input type="submit" value="Save" />
         </p>
     </fieldset>
 }
+
 
 <div>
     @Html.ActionLink("Back to List", "Index")

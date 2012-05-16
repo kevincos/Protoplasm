@@ -20,24 +20,7 @@
         <div class="editor-field">
             @Html.EditorFor(model => model.Name)
             @Html.ValidationMessageFor(model => model.Name)
-        </div>
-
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.PythonScript)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.PythonScript)
-            @Html.ValidationMessageFor(model => model.PythonScript)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.MaxPlayers)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.MaxPlayers)
-            @Html.ValidationMessageFor(model => model.MaxPlayers)
-        </div>
+        </div>        
 
         <p>
             <input type="submit" value="Create" />

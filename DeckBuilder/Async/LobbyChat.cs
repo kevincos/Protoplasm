@@ -257,6 +257,7 @@ namespace DeckBuilder.Async
                     Table newTable = new Table();
                     newTable = db.Tables.Add(newTable);
                     newTable.Game = db.Games.Single(g => g.Name == proposal.game);
+                    newTable.Version = newTable.Game.Versions.First();
                     db.SaveChanges();
 
                     // Create Seats
