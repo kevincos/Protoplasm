@@ -444,6 +444,17 @@ class GameState:
         self.game_over = False
         self.logs = []
         self.table_id = seats[0].TableId
+        seats[self.active_player_index].Waiting = True
+
+    def is_waiting_for_input(player_id):
+        if player_id == self.active_player_id:
+            return True
+        return False
+
+    def set_waiting_status(self, seats):
+        for i in range(len(seats)):
+            seats[i].Waiting = (seats[i].PlayerId == self.active_player_id)
+
 
     def log(self, message):
         self.logs.append(message)

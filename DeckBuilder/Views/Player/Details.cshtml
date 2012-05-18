@@ -1,54 +1,52 @@
-﻿@model DeckBuilder.Models.Player
+﻿@model DeckBuilder.ViewModels.ProfileViewModel
 
 @{
-    ViewBag.Title = "Developer Page";
+    ViewBag.Title = "Profile Page";
 }
 
 <fieldset>
 
     <div class="ListPanelImage">
-        <img src = "@Model.ProfileImageUrl" />
+        <img src = "@Model.player.ProfileImageUrl" />
     </div>
 
     <div class="ListPanelInfo">     
-        <div class="ListPanelHeader">@Model.Name</div>                   
+        <div class="ListPanelHeader">@Model.player.Name</div>                   
         <span class = "ListPanelText">Level: 100</span>
         <span class = "ListPanelText">Exp: 3203</span>
     </div>
 
     <h2>Active Games</h2>
-    @foreach (var item in @Model.ActiveSeats)
+    @foreach (var item in @Model.ActiveGames)
     {
         <div>
-            @item.Table.Game.Name with
-            @foreach (var seat in item.Table.Seats)
-            {
-                if (@Model.Name != @seat.Player.Name)
-                {
-                    @seat.Player.Name
-                }
-            }
-            @if (item.Table.TableState == 0)
-            {
-                <html>(Proposed)</html>
-            }
-            @if (item.Table.TableState == 2)
-            {
-                <html>(In-Play)</html>
-            }
-            @if (item.Table.TableState == 3)
-            {
-                <html>(Complete)</html>
-            }
-                    
-            @Html.ActionLink("Play", "Play", "Table", new { id = item.TableId }, null)
+            @item.gameName with @item.formattedOpponentNames @item.status                    
+            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
         </div>
     }
     <h2>Proposed Games</h2>    
+    @foreach (var item in @Model.ProposedGames)
+    {
+        <div>
+            @item.gameName with @item.formattedOpponentNames @item.status
+            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+            @if (item.cancellable == true)
+            {
+                @Html.ActionLink("Cancel", "Cancel", "Table", new { id = item.tableId }, null)
+            }
+        </div>
+    }
     <h2>Completed Games</h2>
+    @foreach (var item in @Model.CompletedGames)
+    {
+        <div>
+            @item.gameName with @item.formattedOpponentNames @item.status
+            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+        </div>
+    }
 </fieldset>
 
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.PlayerID }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.player.PlayerID }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

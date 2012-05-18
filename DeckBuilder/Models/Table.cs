@@ -46,40 +46,24 @@ namespace DeckBuilder.Models
 
         public void GenerateInitialState()
         {
-            if (Game.Name == "Geomancer")
-            {
-                GeomancerState gameState = new GeomancerState();  
-                gameState.InitializeState(Seats.ToList());
-                GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
-            }
-            else if (Game.Name == "Onslaught")
-            {
-                OnslaughtState gameState = new OnslaughtState();
-                gameState.InitializeState(Seats.ToList());
-                GameState = Compression.CompressGameState(gameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
-            }
-            else
-            {
-                TableController.InitScriptEngine();
-                TableController.LoadModules(Game.Name, Version.PythonScript);
+            TableController.InitScriptEngine();
+            TableController.LoadModules(Game.Name, Version.PythonScript);
 
-                ScriptScope runScope = TableController.engine.CreateScope();
-                runScope.ImportModule("cPickle");
-                runScope.ImportModule("protoplasm");
-                runScope.ImportModule(Game.Name);
+            ScriptScope runScope = TableController.engine.CreateScope();
+            runScope.ImportModule("cPickle");
+            runScope.ImportModule("protoplasm");
+            runScope.ImportModule(Game.Name);
 
-                // Input array of seats.
-                Seat[] seatsArray = Seats.ToArray();
-                runScope.SetVariable("seats", seatsArray);                
+            // Input array of seats.
+            Seat[] seatsArray = Seats.ToArray();
+            runScope.SetVariable("seats", seatsArray);
 
-                ScriptSource runSource = TableController.engine.CreateScriptSourceFromString("pickledState = cPickle.dumps("+Game.Name+".Init(seats),0)", SourceCodeKind.Statements);                
+            ScriptSource runSource = TableController.engine.CreateScriptSourceFromString("initialState = " + Game.Name + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SourceCodeKind.Statements);                
 
-                runSource.Execute(runScope);
+            runSource.Execute(runScope);
 
 
-                GameState = Compression.CompressStringState(runScope.GetVariable("pickledState"));
-            }
-
+            GameState = Compression.CompressStringState(runScope.GetVariable("pickledState"));
         }
     }
 }

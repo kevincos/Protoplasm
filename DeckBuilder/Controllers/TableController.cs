@@ -56,14 +56,27 @@ namespace DeckBuilder.Controllers
         {
             Table table = db.Tables.Where(t => t.TableID == id).Include("Seats").Single();
 
-            List<Seat> seats = db.Seats.ToList();
-            List<string> playerNames = seats.Select(s => s.Player.Name).ToList();
+            List<string> playerNames = table.Seats.Select(s => s.Player.Name).ToList();
             if (!playerNames.Contains(User.Identity.Name))
             {
                 return RedirectToAction("Details", "Table", new { id = id });
             }
 
-            Seat currentSeat = table.Seats.Where(s => s.Player.Name == User.Identity.Name).Single();
+            Seat currentSeat = table.Seats.Where(s => s.Player.Name == User.Identity.Name).Single();            
+
+            if (table.TableState == (int)TableState.Proposed)
+            {
+                currentSeat.Accepted = true;
+                bool allAccepted = true;
+                foreach (Seat s in table.Seats)
+                {
+                    if (s.Accepted == false)
+                        allAccepted = false;
+                }
+                if (allAccepted == true)
+                    table.TableState = (int)(TableState.InPlay);
+                db.SaveChanges();
+            }
 
             if (table.Game.Name == "Geomancer")
             {
@@ -172,7 +185,8 @@ namespace DeckBuilder.Controllers
                 PlayerId = player.PlayerID,
                 TableId = newTable.TableID,
                 DeckId = db.Decks.First().DeckID,
-                Active = true
+                Accepted = true,
+                Waiting = false
             };
             db.Seats.Add(s1);
             Seat s2 = new Seat
@@ -180,7 +194,8 @@ namespace DeckBuilder.Controllers
                 PlayerId = opponent.PlayerID,
                 TableId = newTable.TableID,
                 DeckId = db.Decks.First().DeckID,
-                Active = true
+                Accepted = false,
+                Waiting = false
             };
             db.Seats.Add(s2);
 
@@ -191,31 +206,6 @@ namespace DeckBuilder.Controllers
             newTable.GenerateInitialState();
             db.SaveChanges();
             return RedirectToAction("Play", new { id = newTable.TableID });
-        }
-
-        // Update
-        [HttpPost]
-        public ActionResult UpdateMechtonic(int id, MechtonicUpdate inputState)
-        {
-            Table table = db.Tables.Find(id);
-
-            // Get and decompress master state from database                        
-            MechtonicState masterState = (MechtonicState)Compression.DecompressGameState(table.GameState, MechtonicState.GetSerializer());
-            // Merge state with master gamestate
-            masterState.Update(inputState);
-            // Compress state for database storage
-            table.GameState = Compression.CompressGameState(masterState, MechtonicState.GetSerializer());
-            db.SaveChanges();
-
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
-            {
-                clients[s.Player.Name + id].mechtonic_updateGameState(masterState.GetClientState(s.PlayerId));
-            }
-
-            return View();
         }
 
         public static ScriptEngine engine = null;
@@ -286,9 +276,8 @@ namespace DeckBuilder.Controllers
         [HttpPost]
         public ActionResult UpdateMain(int id, GameUpdate update)
         {
+            DateTime start = DateTime.Now;
             Table table = db.Tables.Find(id);
-            if(table.TableState == (int)TableState.Proposed)
-                table.TableState = (int)TableState.InPlay;
 
             InitScriptEngine();
             LoadModules(table.Game.Name, table.Version.PythonScript);
@@ -296,16 +285,21 @@ namespace DeckBuilder.Controllers
             ScriptScope runScope = engine.CreateScope();
             runScope.ImportModule("cPickle");
 
-            string init_pickledState = Compression.DecompressStringState(table.GameState);     
-
+            string init_pickledState = Compression.DecompressStringState(table.GameState);
+            DateTime modulesLoaded = DateTime.Now;
 
             // PYTHON UPDATE
 
             // Input state                                                                                                              
             runScope.SetVariable("inputState", init_pickledState);
             runScope.SetVariable("update", update);
+            // Input array of seats.
+            Seat[] seatsArray = table.Seats.ToArray();
+            runScope.SetVariable("seats", seatsArray);
 
-            ScriptSource runSource = engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
+            DateTime variablesSet = DateTime.Now;
+
+            ScriptSource runSource = engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);gameState.set_waiting_status(seats);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
             runSource.Execute(runScope);
 
             string final_pickledState = runScope.GetVariable("finalState");
@@ -313,7 +307,12 @@ namespace DeckBuilder.Controllers
             if (game_over == true)
                 table.TableState = (int)TableState.Complete;
             table.GameState = Compression.CompressStringState(final_pickledState);
+
+            DateTime scriptsExecuted = DateTime.Now;
+
             db.SaveChanges();
+
+            DateTime databaseSaved = DateTime.Now;
 
             // Send updated states to clients
             IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
@@ -323,7 +322,13 @@ namespace DeckBuilder.Controllers
                 string viewJson = GetPythonView(table, final_pickledState, s.PlayerId);
                 clients[s.Player.Name + id].main_updateGameState(viewJson);
             }
-
+            DateTime end = DateTime.Now;
+            TimeSpan totalTime = end.Subtract(start);
+            TimeSpan moduleLoadTime = modulesLoaded.Subtract(start);
+            TimeSpan variablesSetTime = variablesSet.Subtract(modulesLoaded);
+            TimeSpan scriptsExecutedTime = scriptsExecuted.Subtract(variablesSet);
+            TimeSpan databaseSavedTime = databaseSaved.Subtract(scriptsExecuted);
+            TimeSpan updateTime = end.Subtract(databaseSaved);
             return View();
         }
 

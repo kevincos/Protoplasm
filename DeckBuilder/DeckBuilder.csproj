@@ -185,6 +185,7 @@
     <Compile Include="Protoplasm\HexBoard.cs" />
     <Compile Include="Protoplasm\PlayerContext.cs" />
     <Compile Include="Protoplasm\SquareBoard.cs" />
+    <Compile Include="ViewModels\ProfileViewModel.cs" />
     <Compile Include="ViewModels\GameDetailsViewModel.cs" />
     <Compile Include="ViewModels\PlayerEntryViewModel.cs" />
   </ItemGroup>
@@ -286,6 +287,7 @@
     <Content Include="Content\Images\Frames\metal_upperrightcorner_active.png" />
     <Content Include="Content\Images\Frames\metal_viewframe.png" />
     <Content Include="Content\Images\Frames\metal_viewframe_active.png" />
+    <Content Include="Content\Images\mechtoniclogo.png" />
     <Content Include="Content\Images\Mechtonic\buy_card.png" />
     <Content Include="Content\Images\Mechtonic\buy_colossus.png" />
     <Content Include="Content\Images\Mechtonic\buy_frame.png" />
@@ -335,6 +337,7 @@
     <Content Include="Content\Images\mysterycat2.png" />
     <Content Include="Content\Images\reversilogo.png" />
     <Content Include="Content\Images\rpslogo.png" />
+    <Content Include="Content\Images\tblaze.PNG" />
     <Content Include="Content\Protoplasm.css" />
     <Content Include="Content\GamePage.css" />
     <Content Include="Content\Images\ampcrystal.png" />

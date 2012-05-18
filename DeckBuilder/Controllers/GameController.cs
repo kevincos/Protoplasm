@@ -41,9 +41,19 @@ namespace DeckBuilder.Controllers
         public ActionResult CreateVersion(int id)
         {
             Game game = db.Games.Find(id);
-            game.Versions.Add(new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = "", CreationDate = DateTime.Now });
+            GameVersion version = new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = "", CreationDate = DateTime.Now, ParentGame = game };
+            game.Versions.Add(version);
             db.SaveChanges();
-            return RedirectToAction("Details", id); 
+            return RedirectToAction("Edit", new { id = id }); 
+        }
+
+
+        //
+        // GET: /Player/Admin
+
+        public ViewResult Admin()
+        {
+            return View(db.Games.ToList());
         }
 
         //
@@ -72,7 +82,7 @@ namespace DeckBuilder.Controllers
                 db.SaveChanges();
                 player.CreatedGames.Add(game);
                 db.SaveChanges();
-                return RedirectToAction("Index");  
+                return RedirectToAction("Edit", "Game", new { id = game.GameID });  
             }
 
             return View(game);

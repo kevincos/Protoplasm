@@ -49,7 +49,7 @@ namespace DeckBuilder.Controllers
             {
                 db.Versions.Add(version);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Edit", "GameVersion", new { id = version.GameVersionID });
             }
 
             return View(version);
@@ -74,7 +74,7 @@ namespace DeckBuilder.Controllers
             {
                 db.Entry(version).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Details", new { id=version.GameVersionID });
+                return RedirectToAction("Edit", new { id=version.GameVersionID });
             }
             return View(version);
         }

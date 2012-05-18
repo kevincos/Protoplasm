@@ -25,7 +25,7 @@
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.PythonScript)
+            @Html.LabelFor(model => model.PythonScript)  (@Html.ActionLink("Documentation", "Docs", "Home", null, null))
         </div>
         <div class="editor-field">
             @Html.TextAreaFor(model => model.PythonScript, 20, 80, null)
@@ -55,5 +55,5 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back to List", "Edit", "Game", new { id = Model.ParentGame.GameID }, null)
 </div>

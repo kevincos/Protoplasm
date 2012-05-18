@@ -39,7 +39,7 @@
         </div>
 
         <div class="editor-field">            
-            @Html.TextAreaFor(model => model.Description, 20, 40, null)
+            @Html.TextAreaFor(model => model.Description, 8, 40, null)
             @Html.ValidationMessageFor(model => model.Description)
         </div>
         
@@ -49,7 +49,42 @@
     </fieldset>
 }
 
+@Html.ActionLink("Add Version", "CreateVersion/"+Model.GameID)
+
+<table>
+    <tr>
+        <th>
+            Version
+        </th>
+        <th>
+            MaxPlayers
+        </th>
+        <th>
+            Dev Stage
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model.Versions) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.VersionString)
+        </td>        
+        <td>
+            @Html.DisplayFor(modelItem => item.MaxPlayers)
+        </td>  
+        <td>
+            @Html.DisplayFor(modelItem => item.DevStage)
+        </td>  
+        <td>
+            @Html.ActionLink("Edit", "Edit", "GameVersion", new { id=item.GameVersionID }, null) |            
+            @Html.ActionLink("Delete", "Delete", "GameVersion", new { id = item.GameVersionID }, null)
+        </td>
+    </tr>
+}
+
+</table>
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back to List", "DeveloperProfile", "Home")
 </div>

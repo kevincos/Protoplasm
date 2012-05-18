@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using DeckBuilder.Models;
+using DeckBuilder.ViewModels;
 
 namespace DeckBuilder.Controllers
 { 
@@ -37,7 +38,8 @@ namespace DeckBuilder.Controllers
         public ViewResult Details(int id)
         {
             Player player = db.Players.Find(id);
-            return View(player);
+            ProfileViewModel playerViewModel = new ProfileViewModel(player);
+            return View(playerViewModel);
         }
 
         //

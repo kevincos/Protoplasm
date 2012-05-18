@@ -18,7 +18,8 @@ namespace DeckBuilder.Models
         public int TableId { get; set; }
         public virtual Table Table { get; set; }
 
-        public bool Active { get; set; }
+        public bool Accepted { get; set; }
+        public bool Waiting { get; set; }
 
         // Rock Paper Scissors Data
         public int Wins { get; set; }

@@ -270,7 +270,8 @@ namespace DeckBuilder.Async
                             PlayerId = p.PlayerID,
                             TableId = newTable.TableID,
                             DeckId = db.Decks.First().DeckID,
-                            Active = true
+                            Accepted = true,
+                            Waiting = false                            
                         };                        
                         db.Seats.Add(s);                        
                     }
@@ -297,61 +298,6 @@ namespace DeckBuilder.Async
                 }
             }
             return;
-        }
-
-        public void Confirm(string opponent, int deckId)
-        {
-            foreach (GameProposal p in proposals)
-            {
-                if (p.InvolvesPlayers(opponent, Caller.name))
-                {
-                    p.ConfirmPlayer(Caller.name, deckId);
-                    if (p.IsConfirmed())
-                    {
-                        // NOTE: GAME CREATION DOES NOT BELONG IN LOBBY CODE
-
-                        // Create Table
-                        Table newTable = new Table();                        
-                        newTable = db.Tables.Add(newTable);
-                        db.SaveChanges();
-
-                        // Create Seats
-                        String yourName = Caller.name;
-                        Player p1 = db.Players.Where(pl => pl.Name == yourName).Single();
-                        Player p2 = db.Players.Where(pl => pl.Name == opponent).Single();
-                        
-                        Seat s1 = new Seat
-                        {
-                            PlayerId = p1.PlayerID,
-                            DeckId = p.GetDeckId(yourName),
-                            TableId = newTable.TableID,
-                            Active = true
-                        };
-                        Seat s2 = new Seat
-                        {
-                            PlayerId = p2.PlayerID,
-                            DeckId = p.GetDeckId(opponent),
-                            TableId = newTable.TableID,
-                            Active = true
-                        };
-                        db.Seats.Add(s1);
-                        db.Seats.Add(s2);
-                        db.SaveChanges();
-
-                        newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
-                        newTable.Game = db.Games.Single(g => g.Name == p.game);
-                        newTable.GenerateInitialState();
-                        db.SaveChanges();
-
-                        proposals.Remove(p);                                     
-
-                        // Redirect plyaers to game
-                        Clients[opponent].beginGame(newTable.TableID);
-                        Clients[Caller.name].beginGame(newTable.TableID);
-                        return;
-                    }                    
-                }
-            }
         }
 
         public void Broadcast(string chatText)
