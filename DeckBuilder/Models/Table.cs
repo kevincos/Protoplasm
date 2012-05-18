@@ -44,6 +44,8 @@ namespace DeckBuilder.Models
 
         public int TableState { get; set; }
 
+        public String ChatRecord { get; set; }
+
         public void GenerateInitialState()
         {
             TableController.InitScriptEngine();
@@ -62,6 +64,7 @@ namespace DeckBuilder.Models
 
             runSource.Execute(runScope);
 
+            ChatRecord = "";
 
             GameState = Compression.CompressStringState(runScope.GetVariable("pickledState"));
         }

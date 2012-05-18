@@ -28,28 +28,13 @@
 
 
 
-@if (ViewBag.Game == "Geomancer")
-{
-    <script type="text/javascript">
-        window.onload = geomancer_init(@ViewBag.state);    
-    </script>
-}
-else if (ViewBag.Game == "Onslaught")
-{
-    <script type="text/javascript">
-        window.onload = onslaught_init(@ViewBag.state);    
-    </script>
-}
-else
-{ 
-    <script type="text/javascript">        
-        window.onload = main_init(@ViewBag.state);   
-    </script>
-}
+
+<script type="text/javascript">        
+    window.onload = main_init(@ViewBag.state);   
+</script>
+
 
 
 <script type="text/javascript">
-
-    initPlayArea("@ViewBag.PlayerName", "@ViewBag.TableId");
-
+    initPlayArea("@ViewBag.PlayerName", "@ViewBag.TableId", "@ViewBag.InitialChatData");
 </script>

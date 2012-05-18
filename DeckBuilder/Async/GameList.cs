@@ -24,9 +24,13 @@ namespace DeckBuilder.Async
         {
             
             Table table = db.Tables.Find(tableId);
+            String fullMessage = DateTime.Now.Hour + ":" + DateTime.Now.Minute + "  " + Context.User.Identity.Name + ": " + chatText;
+            table.ChatRecord+=fullMessage+"<br/>";
+            if (table.ChatRecord.Length > 1024) table.ChatRecord = table.ChatRecord.Substring(table.ChatRecord.Length - 1024);
+            db.SaveChanges();
             foreach (Seat s in table.Seats)
             {
-                Clients[s.Player.Name + tableId].update_chat(DateTime.Now.Hour + ":"+ DateTime.Now.Minute + "  " + Context.User.Identity.Name + ": " +chatText);
+                Clients[s.Player.Name + tableId].update_chat(fullMessage);
             }
         }
     }

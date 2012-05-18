@@ -1,6 +1,6 @@
 ﻿var logCount = 0;
 
-function initPlayArea(playerName, tableId) {
+function initPlayArea(playerName, tableId, initialChatText) {
     $("document").ready(function () {
         var playConnection = $.connection.gameList;
 
@@ -27,6 +27,8 @@ function initPlayArea(playerName, tableId) {
         playConnection.main_updateGameState = function (data) {
             main_setGameState(JSON.parse(data));
         };
+
+        $("#chat").append("<div id='chatline'>" + initialChatText + "</div>");
 
         playConnection.update_chat = function (data) {
             var chatlog = $("#chat");

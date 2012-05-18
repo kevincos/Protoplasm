@@ -78,36 +78,11 @@ namespace DeckBuilder.Controllers
                 db.SaveChanges();
             }
 
-            if (table.Game.Name == "Geomancer")
-            {
-                // DATABASE DECOMPRESS: decompress from database
-                GeomancerState masterState = (GeomancerState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
-                // WIRE COMPRESS : Send client specific game state                     
-                GeomancerState clientState = masterState.GetClientState(currentSeat.PlayerId);
-                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) })));
-            }
-            else if (table.Game.Name == "Onslaught")
-            {
-                // DATABASE DECOMPRESS: decompress from database
-                OnslaughtState masterState = (OnslaughtState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
-                // WIRE COMPRESS : Send client specific game state                     
-                OnslaughtState clientState = masterState.GetClientState(currentSeat.PlayerId);
-                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) })));
-            }
-            else
-            {
-                string pickledState = Compression.DecompressStringState(table.GameState);                
-                ViewBag.state = new HtmlString(GetPythonView(table, pickledState, currentSeat.PlayerId));
-            }
-            /*else
-            {
-                // DATABASE DECOMPRESS: decompress from database
-                BaseGameState masterState = (BaseGameState)Compression.DecompressGameState(table.GameState, GameState<PlayerContext>.GetSerializer(table.Game.Name));
-                // WIRE COMPRESS : Send client specific game state                     
-                GameView clientState = masterState.GetClientView(currentSeat.PlayerId);
-                ViewBag.state = new HtmlString(Compression.ConvertToJSON(clientState, masterState.GetSerializer()));
-            }*/
+            string pickledState = Compression.DecompressStringState(table.GameState);                
+            ViewBag.state = new HtmlString(GetPythonView(table, pickledState, currentSeat.PlayerId));
 
+
+            ViewBag.InitialChatData = new HtmlString(table.ChatRecord);
             ViewBag.game = table.Game.Name;
             ViewBag.TableId = table.TableID;
             ViewBag.PlayerId = currentSeat.PlayerId;
@@ -116,55 +91,6 @@ namespace DeckBuilder.Controllers
             return View(table);
         }
 
-        // Update
-        [HttpPost]
-        public ActionResult Update(int id, GeomancerState inputState)
-        {
-            Table table = db.Tables.Find(id);
-            
-            // Get and decompress master state from database                        
-            GeomancerState masterState = (GeomancerState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
-            // Merge state with master gamestate
-            masterState.Update(inputState);          
-            // Compress state for database storage
-            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(GeomancerState), new Type[] { typeof(GeomancerTile), typeof(GeomancerUnit), typeof(GeomancerCard), typeof(GeomancerCrystal), typeof(GeomancerSpell) }));
-            db.SaveChanges();
-
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
-            {
-                clients[s.Player.Name + id].updateGameState(masterState.GetClientState(s.PlayerId));
-            }
-
-            return View();
-        }
-
-        // Update
-        [HttpPost]
-        public ActionResult UpdateOnslaught(int id, OnslaughtUpdate inputState)
-        {
-            Table table = db.Tables.Find(id);
-
-            // Get and decompress master state from database                        
-            OnslaughtState masterState = (OnslaughtState)Compression.DecompressGameState(table.GameState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
-            // Merge state with master gamestate
-            masterState.Update(inputState);
-            // Compress state for database storage
-            table.GameState = Compression.CompressGameState(masterState, new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OnslaughtState), new Type[] { typeof(OnslaughtPlayerContext), typeof(GalaxyCard), typeof(SupplyPile), typeof(InvasionCard), typeof(InvaderToken) }));
-            db.SaveChanges();
-
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
-            {
-                clients[s.Player.Name + id].onslaught_updateGameState(masterState.GetClientState(s.PlayerId));
-            }
-
-            return View();
-        }
 
         [Authorize]
         public ActionResult Challenge(int opponentId, string gameName)
@@ -331,32 +257,6 @@ namespace DeckBuilder.Controllers
             TimeSpan updateTime = end.Subtract(databaseSaved);
             return View();
         }
-
-        /*
-        // Update
-        [HttpPost]
-        public ActionResult UpdateMain(int id, GameUpdate inputState)
-        {
-            Table table = db.Tables.Find(id);
-
-            // Get and decompress master state from database                        
-            BaseGameState masterState = (BaseGameState)Compression.DecompressGameState(table.GameState, BaseGameState.GetSerializer(table.Game.Name));
-            // Merge state with master gamestate
-            masterState.Update(inputState);
-            // Compress state for database storage
-            table.GameState = Compression.CompressGameState(masterState, masterState.GetSerializer());
-            db.SaveChanges();
-
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
-            {
-                clients[s.Player.Name + id].main_updateGameState(masterState.GetClientView(s.PlayerId));
-            }
-
-            return View();
-        }*/
 
         //
         // GET: /Table/Create
