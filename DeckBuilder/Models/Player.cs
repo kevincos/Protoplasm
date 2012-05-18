@@ -28,6 +28,8 @@ namespace DeckBuilder.Models
         public virtual ICollection<Table> ActiveGames { get; set; }
         public virtual ICollection<Table> CompletedGames { get; set; }
 
+        public virtual ICollection<Seat> ActiveSeats { get; set; }
+
         public virtual ICollection<Game> CreatedGames { get; set; }
 
         

@@ -49,6 +49,7 @@ namespace DeckBuilder.Controllers
         //
         // GET: /Game/Create
 
+        [Authorize]
         public ActionResult Create()
         {
             return View();
@@ -58,11 +59,18 @@ namespace DeckBuilder.Controllers
         // POST: /Game/Create
 
         [HttpPost]
+        [Authorize]
         public ActionResult Create(Game game)
         {
+            PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
+            var player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
+            game.Creator = player;
+            game.CreatorId = player.PlayerID;            
             if (ModelState.IsValid)
             {
                 db.Games.Add(game);
+                db.SaveChanges();
+                player.CreatedGames.Add(game);
                 db.SaveChanges();
                 return RedirectToAction("Index");  
             }

@@ -17,25 +17,12 @@
     <script src="@Url.Content("~/Scripts/Graphics/sprite.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/Graphics/spritecontext.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/GameCore/gamecore.hand.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.hand2.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/GameCore/gamecore.hexboard.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.hexboard2.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/GameCore/gamecore.squareboard.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/GameCore/gamecore.squareboard2.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/GameCore/gamecore.infowindow.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/GameCore/gamecore.squareboard2.js")" type="text/javascript"></script>   
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.infowindow2.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.track.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.main.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Geomancer/geomancer.init.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Geomancer/geomancer.update.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Geomancer/geomancer.draw.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Geomancer/geomancer.overlay.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/RPS/rpsmain.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Onslaught/onslaught.main.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Connect4/connect4.main.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Mechtonic/mechtonic.main.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/Convoy/convoy.main.js")" type="text/javascript"></script>
 </head>
 <body>
     <div class = "content">
@@ -50,11 +37,11 @@
                     </div>
                     <ul id="menu">
                         <li>@Html.ActionLink("News", "Index", "Home")</li>
-                        <li>@Html.ActionLink("Lobby", "Lobby", "Home")</li>
+                        <li>@Html.ActionLink("Lobby", "Lobby", "Home")</li>                        
+                        <li>@Html.ActionLink("Games", "Index", "Game")</li>                    
+                        <li>@Html.ActionLink("Players", "Index", "Player")</li>
                         <li>@Html.ActionLink("Profile", "Profile", "Home")</li>                    
-                        <li>@Html.ActionLink("Games", "Games", "Home")</li>                    
-                        <li>@Html.ActionLink("Forums", "Forums", "Home")</li>
-                        <li>@Html.ActionLink("About", "About", "Home")</li>
+                        <li>@Html.ActionLink("Developer", "DeveloperProfile", "Home")</li>                        
                     </ul>
                 </div>
             </header>

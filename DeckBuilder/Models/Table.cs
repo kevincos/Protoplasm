@@ -21,10 +21,10 @@ namespace DeckBuilder.Models
 {
     public enum TableState
     {
-        Proposed,
-        Cancelled,
-        InPlay,
-        Complete
+        Proposed=0,
+        Cancelled=1,
+        InPlay=2,
+        Complete=3
     }
 
     public class Table
@@ -42,7 +42,7 @@ namespace DeckBuilder.Models
 
         public virtual GameVersion Version { get; set; }
 
-        public TableState TableState { get; set; }
+        public int TableState { get; set; }
 
         public void GenerateInitialState()
         {
@@ -65,7 +65,7 @@ namespace DeckBuilder.Models
 
                 ScriptScope runScope = TableController.engine.CreateScope();
                 runScope.ImportModule("cPickle");
-                runScope.ImportModule("gamestate");
+                runScope.ImportModule("protoplasm");
                 runScope.ImportModule(Game.Name);
 
                 // Input array of seats.

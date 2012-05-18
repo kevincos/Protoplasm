@@ -18,6 +18,16 @@ namespace DeckBuilder.Controllers
 
         public ViewResult Index()
         {
+            ViewBag.currentPlayer = User.Identity.Name;
+            ViewBag.gameList = db.Games.Select(g => g.Name).ToList();
+            return View(db.Players.ToList());
+        }
+
+        //
+        // GET: /Player/Admin
+
+        public ViewResult Admin()
+        {
             return View(db.Players.ToList());
         }
 
@@ -25,6 +35,15 @@ namespace DeckBuilder.Controllers
         // GET: /Player/Details/5
 
         public ViewResult Details(int id)
+        {
+            Player player = db.Players.Find(id);
+            return View(player);
+        }
+
+        //
+        // GET: /Player/Details/5
+
+        public ViewResult Developer(int id)
         {
             Player player = db.Players.Find(id);
             return View(player);

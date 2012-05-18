@@ -2,8 +2,8 @@
     this.type = "SquareBoard";
     this.gameCore = core;
     this.board = srcBoard.grid;
-    this.length = srcBoard.length;
     this.width = srcBoard.width;
+    this.height = srcBoard.height;
     this.sizeX = srcBoard.xSize;
     this.sizeY = srcBoard.ySize;
     this.name = srcBoard.name;
@@ -18,18 +18,18 @@
     this.selectY = null;
     this.selectDirection = null;
 
-    //this.tileSize = this.sizeX / this.length;
+    //this.tileSize = this.sizeX / this.width;
     this.tileSize = srcBoard.xTileSize;
     this.expandFactor = 1.2;
-    //this.imageSize = this.sizeX / this.length;
+    //this.imageSize = this.sizeX / this.width;
     this.imageSize = this.tileSize;
-    this.sizeX = this.length * this.tileSize;
-    this.sizeY = this.width * this.tileSize;
+    this.sizeX = this.width * this.tileSize;
+    this.sizeY = this.height * this.tileSize;
 };
 
 // Update
 SquareBoard2.prototype.update = function () {
-    var mouseCoords = new vMath.vector2((vMath.mousePos.x - this.location.x + .5 * this.tileSize * this.length - .5 * this.tileSize) / this.tileSize, (vMath.mousePos.y - this.location.y + .5 * this.tileSize * this.width - .5 * this.tileSize) / this.tileSize);
+    var mouseCoords = new vMath.vector2((vMath.mousePos.x - this.location.x + .5 * this.tileSize * this.width - .5 * this.tileSize) / this.tileSize, (vMath.mousePos.y - this.location.y + .5 * this.tileSize * this.height - .5 * this.tileSize) / this.tileSize);
     var hoverX = Math.round(mouseCoords.x);
     var hoverY = Math.round(mouseCoords.y);
 
@@ -55,7 +55,7 @@ SquareBoard2.prototype.update = function () {
     else
         hoverEdge = false;
 
-    if (hoverX < 0 || hoverX >= this.length || hoverY < 0 || hoverY >= this.width) {
+    if (hoverX < 0 || hoverX >= this.width || hoverY < 0 || hoverY >= this.height) {
         if (this.hoverX != null)
             this.gameCore.refreshView = true;
         this.hoverX = null;
@@ -95,12 +95,12 @@ SquareBoard2.prototype.update = function () {
 
 // Render
 SquareBoard2.prototype.draw = function (location, elevation, hover, select, inactive) {
-    for (var x = 0; x < this.length; x++) {
-        for (var y = 0; y < this.width; y++) {
+    for (var x = 0; x < this.width; x++) {
+        for (var y = 0; y < this.height; y++) {
 
             // Draw Tile(s) at screen coordinates
             if ((this.hoverX != x || this.hoverY != y) && (this.selectX != x || this.selectY != y)) {
-                var screenCoords = new vMath.vector2(this.location.x - .5 * this.length * this.tileSize + x * this.tileSize + .5 * this.tileSize, this.location.y - .5 * this.width * this.tileSize + y * this.tileSize + .5 * this.tileSize);
+                var screenCoords = new vMath.vector2(this.location.x - .5 * this.width * this.tileSize + x * this.tileSize + .5 * this.tileSize, this.location.y - .5 * this.height * this.tileSize + y * this.tileSize + .5 * this.tileSize);
                 var tile = this.board[x][y];
                 var height = 0;
                 this.gameCore.spriteContext.draw(new Sprite(tile.url), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileSize, this.tileSize, 0, 1);
@@ -125,8 +125,8 @@ SquareBoard2.prototype.draw = function (location, elevation, hover, select, inac
     }
 
     // Select Tile
-    if (this.selectX != null && this.selectX < this.length && this.selectX >= 0 && this.selectY >= 0 && this.selectY < this.width) {
-        var screenCoords = new vMath.vector2(this.location.x - .5 * this.length * this.tileSize + this.selectX * this.tileSize + .5 * this.tileSize, this.location.y - .5 * this.width * this.tileSize + this.selectY * this.tileSize + .5 * this.tileSize);
+    if (this.selectX != null && this.selectX < this.width && this.selectX >= 0 && this.selectY >= 0 && this.selectY < this.height) {
+        var screenCoords = new vMath.vector2(this.location.x - .5 * this.width * this.tileSize + this.selectX * this.tileSize + .5 * this.tileSize, this.location.y - .5 * this.height * this.tileSize + this.selectY * this.tileSize + .5 * this.tileSize);
         var tile = this.board[this.selectX][this.selectY];
         this.gameCore.spriteContext.draw(new Sprite(tile.url), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileSize * this.expandFactor, this.tileSize * this.expandFactor, 0, 1);
         for (var i = 0; i < tile.pieces.length; i++) {
@@ -142,8 +142,8 @@ SquareBoard2.prototype.draw = function (location, elevation, hover, select, inac
     }
 
     // Hover Tile
-    if (this.hoverX != null && this.hoverX < this.length && this.hoverX >= 0 && this.hoverY >= 0 && this.hoverY < this.width) {
-        var screenCoords = new vMath.vector2(this.location.x - .5 * this.length * this.tileSize + this.hoverX * this.tileSize + .5 * this.tileSize, this.location.y - .5 * this.width * this.tileSize + this.hoverY * this.tileSize + .5 * this.tileSize);
+    if (this.hoverX != null && this.hoverX < this.width && this.hoverX >= 0 && this.hoverY >= 0 && this.hoverY < this.height) {
+        var screenCoords = new vMath.vector2(this.location.x - .5 * this.width * this.tileSize + this.hoverX * this.tileSize + .5 * this.tileSize, this.location.y - .5 * this.height * this.tileSize + this.hoverY * this.tileSize + .5 * this.tileSize);
         var tile = this.board[this.hoverX][this.hoverY];
 
         this.gameCore.spriteContext.draw(new Sprite(tile.url), new vMath.vector2(screenCoords.x, screenCoords.y - height), this.tileSize * this.expandFactor, this.tileSize * this.expandFactor, 0, 1);

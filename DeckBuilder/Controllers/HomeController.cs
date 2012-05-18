@@ -19,18 +19,53 @@ namespace DeckBuilder.Controllers
     {
         private DeckBuilderContext db = new DeckBuilderContext();
 
-        public ActionResult Index()
+        [Authorize]
+        public ActionResult Custom()
         {
-            foreach (Table t in db.Tables)
+            PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
+            var player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
+            if (player.Name != "KevinC")
+            {
+                return RedirectToAction("Index");
+            }
+
+            foreach (Player p in db.Players.ToList())
+            {
+                p.ActiveSeats = new List<Seat>();
+            }
+
+            foreach (Game g in db.Games.Include("Creator").ToList())
+            {
+                g.CreatorId = 1;
+                g.Creator = player;
+            }
+            db.SaveChanges();
+            foreach (Game g in db.Games.Include("Creator").ToList())
+            {
+                if(g.Creator.CreatedGames == null)
+                    g.Creator.CreatedGames = new List<Game>();
+                if (!g.Creator.CreatedGames.Contains(g))
+                {
+                    g.Creator.CreatedGames.Add(g);
+                }
+            }
+            db.SaveChanges();
+            /*foreach (Table t in db.Tables)
             {
                 db.Tables.Remove(t);
             }
-            //foreach (Game g in db.Games)
-            //{
-                //db.Games.Remove(g);
-            //}
-            db.SaveChanges();
+            foreach (Game g in db.Games)
+            {
+                g.CreatorId = 1;
+                g.Creator = player;
+            }
+            db.SaveChanges();*/            
 
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Index()
+        {
             ViewBag.TopPosts = db.Posts.Include(p=>p.Player).OrderByDescending(p => p.Date).Take(2);
             return View();
         }
@@ -42,6 +77,15 @@ namespace DeckBuilder.Controllers
             var player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
                 
             return RedirectToAction("Details", "Player", new { id = player.PlayerID });
+        }
+
+        [Authorize]
+        public ActionResult DeveloperProfile()
+        {
+            PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
+            var player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
+
+            return RedirectToAction("Developer", "Player", new { id = player.PlayerID });
         }
 
         [Authorize]
@@ -60,6 +104,11 @@ namespace DeckBuilder.Controllers
             ViewBag.SelectedDeck = deckDropdown;
             ViewBag.SelectedGame = gameDropdown;
             ViewBag.LobbyRoom = roomDropdown;
+            return View();
+        }
+
+        public ActionResult Docs()
+        {
             return View();
         }
 

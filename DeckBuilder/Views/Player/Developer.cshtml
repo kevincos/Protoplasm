@@ -1,0 +1,37 @@
+﻿@model DeckBuilder.Models.Player
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<fieldset>
+
+    <div class="ListPanelImage">
+        <img src = "@Model.ProfileImageUrl" />
+    </div>
+
+    <div class="ListPanelInfo">     
+        <div class="ListPanelHeader">@Model.Name</div>                   
+        <span class = "ListPanelText">Level: 100</span>
+        <span class = "ListPanelText">Exp: 3203</span>
+    </div>    
+
+    <h2>Games</h2>
+    
+    @foreach (var item in @Model.CreatedGames)
+    {
+        <div>
+            @item.Name
+            @Html.ActionLink("Edit", "Edit", "Game", new { id = item.GameID },null)
+        </div>
+    }
+    <br />
+    @Html.ActionLink("Create New Game", "Create", "Game", null, null)
+    <br />
+    @Html.ActionLink("Documentation", "Docs", "Home", null, null)
+</fieldset>
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.PlayerID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

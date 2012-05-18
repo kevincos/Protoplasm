@@ -16,7 +16,7 @@ namespace DeckBuilder.Models
         public virtual Deck Deck { get; set; }
 
         public int TableId { get; set; }
-        public virtual Table Tables { get; set; }
+        public virtual Table Table { get; set; }
 
         public bool Active { get; set; }
 

@@ -1,53 +1,53 @@
 ﻿@model DeckBuilder.Models.Player
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Developer Page";
 }
 
-<h2>Details</h2>
-
 <fieldset>
-    <legend>Player</legend>
 
-    <div class="display-label">Name</div>
-    <div class="display-field">
-        @Html.DisplayFor(model => model.Name)
+    <div class="ListPanelImage">
+        <img src = "@Model.ProfileImageUrl" />
     </div>
 
-    <div class="display-label">ProfileImageUrl</div>
-    <div class="display-field">
-        @Html.DisplayFor(model => model.ProfileImageUrl)
+    <div class="ListPanelInfo">     
+        <div class="ListPanelHeader">@Model.Name</div>                   
+        <span class = "ListPanelText">Level: 100</span>
+        <span class = "ListPanelText">Exp: 3203</span>
     </div>
 
-    <div class="display-label">Win Ratio</div>
-    <div class="display-field">
-        @Html.DisplayFor(model => model.WinRatio)
-    </div>
-
-</fieldset>
-
-<fieldset>
-    <legend>Deck List</legend>
-    @foreach (var deck in Model.Decks)
+    <h2>Active Games</h2>
+    @foreach (var item in @Model.ActiveSeats)
     {
-        
-        <div class="display-field">
-            @Html.ActionLink(deck.Name, "Details", "Deck", new { id = deck.DeckID}, null)
+        <div>
+            @item.Table.Game.Name with
+            @foreach (var seat in item.Table.Seats)
+            {
+                if (@Model.Name != @seat.Player.Name)
+                {
+                    @seat.Player.Name
+                }
+            }
+            @if (item.Table.TableState == 0)
+            {
+                <html>(Proposed)</html>
+            }
+            @if (item.Table.TableState == 2)
+            {
+                <html>(In-Play)</html>
+            }
+            @if (item.Table.TableState == 3)
+            {
+                <html>(Complete)</html>
+            }
+                    
+            @Html.ActionLink("Play", "Play", "Table", new { id = item.TableId }, null)
         </div>
     }
-    @Html.ActionLink("New Deck", "Create", "Deck", new { playerId = Model.PlayerID }, null)
+    <h2>Proposed Games</h2>    
+    <h2>Completed Games</h2>
 </fieldset>
 
-<fieldset>
-    <legend>Card Library</legend>
-    @foreach (var cardSet in Model.CardSets)
-    {
-        
-        <div class="display-field">
-            @Html.Raw(cardSet.Card.Name + "(" + cardSet.Quantity +")")
-        </div>
-    }
-</fieldset>
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.PlayerID }) |
     @Html.ActionLink("Back to List", "Index")

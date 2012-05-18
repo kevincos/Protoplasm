@@ -153,6 +153,45 @@ namespace DeckBuilder.Controllers
             return View();
         }
 
+        [Authorize]
+        public ActionResult Challenge(int opponentId, string gameName)
+        {
+            Player player = db.Players.Where(p => p.Name == User.Identity.Name).Single();
+            Player opponent = db.Players.Find(opponentId);
+            // Create Table
+            Table newTable = new Table();
+            newTable = db.Tables.Add(newTable);
+            newTable.Game = db.Games.Single(g => g.Name == gameName);
+            newTable.Version = newTable.Game.Versions.First();
+            newTable.TableState = (int)TableState.Proposed;
+            db.SaveChanges();
+
+            // Create Seats
+            Seat s1 = new Seat
+            {
+                PlayerId = player.PlayerID,
+                TableId = newTable.TableID,
+                DeckId = db.Decks.First().DeckID,
+                Active = true
+            };
+            db.Seats.Add(s1);
+            Seat s2 = new Seat
+            {
+                PlayerId = opponent.PlayerID,
+                TableId = newTable.TableID,
+                DeckId = db.Decks.First().DeckID,
+                Active = true
+            };
+            db.Seats.Add(s2);
+
+            db.SaveChanges();
+
+            newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
+
+            newTable.GenerateInitialState();
+            db.SaveChanges();
+            return RedirectToAction("Play", new { id = newTable.TableID });
+        }
 
         // Update
         [HttpPost]
@@ -190,6 +229,7 @@ namespace DeckBuilder.Controllers
                 engine = Python.CreateEngine();
                 var paths = engine.GetSearchPaths();
                 paths.Add(HostingEnvironment.MapPath(@"~/Python"));
+                paths.Add(HostingEnvironment.MapPath(@"~/Protoplasm-Python"));
                 engine.SetSearchPaths(paths);
                 loadedModules = new List<string>();
                 errors = new List<string>();
@@ -223,7 +263,7 @@ namespace DeckBuilder.Controllers
             // Input playerId
             runScope.SetVariable("playerId", playerId);
 
-            ScriptSource runSource = engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.View(playerId))", SourceCodeKind.Statements);
+            ScriptSource runSource = engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerId))", SourceCodeKind.Statements);
 
             for (int attempts = 0; attempts < 3; attempts++)
             {
@@ -247,6 +287,8 @@ namespace DeckBuilder.Controllers
         public ActionResult UpdateMain(int id, GameUpdate update)
         {
             Table table = db.Tables.Find(id);
+            if(table.TableState == (int)TableState.Proposed)
+                table.TableState = (int)TableState.InPlay;
 
             InitScriptEngine();
             LoadModules(table.Game.Name, table.Version.PythonScript);
@@ -263,10 +305,13 @@ namespace DeckBuilder.Controllers
             runScope.SetVariable("inputState", init_pickledState);
             runScope.SetVariable("update", update);
 
-            ScriptSource runSource = engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.Update(update);finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
+            ScriptSource runSource = engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
             runSource.Execute(runScope);
 
             string final_pickledState = runScope.GetVariable("finalState");
+            bool game_over = runScope.GetVariable("game_over");
+            if (game_over == true)
+                table.TableState = (int)TableState.Complete;
             table.GameState = Compression.CompressStringState(final_pickledState);
             db.SaveChanges();
 

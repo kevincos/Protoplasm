@@ -258,20 +258,20 @@ namespace DeckBuilder.Async
                     newTable = db.Tables.Add(newTable);
                     newTable.Game = db.Games.Single(g => g.Name == proposal.game);
                     newTable.Version = newTable.Game.Versions.First();
+                    newTable.TableState = (int)TableState.Proposed;
                     db.SaveChanges();
 
                     // Create Seats
                     foreach (string playerName in proposal.PlayerNames)
                     {
                         Player p = db.Players.Where(pl => pl.Name == playerName).Single();
-                        
                         Seat s = new Seat
                         {
                             PlayerId = p.PlayerID,
                             TableId = newTable.TableID,
                             DeckId = db.Decks.First().DeckID,
                             Active = true
-                        };
+                        };                        
                         db.Seats.Add(s);                        
                     }
 
@@ -281,6 +281,7 @@ namespace DeckBuilder.Async
                     
                     newTable.GenerateInitialState();
                     db.SaveChanges();
+                    
 
                     activeProposals.Remove(proposal);
 
