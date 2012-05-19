@@ -207,26 +207,27 @@ class HexBoard(GameObject):
         self.grid = []
         self.type = "HexBoard";
 
-        self.a_min = side_length - 1;
-        self.b_min = side_length - 1;
-        self.c_min = side_length - 1;
-        self.a_max = 3*side_length - 2;
-        self.b_max = 3 * side_length - 2;
-        self.c_max = 3 * side_length - 2;
-        self.c_boundary = 6*(side_length-1);
-        for a in range(0,self.a_max):
+        self.boundary = 2*side_length-1;
+        self.max_coordinate = 3*side_length-3;
+
+        for a in range(0,self.boundary):
             self.grid.append([])
-            for b in range(0,self.b_max):
+            for b in range(0,self.boundary):
                 self.grid[a].append(None)
 
-        for a in range(self.a_min, self.a_max):
-            for b in range(self.b_min, self.b_max):
-                c = self.c_boundary - a - b;
-                if c >= self.c_min and c < self.c_max:
+        for a in range(0, self.boundary):
+            for b in range(0, self.boundary):
+                if self.is_on_board(a,b):
                     self.grid[a][b] = Tile()
 
+    def c_coordinate(self,a,b):
+        return self.max_coordinate - a- b
+
+    def is_on_board(self,a,b):
+        return a < self.boundary and b < self.boundary and self.c_coordinate(a,b) < self.boundary
+
     def get_abc_coords(self,a,b):
-        return (a,b,self.c_boundary - a- b)
+        return (a,b,self.max_coordinate - a- b)
 
     def top_piece(self, a,b):
         if len(self.grid[a][b].pieces) == 0:
@@ -249,10 +250,9 @@ class HexBoard(GameObject):
         self.grid[a][b].pieces.append(piece)
 
     def clear_selection(self):
-        for a in range(self.a_min, self.a_max):
-            for b in range(self.b_min, self.b_max):
-                c = self.c_boundary - a - b;
-                if c >= self.c_min and c < self.c_max:
+        for a in range(0, self.boundary):
+            for b in range(0, self.boundary):
+                if self.is_on_board(a,b):
                     self.grid[a][b].selectable = False
 
     def view(self, x, y, radius):
@@ -264,9 +264,9 @@ class HexBoard(GameObject):
         view["y"]=y
         view["radius"]=radius
         view["grid"] = []
-        for a in range(self.a_max):
+        for a in range(self.boundary):
             view["grid"].append([])
-            for b in range(self.b_max):
+            for b in range(self.boundary):
                 if self.grid[a][b] is None:
                     view["grid"][a].append({})
                 else:

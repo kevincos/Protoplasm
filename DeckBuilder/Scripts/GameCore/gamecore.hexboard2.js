@@ -9,13 +9,8 @@
 
     this.board = srcBoard.grid;
 
-    this.aMin = srcBoard.sideLength - 1; // 0
-    this.bMin = srcBoard.sideLength - 1; // 0
-    this.cMin = srcBoard.sideLength - 1; // 0 
-    this.aMax = 3 * srcBoard.sideLength - 2; // 14
-    this.bMax = 3 * srcBoard.sideLength - 2; // 11
-    this.cMax = 3 * srcBoard.sideLength - 2; // 14
-    this.cBoundary = 6 * (srcBoard.sideLength - 1);
+    this.boundary = 2 * srcBoard.sideLength - 1;
+    this.maxCoord = 3 * srcBoard.sideLength - 3;
 
     this.tileRadius = srcBoard.radius;
     this.hexRadius = srcBoard.radius / 2.412;
@@ -25,10 +20,10 @@
     var totalX = 0;
     var totalY = 0;
     var tileCount = 0;
-    for (var a = this.aMin; a < this.aMax; a++) {
-        for (var b = this.bMin; b < this.bMax; b++) {
-            var c = this.cBoundary - a - b;
-            if (c >= this.cMin && c < this.cMax) {
+    for (var a = 0; a < this.boundary; a++) {
+        for (var b = 0; b < this.boundary; b++) {
+            var c = this.maxCoord - a - b;
+            if (c >= 0 && c < this.boundary) {
                 var tileCenter = hexMath.toScreenCoords(new vMath.vector2(0,0), a, b, this.hexRadius);
                 totalX+=tileCenter.x;
                 totalY+=tileCenter.y;
@@ -60,10 +55,10 @@
 // Update
 HexBoard2.prototype.update = function () {
     var hexMouseCoords = hexMath.toHexCoords(this.origin, vMath.mousePos.x, vMath.mousePos.y, this.hexRadius);
-    var c = this.cBoundary - hexMouseCoords.x - hexMouseCoords.y;
+    var c = this.maxCoord - hexMouseCoords.x - hexMouseCoords.y;
     var hoverA = Math.round(hexMouseCoords.x);
     var hoverB = Math.round(hexMouseCoords.y);
-    var hoverC = this.cBoundary - hoverA - hoverB;
+    var hoverC = this.maxCoord - hoverA - hoverB;
 
     var hoverDirection = 0;
     var relA = hoverA - hexMouseCoords.x;
@@ -90,7 +85,7 @@ HexBoard2.prototype.update = function () {
     else
         hoverEdge = false;
 
-    if (hoverA < this.aMin|| hoverA >= this.aMax || hoverB < this.bMin || hoverB >= this.bMax || hoverC < this.cMin || hoverC >= this.cMax) {
+    if (hoverA < 0 || hoverA >= this.boundary || hoverB < 0 || hoverB >= this.boundary || hoverC < 0 || hoverC >= this.boundary) {
         if (this.hoverA != null)
             this.gameCore.refreshView = true;
         this.hoverA = null;
@@ -130,10 +125,10 @@ HexBoard2.prototype.update = function () {
 
 // Render
 HexBoard2.prototype.draw = function (location, elevation, hover, select, inactive) {
-    for (var a = this.aMin; a < this.aMax; a++) {
-        for (var b = this.bMin; b < this.bMax; b++) {
-            var c = this.cBoundary - a - b;
-            if (c >= this.cMin && c < this.cMax) {
+    for (var a = 0; a < this.boundary; a++) {
+        for (var b = 0; b < this.boundary; b++) {
+            var c = this.maxCoord - a - b;
+            if (c >= 0 && c < this.boundary) {
                 // Draw Hex Tile(s) at screen coordinates + angle
                 if ((this.hoverA != a || this.hoverB != b) && (this.selectA != a || this.selectB != b)) {
                     var tile = this.board[a][b];
@@ -168,7 +163,7 @@ HexBoard2.prototype.draw = function (location, elevation, hover, select, inactiv
     }
 
     // Select Tile
-    if (this.selectA != null && this.selectA < this.aMax && this.selectA >= this.aMin && this.selectB >= this.bMin && this.selectB < this.bMax) {
+    if (this.selectA != null && this.selectA < this.boundary && this.selectA >= 0 && this.selectB >= 0 && this.selectB < this.boundary) {
         var screenCoords = hexMath.toScreenCoords(this.origin, this.selectA, this.selectB, this.hexRadius);
         var tile = this.board[this.selectA][this.selectB];
         var height = 0;
@@ -180,7 +175,7 @@ HexBoard2.prototype.draw = function (location, elevation, hover, select, inactiv
     }
 
     // Hover Tile
-    if (this.hoverA != null && this.hoverA < this.aMax && this.hoverA >= this.aMin && this.hoverB >= this.bMin && this.hoverB < this.bMax) {
+    if (this.hoverA != null && this.hoverA < this.boundary && this.hoverA >= 0 && this.hoverB >= 0 && this.hoverB < this.boundary) {
         var screenCoords = hexMath.toScreenCoords(this.origin, this.hoverA, this.hoverB, this.hexRadius);
         var tile = this.board[this.hoverA][this.hoverB];
         var height = 0;
