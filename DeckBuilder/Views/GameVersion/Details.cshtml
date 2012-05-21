@@ -14,6 +14,13 @@
         @Html.DisplayFor(model => model.VersionString)
     </div>
 
+    <div class="editor-label">
+        @Html.LabelFor(model => model.ModuleName) / Class Name
+    </div>
+    <div class="editor-field">
+        @Html.DisplayFor(model => model.ModuleName)        
+    </div>
+
     <div class="display-label">PythonScript</div>
     <div class="display-field">
         @Html.DisplayFor(model => model.PythonScript)

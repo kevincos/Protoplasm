@@ -19,6 +19,8 @@ namespace DeckBuilder.Models
 
         public string VersionString { get; set; }
 
+        public string ModuleName { get; set; }        
+
         public string PythonScript { get; set; }
 
         public int MaxPlayers { get; set; }

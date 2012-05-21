@@ -128,6 +128,15 @@ namespace DeckBuilder.Controllers
         public ActionResult DeleteConfirmed(int id)
         {            
             Game game = db.Games.Find(id);
+
+            foreach (GameVersion v in game.Versions)
+            {
+                foreach (Table t in db.Tables.Where(t => t.Version.GameVersionID == v.GameVersionID))
+                {
+                    db.Tables.Remove(t);
+                }
+            }
+
             db.Games.Remove(game);
             db.SaveChanges();
             return RedirectToAction("Index");

@@ -95,9 +95,15 @@ namespace DeckBuilder.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             GameVersion version = db.Versions.Find(id);
+            int parentId = version.ParentGame.GameID;
+            foreach (Table t in db.Tables.Where(t => t.Version.GameVersionID == version.GameVersionID))
+            {
+                db.Tables.Remove(t);
+            }
+                
             db.Versions.Remove(version);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", "Game", new { id = parentId });
         }
 
         protected override void Dispose(bool disposing)

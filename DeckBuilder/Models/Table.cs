@@ -49,18 +49,18 @@ namespace DeckBuilder.Models
         public void GenerateInitialState()
         {
             TableController.InitScriptEngine();
-            TableController.LoadModules(Game.Name, Version.PythonScript);
+            TableController.LoadModules(Version.ModuleName, Version.PythonScript);
 
             ScriptScope runScope = TableController.engine.CreateScope();
             runScope.ImportModule("cPickle");
             runScope.ImportModule("protoplasm");
-            runScope.ImportModule(Game.Name);
+            runScope.ImportModule(Version.ModuleName);
 
             // Input array of seats.
             Seat[] seatsArray = Seats.ToArray();
             runScope.SetVariable("seats", seatsArray);
 
-            ScriptSource runSource = TableController.engine.CreateScriptSourceFromString("initialState = " + Game.Name + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SourceCodeKind.Statements);                
+            ScriptSource runSource = TableController.engine.CreateScriptSourceFromString("initialState = " + Version.ModuleName + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SourceCodeKind.Statements);                
 
             runSource.Execute(runScope);
 
