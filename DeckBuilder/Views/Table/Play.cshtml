@@ -8,13 +8,23 @@
     </canvas>
 
     <div id="datablock">
-        <div style = "float:left">        
-            <div id="chat" class="logsection">        
-            </div>
-            <form id="chatform">
-                <input id="chatinput"/>        
-                <button id="chatbutton" type = "submit">Say</button>
-            </form>
+        <div style = "float:left">  
+            @if (ViewBag.AvailablePlayers == 0)
+            {
+                <div id="chat" class="logsection">        
+                </div>
+                <form id="chatform">
+                    <input id="chatinput"/>        
+                    <button id="chatbutton" type = "submit">Say</button>
+                </form>
+            }
+            else
+            {
+                for (int i = 0; i < ViewBag.AvailablePlayers; i++)
+                {
+                    <a href = "@ViewBag.TableId?playerIndex=@i">Player @i View</a>
+                }
+            }
         </div>
 
         <div style = "float: right">

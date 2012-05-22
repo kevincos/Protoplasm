@@ -46,6 +46,11 @@
         <div class="editor-field">
             @Html.EditorFor(model => model.MaxPlayers)
             @Html.ValidationMessageFor(model => model.MaxPlayers)
+
+            @for (int i = 2; i <= Model.MaxPlayers; i++)
+            {
+                <a href = "../Test/@Model.GameVersionID?numPlayers=@i">Test with @i Players</a>
+            }
         </div>
 
         <div class="editor-label">

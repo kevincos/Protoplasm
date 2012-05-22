@@ -125,12 +125,7 @@
     <Compile Include="Controllers\PostController.cs" />
     <Compile Include="Controllers\TableController.cs" />
     <Compile Include="DAL\DeckBuilderInitializer.cs" />
-    <Compile Include="GameState\Connect4State.cs" />
-    <Compile Include="GameState\ConvoyState.cs" />
-    <Compile Include="GameState\MechtonicState.cs" />
     <Compile Include="GameState\OnslaughtState.cs" />
-    <Compile Include="GameState\ReversiState.cs" />
-    <Compile Include="GameState\TemplateState.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -171,7 +166,6 @@
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\PersonInputModel.cs" />
     <Compile Include="Models\PlayerIdentity.cs" />
-    <Compile Include="GameState\RPSState.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\Table.cs" />
     <Compile Include="Models\Seat.cs" />

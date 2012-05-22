@@ -34,7 +34,7 @@ HandInstance2.prototype.update = function () {
             var update = {};
             update.selectIndex = hoverChoiceIndex;
             update.selectObjectName = this.name;
-            update.playerId = currentPlayerId;
+            update.playerIndex = currentPlayerIndex;
             var updateUrl = '/table/updateMain/' + gameState.tableId;
             $.ajax({
                 url: updateUrl,

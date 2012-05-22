@@ -15,7 +15,7 @@ namespace DeckBuilder.Controllers
         private DeckBuilderContext db = new DeckBuilderContext();
 
         //
-        // GET: /Game/
+        // GET: /GameVersion/
 
         public ViewResult Index()
         {
@@ -23,7 +23,7 @@ namespace DeckBuilder.Controllers
         }
 
         //
-        // GET: /Game/Details/5
+        // GET: /GameVersion/Details/5
 
         public ViewResult Details(int id)
         {
@@ -32,7 +32,7 @@ namespace DeckBuilder.Controllers
         }
 
         //
-        // GET: /Game/Create
+        // GET: /GameVersion/Create
 
         public ActionResult Create()
         {
@@ -40,7 +40,55 @@ namespace DeckBuilder.Controllers
         }
 
         //
-        // POST: /Game/Create
+        // TEST: /GameVersion/Test/5
+
+        [Authorize]
+        public ActionResult Test(int id, int numPlayers=2)
+        {
+            GameVersion version = db.Versions.Find(id);
+            Game game = version.ParentGame;
+            
+
+            PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
+            Player player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
+            if (player.PlayerID != game.CreatorId)
+                RedirectToAction("DeveloperProfile", "Home");
+
+            
+
+            Table newTable = new Table();
+            newTable = db.Tables.Add(newTable);
+            newTable.Game = db.Games.Single(g => g.Name == game.Name);
+            newTable.Version = newTable.Game.Versions.First();
+            newTable.TableState = (int)TableState.Proposed;
+            newTable.SoloPlayTest = true;
+            db.SaveChanges();
+
+            // Create Seats
+            for (int i = 0; i < numPlayers; i++)
+            {
+                Seat s = new Seat
+                {
+                    PlayerId = player.PlayerID,
+                    TableId = newTable.TableID,
+                    DeckId = db.Decks.First().DeckID,
+                    Accepted = true,
+                    Waiting = false
+                };
+                db.Seats.Add(s);    
+            }            
+
+            db.SaveChanges();
+
+            newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
+
+            newTable.GenerateInitialState();
+            db.SaveChanges();
+            return RedirectToAction("Play", "Table", new { id = newTable.TableID, playerIndex = 0 });
+        }
+
+        //
+        // POST: /GameVersion/Create
 
         [HttpPost]
         public ActionResult Create(GameVersion version)
@@ -56,7 +104,7 @@ namespace DeckBuilder.Controllers
         }
 
         //
-        // GET: /Game/Edit/5
+        // GET: /GameVersion/Edit/5
 
         public ActionResult Edit(int id)
         {
@@ -65,7 +113,7 @@ namespace DeckBuilder.Controllers
         }
 
         //
-        // POST: /Game/Edit/5
+        // POST: /GameVersion/Edit/5
 
         [HttpPost]
         public ActionResult Edit(GameVersion version)
@@ -80,7 +128,7 @@ namespace DeckBuilder.Controllers
         }
 
         //
-        // GET: /Game/Delete/5
+        // GET: /GameVersion/Delete/5
 
         public ActionResult Delete(int id)
         {
@@ -105,6 +153,7 @@ namespace DeckBuilder.Controllers
             db.SaveChanges();
             return RedirectToAction("Edit", "Game", new { id = parentId });
         }
+
 
         protected override void Dispose(bool disposing)
         {

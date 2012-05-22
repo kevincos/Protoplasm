@@ -14,7 +14,7 @@ namespace DeckBuilder.Protoplasm
 
     public class GameUpdate
     {
-        public int playerId { get; set; }        
+        public int playerIndex { get; set; }        
 
         public string selectObjectName { get; set; }
         public int selectX { get; set; }

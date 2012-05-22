@@ -14,11 +14,11 @@ var viewObjects = [];
 var backgroundUrl = null;
 var frameUrl = null;
 
-var currentPlayerId = null;
+var currentPlayerIndex = null;
 
 function main_setGameState(view) {
     gameState = view;
-    currentPlayerId = view.activePlayerId;
+    currentPlayerIndex = view.activePlayerIndex;
 
     //squareBoards = [];
     //hands = [];

@@ -46,6 +46,8 @@ namespace DeckBuilder.Models
 
         public String ChatRecord { get; set; }
 
+        public bool SoloPlayTest { get; set; }
+
         public void GenerateInitialState()
         {
             TableController.InitScriptEngine();

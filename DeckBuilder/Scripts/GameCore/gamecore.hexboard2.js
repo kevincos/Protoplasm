@@ -110,7 +110,7 @@ HexBoard2.prototype.update = function () {
         update.selectX = this.hoverA;
         update.selectY = this.hoverB;
         update.selectObjectName = this.name;
-        update.playerId = currentPlayerId;
+        update.playerIndex = currentPlayerIndex;
         var updateUrl = '/table/updateMain/' + gameState.tableId;
         $.ajax({
             url: updateUrl,

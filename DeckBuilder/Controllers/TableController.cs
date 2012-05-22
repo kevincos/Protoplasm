@@ -52,7 +52,7 @@ namespace DeckBuilder.Controllers
         //
         // GET: /Table/Play/5
         [Authorize]
-        public ActionResult Play(int id)
+        public ActionResult Play(int id, int playerIndex=0)
         {
             Table table = db.Tables.Where(t => t.TableID == id).Include("Seats").Single();
 
@@ -62,7 +62,21 @@ namespace DeckBuilder.Controllers
                 return RedirectToAction("Details", "Table", new { id = id });
             }
 
-            Seat currentSeat = table.Seats.Where(s => s.Player.Name == User.Identity.Name).Single();            
+            Seat currentSeat = null;
+            if (table.SoloPlayTest == true)                
+                currentSeat = table.Seats.ElementAt(playerIndex);
+            else
+                for (int i = 0; i < table.Seats.Count; i++)
+                {
+                    Seat s = table.Seats.ElementAt(i);
+                    if (s.Player.Name == User.Identity.Name)
+                    {
+                        playerIndex = i;
+                        currentSeat = s;
+                    }
+                }
+                
+            
 
             if (table.TableState == (int)TableState.Proposed)
             {
@@ -79,18 +93,20 @@ namespace DeckBuilder.Controllers
             }
 
             string pickledState = Compression.DecompressStringState(table.GameState);                
-            ViewBag.state = new HtmlString(GetPythonView(table, pickledState, currentSeat.PlayerId));
+            ViewBag.state = new HtmlString(GetPythonView(table, pickledState, playerIndex));
 
 
             ViewBag.InitialChatData = new HtmlString(table.ChatRecord);
             ViewBag.game = table.Game.Name;
             ViewBag.TableId = table.TableID;
-            ViewBag.PlayerId = currentSeat.PlayerId;
+            ViewBag.PlayerIndex = playerIndex;
             ViewBag.PlayerName = currentSeat.Player.Name;
+            ViewBag.AvailablePlayers = 0;
+            if (table.SoloPlayTest == true)
+                ViewBag.AvailablePlayers = table.Seats.Count;
 
             return View(table);
         }
-
 
         [Authorize]
         public ActionResult Challenge(int opponentId, string gameName)
@@ -161,7 +177,7 @@ namespace DeckBuilder.Controllers
             }
         }
 
-        public string GetPythonView(Table table, string pickledState, int playerId)
+        public string GetPythonView(Table table, string pickledState, int playerIndex)
         {
             InitScriptEngine();
             LoadModules(table.Version.ModuleName, table.Version.PythonScript);
@@ -177,9 +193,9 @@ namespace DeckBuilder.Controllers
             runScope.SetVariable("inputState", pickledState);
 
             // Input playerId
-            runScope.SetVariable("playerId", playerId);
+            runScope.SetVariable("playerIndex", playerIndex);
 
-            ScriptSource runSource = engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerId))", SourceCodeKind.Statements);
+            ScriptSource runSource = engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerIndex))", SourceCodeKind.Statements);
 
             for (int attempts = 0; attempts < 3; attempts++)
             {
@@ -243,10 +259,14 @@ namespace DeckBuilder.Controllers
             // Send updated states to clients
             IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
             dynamic clients = connectionManager.GetClients<GameList>();
-            foreach (Seat s in table.Seats)
+            for (int i = 0; i < table.Seats.Count; i++)
             {
-                string viewJson = GetPythonView(table, final_pickledState, s.PlayerId);
-                clients[s.Player.Name + id].main_updateGameState(viewJson);
+                Seat s = table.Seats.ElementAt(i);
+                if (table.SoloPlayTest == false || s.Waiting == true)
+                {
+                    string viewJson = GetPythonView(table, final_pickledState, i);
+                    clients[s.Player.Name + id].main_updateGameState(viewJson);
+                }
             }
             DateTime end = DateTime.Now;
             TimeSpan totalTime = end.Subtract(start);

@@ -440,29 +440,27 @@ class GameState:
         for i in range(len(seats)):
             self.player_contexts.append(PlayerContext(seats[i].PlayerId, seats[i].Player.Name));
         self.active_player_index = 0
-        self.active_player_id = self.player_contexts[0].player_id
         self.game_over = False
         self.logs = []
         self.table_id = seats[0].TableId
         seats[self.active_player_index].Waiting = True
 
-    def is_waiting_for_input(player_id):
-        if player_id == self.active_player_id:
+    def is_waiting_for_input(player_index):
+        if player_index == self.active_player_index:
             return True
         return False
 
     def set_waiting_status(self, seats):
         for i in range(len(seats)):
-            seats[i].Waiting = (seats[i].PlayerId == self.active_player_id)
+            seats[i].Waiting = (i == self.active_player_index)
 
 
     def log(self, message):
         self.logs.append(message)
 
-    def get_player_context(self, player_id):
-        return filter(lambda pc: pc.player_id == player_id,self.player_contexts)[0]
+    def get_player_context(self, player_index):
+        return self.player_contexts[player_index]
 
     def advance_active_player(self):
         self.active_player_index+=1
         self.active_player_index%=len(self.player_contexts)
-        self.active_player_id = self.player_contexts[self.active_player_index].player_id

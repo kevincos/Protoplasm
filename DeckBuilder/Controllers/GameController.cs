@@ -75,12 +75,18 @@ namespace DeckBuilder.Controllers
             PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
             var player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
             game.Creator = player;
-            game.CreatorId = player.PlayerID;            
+            game.CreatorId = player.PlayerID;
+            String className = game.Name.Replace(" ","").Replace(".","").Replace(":","").Replace(",","").Replace("!","").Replace("-","");
+            String templateScript = "import gamestate\nclass " + className + "(gamestate.GameState):\n\tdef __init__(self, seats):\n\t\tgamestate.GameState.__init__(self, seats)\n\n\tdef Update(self, update):\n\t\tpass\n\n\tdef View(self, playerId):\n\t\tview = {}\n\t\tview[\"activePlayerId\"] = playerId\n\t\tview[\"tableId\"] = self.tableId\n\t\tview[\"logs\"] = self.logs\n\t\tview[\"drawList\"] = []\n\t\treturn view\n\ndef Init(seats):\n\treturn " + className + "(seats)";
+            GameVersion version = new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = templateScript, CreationDate = DateTime.Now, ModuleName = className, ParentGame = game };
+            game.Versions = new List<GameVersion>();
+            game.Versions.Add(version);
+            
             if (ModelState.IsValid)
             {
                 db.Games.Add(game);
-                db.SaveChanges();
-                player.CreatedGames.Add(game);
+                db.SaveChanges();                
+                player.CreatedGames.Add(game);                
                 db.SaveChanges();
                 return RedirectToAction("Edit", "Game", new { id = game.GameID });  
             }

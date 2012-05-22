@@ -80,7 +80,7 @@ SquareBoard2.prototype.update = function () {
         update.selectX = this.hoverX;
         update.selectY = this.hoverY;
         update.selectObjectName = this.name;
-        update.playerId = currentPlayerId;
+        update.playerIndex = currentPlayerIndex;
         var updateUrl = '/table/updateMain/' + gameState.tableId;
         $.ajax({
             url: updateUrl,
