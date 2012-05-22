@@ -29,37 +29,12 @@ namespace DeckBuilder.Controllers
                 return RedirectToAction("Index");
             }
 
-            foreach (Player p in db.Players.ToList())
+            foreach (GameVersion v in db.Versions)
             {
-                p.ActiveSeats = new List<Seat>();
-            }
-
-            foreach (Game g in db.Games.Include("Creator").ToList())
-            {
-                g.CreatorId = 1;
-                g.Creator = player;
+                if (v.DevStage != "Alpha" && v.DevStage != "Release")
+                    v.DevStage = "Alpha";
             }
             db.SaveChanges();
-            foreach (Game g in db.Games.Include("Creator").ToList())
-            {
-                if(g.Creator.CreatedGames == null)
-                    g.Creator.CreatedGames = new List<Game>();
-                if (!g.Creator.CreatedGames.Contains(g))
-                {
-                    g.Creator.CreatedGames.Add(g);
-                }
-            }
-            db.SaveChanges();
-            /*foreach (Table t in db.Tables)
-            {
-                db.Tables.Remove(t);
-            }
-            foreach (Game g in db.Games)
-            {
-                g.CreatorId = 1;
-                g.Creator = player;
-            }
-            db.SaveChanges();*/            
 
             return RedirectToAction("Index");
         }
@@ -96,7 +71,10 @@ namespace DeckBuilder.Controllers
             ViewBag.PlayerName = player.Name;
             SelectList deckDropdown = new SelectList(player.Decks, "DeckID", "Name");
 
-            SelectList gameDropdown = new SelectList(db.Games.Select(g => g.Name).ToList());
+            List<GameVersion> versionList = db.Games.ToList().Select(g => g.LatestRelease).ToList();
+            versionList.AddRange(player.CreatedGames.ToList().Select(g => g.ActiveDev).ToList());
+            versionList = versionList.Where(v => v != null).ToList();
+            SelectList gameDropdown = new SelectList(versionList, "GameVersionID", "DisplayName");            
 
             SelectList roomDropdown = new SelectList(new List<string> { "General", "Classic", "Prototype" });
             

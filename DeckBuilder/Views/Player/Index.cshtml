@@ -24,10 +24,10 @@
         @if (ViewBag.currentPlayer != @item.Name)
         {
             <div class = "ListPanelInvite">
-                <select class="ListPanelSelect" id=@item.PlayerID>
-                    @foreach (var option in ViewBag.gameList)
+                <select class="ListPanelSelect" id=@item.PlayerID>                    
+                    @for (var i = 0; i < ViewBag.gameNameList.Count; i++)
                     {
-                        <option>@option</option>
+                        <option value = @ViewBag.gameVersionList[i]>@ViewBag.gameNameList[i]</option>
                     }
                 </select>
                 <button class="ListPanelButton" value="@item.PlayerID">Challenge</button>

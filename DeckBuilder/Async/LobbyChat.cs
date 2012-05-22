@@ -74,16 +74,18 @@ namespace DeckBuilder.Async
         public static int latestID = 0;
 
         public int ProposalID { get; set; }
-        public string game { get; set; }
+        public string gameName { get; set; }
+        public int versionId {get; set;}
         public int hostIndex { get; set; }
         public List<ProposalPlayerStatus> players { get; set; }
         public List<string> withdrawnPlayers { get; set; }
 
-        public Proposal(string hostPlayer, List<string> opponents, string game)
+        public Proposal(string hostPlayer, List<string> opponents, string gameName, int versionId)
         {
             this.ProposalID = latestID;
             latestID++;
-            this.game = game;
+            this.gameName = gameName.Replace("\n","");
+            this.versionId = versionId;
             this.hostIndex = 0;
             players = new List<ProposalPlayerStatus>();
             players.Add(new ProposalPlayerStatus { name = hostPlayer, ready = true });
@@ -198,9 +200,10 @@ namespace DeckBuilder.Async
             }
         }
 
-        public void NewProposal(string hostPlayer, List<string> opponents, string game)
+        public void NewProposal(string hostPlayer, List<string> opponents, int versionId, string gameName)
         {
-            Proposal p = new Proposal(hostPlayer, opponents, game);
+
+            Proposal p = new Proposal(hostPlayer, opponents, gameName, versionId);
             activeProposals.Add(p);
             UpdateClients(p,null);
             return;
@@ -256,8 +259,9 @@ namespace DeckBuilder.Async
                     // Create Table
                     Table newTable = new Table();
                     newTable = db.Tables.Add(newTable);
-                    newTable.Game = db.Games.Single(g => g.Name == proposal.game);
-                    newTable.Version = newTable.Game.Versions.First();
+                    string gameName = proposal.gameName.Replace("*","");
+                    newTable.Game = db.Games.Single(g => g.Name == gameName);
+                    newTable.Version = newTable.Game.Versions.Single(v => v.GameVersionID == proposal.versionId);
                     newTable.TableState = (int)TableState.Proposed;
                     db.SaveChanges();
 

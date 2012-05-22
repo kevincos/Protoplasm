@@ -41,7 +41,7 @@ namespace DeckBuilder.Controllers
         public ActionResult CreateVersion(int id)
         {
             Game game = db.Games.Find(id);
-            GameVersion version = new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = "", CreationDate = DateTime.Now, ParentGame = game };
+            GameVersion version = new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = "", DevStage = "Alpha", CreationDate = DateTime.Now, ParentGame = game };
             game.Versions.Add(version);
             db.SaveChanges();
             return RedirectToAction("Edit", new { id = id }); 
@@ -78,7 +78,7 @@ namespace DeckBuilder.Controllers
             game.CreatorId = player.PlayerID;
             String className = game.Name.Replace(" ","").Replace(".","").Replace(":","").Replace(",","").Replace("!","").Replace("-","");
             String templateScript = "import gamestate\nclass " + className + "(gamestate.GameState):\n\tdef __init__(self, seats):\n\t\tgamestate.GameState.__init__(self, seats)\n\n\tdef Update(self, update):\n\t\tpass\n\n\tdef View(self, playerId):\n\t\tview = {}\n\t\tview[\"activePlayerId\"] = playerId\n\t\tview[\"tableId\"] = self.tableId\n\t\tview[\"logs\"] = self.logs\n\t\tview[\"drawList\"] = []\n\t\treturn view\n\ndef Init(seats):\n\treturn " + className + "(seats)";
-            GameVersion version = new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = templateScript, CreationDate = DateTime.Now, ModuleName = className, ParentGame = game };
+            GameVersion version = new GameVersion { VersionString = "1.0", MaxPlayers = 2, PythonScript = templateScript, CreationDate = DateTime.Now, DevStage = "Alpha", ModuleName = className, ParentGame = game };
             game.Versions = new List<GameVersion>();
             game.Versions.Add(version);
             

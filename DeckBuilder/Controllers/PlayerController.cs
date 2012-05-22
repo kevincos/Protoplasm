@@ -20,7 +20,19 @@ namespace DeckBuilder.Controllers
         public ViewResult Index()
         {
             ViewBag.currentPlayer = User.Identity.Name;
-            ViewBag.gameList = db.Games.Select(g => g.Name).ToList();
+            //ViewBag.gameList = db.Games.Select(g => g.Name).ToList();
+
+            Player player = db.Players.Where(p => p.Name == User.Identity.Name).SingleOrDefault();
+
+            List<GameVersion> versionList = db.Games.ToList().Select(g => g.LatestRelease).ToList();
+            if (player != null)
+            {
+                versionList.AddRange(player.CreatedGames.ToList().Select(g => g.ActiveDev).ToList());
+            }
+            versionList = versionList.Where(v => v != null).ToList();
+            ViewBag.gameVersionList = versionList.Select(v => v.GameVersionID).ToList();
+            ViewBag.gameNameList = versionList.Select(v => v.DisplayName).ToList();
+            
             return View(db.Players.ToList());
         }
 

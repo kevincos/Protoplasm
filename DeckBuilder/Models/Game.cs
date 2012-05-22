@@ -18,5 +18,36 @@ namespace DeckBuilder.Models
         public virtual ICollection<Player> Testers { get; set; }
 
         public virtual ICollection<GameVersion> Versions { get; set; }
+
+        public GameVersion LatestRelease
+        {
+            get
+            {
+                try
+                {
+                    return Versions.Where(v => v.DevStage == "Release").OrderBy(v => v.CreationDate).First();
+                }
+                catch
+                {
+                    return null;
+                }
+
+            }
+        }
+
+        public GameVersion ActiveDev
+        {
+            get
+            {
+                try
+                {
+                    return Versions.Where(v => v.DevStage == "Alpha").OrderBy(v => v.CreationDate).First();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
     }
 }

@@ -68,5 +68,10 @@
 }
 
 <div>
+    @Html.ActionLink("Mark Version as Stable", "Release", "GameVersion", new { id = Model.GameVersionID }, null)
+</div>
+
+
+<div>
     @Html.ActionLink("Back to List", "Edit", "Game", new { id = Model.ParentGame.GameID }, null)
 </div>

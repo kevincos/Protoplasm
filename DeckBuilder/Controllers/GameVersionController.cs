@@ -87,6 +87,39 @@ namespace DeckBuilder.Controllers
             return RedirectToAction("Play", "Table", new { id = newTable.TableID, playerIndex = 0 });
         }
 
+                //
+        // TEST: /GameVersion/Test/5
+
+        [Authorize]
+        public ActionResult Release(int id)
+        {
+            GameVersion version = db.Versions.Find(id);
+            Game game = version.ParentGame;
+            int parentId = game.GameID;
+            
+
+            PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
+            Player player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
+            if (player.PlayerID != game.CreatorId)
+                RedirectToAction("DeveloperProfile", "Home");
+
+            GameVersion newVersion = new GameVersion
+            {
+                ModuleName = version.ModuleName,
+                VersionString = version.VersionString,
+                PythonScript = version.PythonScript,
+                MaxPlayers = version.MaxPlayers,
+                ParentGame = version.ParentGame,
+                CreationDate = DateTime.Now,
+                DevStage = "Alpha"
+            };
+            game.Versions.Add(newVersion);
+            version.DevStage = "Release";
+            db.SaveChanges();
+
+            return RedirectToAction("Edit", "Game", new { id = parentId });
+        }
+
         //
         // POST: /GameVersion/Create
 

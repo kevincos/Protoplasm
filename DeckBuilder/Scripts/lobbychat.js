@@ -75,7 +75,7 @@ function initLobbyChat(playerName) {
                 else
                     $('#proposal' + i).append("<button id='cancel" + i + "'>Cancel</button>");
 
-                $('#proposal' + i).append("<span>" + proposals[i].game + "</span>");
+                $('#proposal' + i).append("<span>" + proposals[i].gameName + "</span>");
                 $('#proposal' + i).append("<span> with </span>");
                 for (var j = 0; j < proposals[i].players.length; j++) {
                     if (proposals[i].players[j].name != playerName) {
@@ -106,7 +106,7 @@ function initLobbyChat(playerName) {
             }
             if (opponents.length > 0) {
                 // SEND OPPONENT LIST TO SERVER
-                lobbyChatClient.newProposal(playerName, opponents, $('#SelectedGame').val());
+                lobbyChatClient.newProposal(playerName, opponents, $('#SelectedGame').val(), $('#SelectedGame option:selected').text());
             }
         });
 

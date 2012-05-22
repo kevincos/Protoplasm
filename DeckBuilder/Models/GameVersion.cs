@@ -5,13 +5,6 @@ using System.Web;
 
 namespace DeckBuilder.Models
 {
-    public enum DevStage
-    {
-        Alpha,
-        ClosedBeta,
-        OpenBeta,
-        Release        
-    }
 
     public class GameVersion
     {
@@ -25,7 +18,7 @@ namespace DeckBuilder.Models
 
         public int MaxPlayers { get; set; }
 
-        public DevStage DevStage { get; set; }
+        public String DevStage { get; set; }
 
         public DateTime CreationDate { get; set; }
 
@@ -36,5 +29,16 @@ namespace DeckBuilder.Models
         public virtual ICollection<Table> ProposedGames { get; set; }
 
         public virtual ICollection<Feedback> Feedback { get; set; }
+
+        public string DisplayName
+        {
+            get
+            {
+                string s = ParentGame.Name;
+                if (DevStage == "Alpha")
+                    s += "*";
+                return s;
+            }
+        }
     }
 }

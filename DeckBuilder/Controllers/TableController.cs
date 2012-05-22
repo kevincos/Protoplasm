@@ -109,15 +109,15 @@ namespace DeckBuilder.Controllers
         }
 
         [Authorize]
-        public ActionResult Challenge(int opponentId, string gameName)
+        public ActionResult Challenge(int opponentId, int versionId)
         {
             Player player = db.Players.Where(p => p.Name == User.Identity.Name).Single();
             Player opponent = db.Players.Find(opponentId);
             // Create Table
             Table newTable = new Table();
             newTable = db.Tables.Add(newTable);
-            newTable.Game = db.Games.Single(g => g.Name == gameName);
-            newTable.Version = newTable.Game.Versions.First();
+            newTable.Version = db.Versions.Find(versionId);
+            newTable.Game = newTable.Version.ParentGame;
             newTable.TableState = (int)TableState.Proposed;
             db.SaveChanges();
 
