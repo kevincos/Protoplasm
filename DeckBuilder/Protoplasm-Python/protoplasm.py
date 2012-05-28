@@ -433,6 +433,11 @@ class PlayerContext:
     def __init__(self, player_id, name):
         self.player_id= player_id
         self.name=name
+        self.stats_base = {}
+        self.result = "None"
+
+    def stat_log(self,key,value):
+        self.stats_base[key]=value
 
 class GameState:
     def __init__(self, seats):
@@ -443,6 +448,7 @@ class GameState:
         self.game_over = False
         self.logs = []
         self.table_id = seats[0].TableId
+        self.stats_base = {}
         seats[self.active_player_index].Waiting = True
 
     def is_waiting_for_input(player_index):
@@ -453,6 +459,26 @@ class GameState:
     def set_waiting_status(self, seats):
         for i in range(len(seats)):
             seats[i].Waiting = (i == self.active_player_index)
+
+    def stats(self):
+        return ""
+
+    def stat_log(self,key, value):
+        self.stats_base[key] = value
+
+    def stat_log_item(self,item,data):
+        try:
+            self.stats_base[item].append(data)
+        except:
+            self.stats_base[item]=[data]
+
+    def generate_stats(self):
+        self.stats_base["player"] = []
+        for (i,context) in enumerate(self.player_contexts):
+            context.stat_log("index",i)
+            context.stat_log("result",context.result)
+            self.stats_base["player"].append(context.stats_base)
+        return self.stats_base
 
 
     def log(self, message):

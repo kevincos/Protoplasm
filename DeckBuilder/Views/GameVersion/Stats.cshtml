@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Stats";
+}
+
+<script src="@Url.Content("~/Scripts/stats.js")" type="text/javascript"></script>
+
+
+<script type="text/javascript">versionID=@ViewBag.VersionID</script>
+
+<h2>Stats</h2>
+
+<div>
+    Graph Type<select id="GraphDropdown"><option value=0>PercentOverItems</option><option value=1>PercentOverGames</option><option value=2>CountOverItems</option><option value=3>CountOverGames</option><option value=4>AverageOverItems</option><option value=5>AverageOverGames</option><option value=6>SumOverItems</option><option value=7>SumOverGames</option></select>
+</div>
+<div id="DataSet">
+    Data Set (comma separated list)<input id="DataSetInput" type=text></input>
+</div>
+
+<div id="IndependentAxis">
+    Independent Axis<input id="IndependentAxisInput" type=text></input>
+</div>
+
+<div id="ItemName">
+    Item Name<input id="ItemNameInput" type=text></input>
+</div>
+
+<div id="TargetKeyContainer">
+    Target Type<select id="TargetDropdown"><option value=0>Key-Value</option><option value=1>Indexed-Key</option><option value=2>Dict-Key</option></select>
+    <span id="TargetKey">Target Key<input id="TargetKeyInput" type=text></input></span>
+    <span id="TargetIndex">Target Index<input id="TargetIndexInput" type=text></input></span>
+    <span id="TargetDictKey">Target DictKey<input id="TargetDictKeyInput" type=text></input></span>
+</div>
+
+<div id="PrimaryConditions">Select Conditions <button id="AddPrimaryCondition">Add</button><br />
+</div>
+
+<div id="SecondaryConditions">Sample Conditions <button id="AddSecondaryCondition">Add</button><br />
+</div>
+
+<button id="GraphButton">Graph</button>
+
+<div id="chartdiv" style="height:800px;width:600px; "></div>

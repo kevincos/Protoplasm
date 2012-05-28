@@ -22,6 +22,8 @@ namespace DeckBuilder.Models
 
         public DateTime CreationDate { get; set; }
 
+        public String StatLog { get; set; }
+
         public virtual Game ParentGame { get; set; }
 
         public virtual ICollection<Table> CompletedGames { get; set; }

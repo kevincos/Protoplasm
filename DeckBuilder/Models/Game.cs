@@ -25,7 +25,7 @@ namespace DeckBuilder.Models
             {
                 try
                 {
-                    return Versions.Where(v => v.DevStage == "Release").OrderBy(v => v.CreationDate).First();
+                    return Versions.Where(v => v.DevStage == "Release").OrderBy(v => v.CreationDate).Last();
                 }
                 catch
                 {

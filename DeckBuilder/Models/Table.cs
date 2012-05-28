@@ -16,6 +16,7 @@ using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using System.Web.Hosting;
 using DeckBuilder.Controllers;
+using DeckBuilder.Protoplasm_Python;
 
 namespace DeckBuilder.Models
 {
@@ -50,10 +51,10 @@ namespace DeckBuilder.Models
 
         public void GenerateInitialState()
         {
-            TableController.InitScriptEngine();
-            TableController.LoadModules(Version.ModuleName, Version.PythonScript);
+            PythonScriptEngine.InitScriptEngine();
+            PythonScriptEngine.LoadModules(Version.ModuleName, Version.PythonScript);
 
-            ScriptScope runScope = TableController.engine.CreateScope();
+            ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
             runScope.ImportModule("cPickle");
             runScope.ImportModule("protoplasm");
             runScope.ImportModule(Version.ModuleName);
@@ -62,7 +63,7 @@ namespace DeckBuilder.Models
             Seat[] seatsArray = Seats.ToArray();
             runScope.SetVariable("seats", seatsArray);
 
-            ScriptSource runSource = TableController.engine.CreateScriptSourceFromString("initialState = " + Version.ModuleName + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SourceCodeKind.Statements);                
+            ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("initialState = " + Version.ModuleName + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SourceCodeKind.Statements);                
 
             runSource.Execute(runScope);
 

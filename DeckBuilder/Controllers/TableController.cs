@@ -24,6 +24,7 @@ using IronPython.Hosting;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using System.Web.Hosting;
+using DeckBuilder.Protoplasm_Python;
 
 namespace DeckBuilder.Controllers
 { 
@@ -150,39 +151,12 @@ namespace DeckBuilder.Controllers
             return RedirectToAction("Play", new { id = newTable.TableID });
         }
 
-        public static ScriptEngine engine = null;
-        public static List<string> loadedModules = null;
-        public static List<string> errors = null;
-
-        public static void InitScriptEngine()
-        {
-            if (engine == null || loadedModules == null || errors == null)
-            {
-                engine = Python.CreateEngine();
-                var paths = engine.GetSearchPaths();
-                paths.Add(HostingEnvironment.MapPath(@"~/Python"));
-                paths.Add(HostingEnvironment.MapPath(@"~/Protoplasm-Python"));
-                engine.SetSearchPaths(paths);
-                loadedModules = new List<string>();
-                errors = new List<string>();
-            }            
-        }
-        public static void LoadModules(string moduleName, string code)
-        {
-            if (!loadedModules.Contains(moduleName))
-            {
-                ScriptScope moduleScope = engine.CreateModule(moduleName);
-                ScriptSource moduleSource = engine.CreateScriptSourceFromString(code, SourceCodeKind.File);
-                moduleSource.Execute(moduleScope);
-            }
-        }
-
         public string GetPythonView(Table table, string pickledState, int playerIndex)
         {
-            InitScriptEngine();
-            LoadModules(table.Version.ModuleName, table.Version.PythonScript);
-            
-            ScriptScope runScope = engine.CreateScope();
+            PythonScriptEngine.InitScriptEngine();
+            PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript);
+
+            ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
             runScope.ImportModule("cPickle");
             
             // Output state
@@ -195,7 +169,7 @@ namespace DeckBuilder.Controllers
             // Input playerId
             runScope.SetVariable("playerIndex", playerIndex);
 
-            ScriptSource runSource = engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerIndex))", SourceCodeKind.Statements);
+            ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerIndex))", SourceCodeKind.Statements);
 
             for (int attempts = 0; attempts < 3; attempts++)
             {
@@ -206,7 +180,7 @@ namespace DeckBuilder.Controllers
                 }
                 catch (Exception e)
                 {
-                    errors.Add(e.ToString());
+                    PythonScriptEngine.errors.Add(e.ToString());
                     runSource.Execute(runScope);
                 }
             }
@@ -221,10 +195,10 @@ namespace DeckBuilder.Controllers
             DateTime start = DateTime.Now;
             Table table = db.Tables.Find(id);
 
-            InitScriptEngine();
-            LoadModules(table.Version.ModuleName, table.Version.PythonScript);
+            PythonScriptEngine.InitScriptEngine();
+            PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript);
 
-            ScriptScope runScope = engine.CreateScope();
+            ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
             runScope.ImportModule("cPickle");
 
             string init_pickledState = Compression.DecompressStringState(table.GameState);
@@ -241,13 +215,29 @@ namespace DeckBuilder.Controllers
 
             DateTime variablesSet = DateTime.Now;
 
-            ScriptSource runSource = engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);gameState.set_waiting_status(seats);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
+            ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);gameState.set_waiting_status(seats);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
             runSource.Execute(runScope);
 
             string final_pickledState = runScope.GetVariable("finalState");
             bool game_over = runScope.GetVariable("game_over");
             if (game_over == true)
+            {
+                if (table.TableState != (int)TableState.Complete && table.Version.DevStage == "Release")
+                {
+                    // Game just ended. Collect stats.
+                    runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; stats = json.dumps(gameState.stats())", SourceCodeKind.Statements);
+                    runSource.Execute(runScope);
+                    String latestStats = runScope.GetVariable("stats");
+                    if (table.Version.StatLog == "" || table.Version.StatLog == null)
+                        table.Version.StatLog = "[]";
+                    table.Version.StatLog = table.Version.StatLog.Remove(table.Version.StatLog.Length - 1);
+                    if(table.Version.StatLog.Length > 1)
+                        table.Version.StatLog += ",";
+                    table.Version.StatLog += latestStats + "]";
+
+                }
                 table.TableState = (int)TableState.Complete;
+            }
             table.GameState = Compression.CompressStringState(final_pickledState);
 
             DateTime scriptsExecuted = DateTime.Now;

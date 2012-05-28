@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using DeckBuilder.Models;
 using DeckBuilder.ViewModels;
+using DeckBuilder.Stats;
 
 namespace DeckBuilder.Controllers
 {
@@ -111,13 +112,48 @@ namespace DeckBuilder.Controllers
                 MaxPlayers = version.MaxPlayers,
                 ParentGame = version.ParentGame,
                 CreationDate = DateTime.Now,
+                StatLog = "[]",
                 DevStage = "Alpha"
             };
             game.Versions.Add(newVersion);
             version.DevStage = "Release";
+            version.CreationDate = DateTime.Now;
+            version.VersionString = "X";
             db.SaveChanges();
 
             return RedirectToAction("Edit", "Game", new { id = parentId });
+        }
+
+        public ActionResult Stats(int id)
+        {
+            /*GameVersion version = db.Versions.Find(id);
+
+            Graph g = new Graph(new List<string> { "0", "1" });
+            g.AddDataSet("WinRate");
+            Condition winCondition = new Condition("result", "Win");
+            Condition indexCondition = new Condition("index", "[x]");
+            g.PercentOverItems("player", new List<Condition> { indexCondition }, new List<Condition> { winCondition });
+            g.GenerateData(version.StatLog);
+
+            return RedirectToAction("Edit", new { id = version.GameVersionID });*/
+            ViewBag.VersionID = id;
+            return View();
+        }
+
+        public JsonResult Graph(int id, Graph graphData)
+        {
+            GameVersion version = db.Versions.Find(id);
+
+            List<List<float>> results = graphData.GenerateData(version.StatLog);
+
+            /*Graph g = new Graph(new List<string> { "0", "1" });
+            g.AddDataSet("WinRate");
+            Condition winCondition = new Condition("result", "Win");
+            Condition indexCondition = new Condition("index", "[x]");
+            g.PercentOverItems("player", new List<Condition> { indexCondition }, new List<Condition> { winCondition });
+            g.GenerateData(version.StatLog);*/
+
+            return Json(results);          
         }
 
         //
