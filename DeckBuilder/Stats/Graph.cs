@@ -152,7 +152,7 @@ namespace DeckBuilder.Stats
                     }
                     runSource.Execute(runScope);
                     var r = runScope.GetVariable("result");
-                    results[j].Add((float)r);                    
+                    results[j].Add((float)r);                
                 }
 
             }
