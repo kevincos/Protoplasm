@@ -48,6 +48,8 @@ namespace DeckBuilder.Models
         public String ChatRecord { get; set; }
 
         public bool SoloPlayTest { get; set; }
+        public bool Ranked { get; set; }
+        public bool Alpha { get; set; }
 
         public void GenerateInitialState()
         {

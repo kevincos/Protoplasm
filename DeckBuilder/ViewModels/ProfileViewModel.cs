@@ -48,6 +48,26 @@ namespace DeckBuilder.ViewModels
         }
     }
 
+    public class RecordViewModel
+    {
+        public String Name { get; set; }
+        public int TotalGames { get; set; }
+        public int Wins { get; set; }
+        public int Draws { get; set; }
+        public int Losses { get; set; }
+        public int WinPercent { get; set; }
+
+        public RecordViewModel(Record r)
+        {
+            Wins = r.Wins;
+            Losses = r.Losses;
+            Draws = r.Draws;
+            TotalGames = r.GamesPlayed;
+            WinPercent = 100 * Wins / TotalGames;
+            Name = r.Game.Name;
+        }
+    }
+
     public class ProfileViewModel
     {
         public Player player;
@@ -56,12 +76,16 @@ namespace DeckBuilder.ViewModels
         public List<SeatViewModel> CompletedGames;
         public List<SeatViewModel> ProposedGames;
 
+        public List<RecordViewModel> GameRecords;
+
         public ProfileViewModel(Player viewPlayer)
         {
             player = viewPlayer;
             ActiveGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.InPlay).Select(s => new SeatViewModel(s)).ToList();
             CompletedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Complete).Select(s => new SeatViewModel(s)).ToList();
             ProposedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Proposed).Select(s => new SeatViewModel(s)).ToList();
+
+            GameRecords = player.Records.Select(r => new RecordViewModel(r)).ToList();
         }
     }
 }

@@ -167,6 +167,7 @@
     <Compile Include="Models\PersonInputModel.cs" />
     <Compile Include="Models\PlayerIdentity.cs" />
     <Compile Include="Models\Post.cs" />
+    <Compile Include="Models\Record.cs" />
     <Compile Include="Models\Table.cs" />
     <Compile Include="Models\Seat.cs" />
     <Compile Include="Models\Player.cs" />

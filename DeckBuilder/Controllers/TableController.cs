@@ -221,9 +221,45 @@ namespace DeckBuilder.Controllers
             string final_pickledState = runScope.GetVariable("finalState");
             bool game_over = runScope.GetVariable("game_over");
             if (game_over == true)
-            {
+            {                
                 if (table.TableState != (int)TableState.Complete && table.Version.DevStage == "Release")
                 {
+                    // Log player wins/losses
+                    foreach (Seat s in table.Seats)
+                    {
+                        Player p = s.Player;
+                        if (p.Records == null) p.Records = new List<Record>();
+                        // Find record if it exists. Otherwise create one.
+                        Record r = p.Records.FirstOrDefault(record => record.GameId == table.GameId);
+                        if (r == null)
+                        {
+                            r = new Record();
+                            r.GameId = table.GameId;
+                            r.PlayerId = p.PlayerID;
+                            p.Records.Add(r);
+                        }
+                        if (table.Ranked == true)
+                        {
+                            r.RankedGamesPlayed++;
+                            if (s.Result == "Win")
+                                r.RankedWins++;
+                            if (s.Result == "Loss")
+                                r.RankedLosses++;
+                            if (s.Result == "Draw")
+                                r.RankedDraws++;
+                        }
+                        else
+                        {
+                            r.GamesPlayed++;
+                            if (s.Result == "Win")
+                                r.Wins++;
+                            if (s.Result == "Loss")
+                                r.Losses++;
+                            if (s.Result == "Draw")
+                                r.Draws++;
+                        }
+
+                    }
                     // Game just ended. Collect stats.
                     runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; stats = json.dumps(gameState.stats())", SourceCodeKind.Statements);
                     runSource.Execute(runScope);

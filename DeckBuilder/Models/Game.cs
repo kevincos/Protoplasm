@@ -19,6 +19,8 @@ namespace DeckBuilder.Models
 
         public virtual ICollection<GameVersion> Versions { get; set; }
 
+        public virtual ICollection<Record> Records { get; set; }
+
         public GameVersion LatestRelease
         {
             get

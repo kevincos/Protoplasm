@@ -16,6 +16,15 @@
         <span class = "ListPanelText">Exp: 3203</span>
     </div>
 
+    @foreach (var record in @Model.GameRecords)
+    {
+        <div>
+            <h2>@record.Name</h2>
+            Games Played: @record.TotalGames <br />
+            Win Rate: @record.WinPercent %       
+        </div>
+    }
+
     <h2>Active Games</h2>
     @foreach (var item in @Model.ActiveGames)
     {

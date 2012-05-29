@@ -459,9 +459,10 @@ class GameState:
     def set_waiting_status(self, seats):
         for i in range(len(seats)):
             seats[i].Waiting = (i == self.active_player_index)
+            seats[i].Result = self.player_contexts[i].result
 
     def stats(self):
-        return ""
+        return generate_stats()
 
     def stat_log(self,key, value):
         self.stats_base[key] = value

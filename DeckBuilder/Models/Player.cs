@@ -32,6 +32,8 @@ namespace DeckBuilder.Models
 
         public virtual ICollection<Game> CreatedGames { get; set; }
 
+        public virtual ICollection<Record> Records { get; set; }
+
         
     }
 }
