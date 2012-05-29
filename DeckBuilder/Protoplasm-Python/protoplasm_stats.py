@@ -1,4 +1,5 @@
-﻿import json
+﻿from encodings import hex_codec
+import json
 
 def replace_value(value, independent_variable, prev_independent_variable, data_set_name):
     if value == "[x]":
