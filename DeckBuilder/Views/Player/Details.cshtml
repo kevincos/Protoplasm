@@ -19,6 +19,11 @@
     @foreach (var record in @Model.GameRecords)
     {
         <div>
+            <h2>@record.Name (Ranked)</h2>
+            Games Played: @record.RankedTotalGames <br />
+            Win Rate: @record.RankedWinPercent %       
+        </div>
+        <div>
             <h2>@record.Name</h2>
             Games Played: @record.TotalGames <br />
             Win Rate: @record.WinPercent %       

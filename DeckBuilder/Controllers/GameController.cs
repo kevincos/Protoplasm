@@ -36,6 +36,7 @@ namespace DeckBuilder.Controllers
                 Name = game.Name,
                 Versions = game.Versions.ToList()
             };
+            viewModel.SetRankings(game.Records);
             return View(viewModel);
         }
 

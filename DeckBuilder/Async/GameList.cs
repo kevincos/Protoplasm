@@ -22,10 +22,10 @@ namespace DeckBuilder.Async
 
         public void Chat(int tableId, string chatText)
         {
-            
+
             Table table = db.Tables.Find(tableId);
             String fullMessage = DateTime.Now.Hour + ":" + DateTime.Now.Minute + "  " + Context.User.Identity.Name + ": " + chatText;
-            table.ChatRecord+=fullMessage+"<br/>";
+            table.ChatRecord += fullMessage + "<br/>";
             if (table.ChatRecord.Length > 1024) table.ChatRecord = table.ChatRecord.Substring(table.ChatRecord.Length - 1024);
             db.SaveChanges();
             foreach (Seat s in table.Seats)

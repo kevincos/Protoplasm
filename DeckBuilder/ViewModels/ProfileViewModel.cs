@@ -57,13 +57,32 @@ namespace DeckBuilder.ViewModels
         public int Losses { get; set; }
         public int WinPercent { get; set; }
 
+        public int RankedTotalGames { get; set; }
+        public int RankedWins { get; set; }
+        public int RankedDraws { get; set; }
+        public int RankedLosses { get; set; }
+        public int RankedWinPercent { get; set; }
+
         public RecordViewModel(Record r)
         {
             Wins = r.Wins;
             Losses = r.Losses;
             Draws = r.Draws;
             TotalGames = r.GamesPlayed;
-            WinPercent = 100 * Wins / TotalGames;
+            if(TotalGames == 0)
+                WinPercent = 0;
+            else
+                WinPercent = 100 * Wins / TotalGames;
+
+            RankedWins = r.RankedWins;
+            RankedLosses = r.RankedLosses;
+            RankedDraws = r.RankedDraws;
+            RankedTotalGames = r.RankedGamesPlayed;
+            if (RankedTotalGames == 0)
+                RankedWinPercent = 0;
+            else
+                RankedWinPercent = 100 * RankedWins / RankedTotalGames;
+
             Name = r.Game.Name;
         }
     }

@@ -51,6 +51,17 @@ namespace DeckBuilder.Controllers
         }
 
         //
+        // GET: /Table/Wait?matchRequestId=2312
+        [Authorize]
+        public ActionResult Wait(int matchRequestId)
+        {            
+            Player player = db.Players.Where(p => p.Name == User.Identity.Name).Single();
+            ViewBag.WaitId = matchRequestId;
+            ViewBag.PlayerName = player.Name;
+            return View();
+        }
+
+        //
         // GET: /Table/Play/5
         [Authorize]
         public ActionResult Play(int id, int playerIndex=0)

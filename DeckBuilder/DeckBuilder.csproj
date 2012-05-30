@@ -113,6 +113,7 @@
   <ItemGroup>
     <Compile Include="App_Start\DontDropDBJustCreateTables.cs" />
     <Compile Include="App_Start\DontDropDbJustCreateTablesIfModelChangedStart.cs" />
+    <Compile Include="Async\WaitingArea.cs" />
     <Compile Include="Async\GameList.cs" />
     <Compile Include="Async\LobbyChat.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -620,6 +621,7 @@
     <Content Include="README.jQuery.vsdoc.txt" />
     <Content Include="Scripts\Connect4\connect4.main.js" />
     <Content Include="Scripts\Convoy\convoy.main.js" />
+    <Content Include="Scripts\waitingRoom.js" />
     <Content Include="Scripts\gameList.js" />
     <Content Include="Scripts\GameCore\gamecore.hexboard2.js" />
     <Content Include="Scripts\GameCore\gamecore.infowindow2.js" />
@@ -822,6 +824,8 @@
   <ItemGroup>
     <None Include="Content\Images\convoylogo.pdn" />
     <Content Include="Views\GameVersion\Stats.cshtml" />
+    <Content Include="Views\MatchRequest\Index.cshtml" />
+    <Content Include="Views\Table\Wait.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

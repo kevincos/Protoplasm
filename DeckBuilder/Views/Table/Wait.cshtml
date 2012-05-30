@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "Waiting";
+}
+
+<div class="gameArea">
+    <canvas id="canvas" width="800" height="600">
+    <p>Your browser does not support the canvas element.</p>
+    </canvas>
+
+    <div id="datablock">
+        <div style = "float:left">              
+            <div id="chat" class="logsection">        
+            </div>
+            <form id="chatform">
+                <input id="chatinput"/>        
+                <button id="chatbutton" type = "submit">Say</button>
+            </form>
+        </div>
+
+        <div style = "float: right">
+            <div id="log" class="logsection">        
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    initWaitingArea("@ViewBag.PlayerName", "@ViewBag.WaitId");
+</script>

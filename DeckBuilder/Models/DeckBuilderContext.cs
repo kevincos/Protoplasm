@@ -21,6 +21,7 @@ namespace DeckBuilder.Models
         public DbSet<Seat> Seats { get; set; }
         public DbSet<CardSet> CardSets { get; set; }
         public DbSet<Deck> Decks { get; set; }
+        public DbSet<MatchRequest> MatchRequests { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
