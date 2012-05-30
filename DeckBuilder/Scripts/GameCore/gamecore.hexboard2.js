@@ -105,7 +105,7 @@ HexBoard2.prototype.update = function () {
     this.hoverC = hoverC;
     this.hoverDirection = hoverDirection;
     this.hoverEdge = hoverEdge;
-    if (vMath.mouseDown == true && this.gameCore.mouseDown == false && this.board[this.hoverA][this.hoverB].selectable == true) {        
+    if (vMath.mouseDown == true && this.gameCore.mouseDown == false && this.board[this.hoverA][this.hoverB].selectable == true) {
         var update = {};
         update.selectX = this.hoverA;
         update.selectY = this.hoverB;
@@ -115,9 +115,17 @@ HexBoard2.prototype.update = function () {
         $.ajax({
             url: updateUrl,
             type: 'POST',
-            dataType: 'json',
+            dataType: 'text',
             data: JSON.stringify(update),
-            contentType: 'application/json; charset=utf-8'
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if ($('#debug').length == 0) {
+                    alert(data)
+                }
+                else {
+                    $('#debug').html(data);
+                }
+            }
         });
     }
 

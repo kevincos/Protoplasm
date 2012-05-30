@@ -88,6 +88,14 @@ section {
     height:60px;    
 }
 
+.ListPanelLong
+{
+    position:relative; 
+    border: 5px ridge #e0e0e0;
+    width:800px;
+    height:60px;    
+}
+
 .ListPanelImage
 {
     display:inline-block;    
@@ -118,6 +126,13 @@ section {
     margin-left:30px;
 }
 
+.RankedMatchButton
+{
+    width:140px;
+    height:25px;
+    margin-left:10px;
+}
+
 .ListPanelDescription
 {
     position:absolute;
@@ -128,6 +143,20 @@ section {
     margin:0px;
     z-index: 3;    
     padding:5px;
+}
+
+
+
+.ListPanelStartMatch
+{
+    position:absolute;
+    left:620px;
+    display:inline-block;        
+    width:160px;
+    height:50px;    
+    margin:0px;
+    z-index: 3;    
+    padding:5px;    
 }
 
 .ListPanelInvite

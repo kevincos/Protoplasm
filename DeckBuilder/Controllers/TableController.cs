@@ -192,116 +192,123 @@ namespace DeckBuilder.Controllers
         [HttpPost]
         public ActionResult UpdateMain(int id, GameUpdate update)
         {
-            DateTime start = DateTime.Now;
-            Table table = db.Tables.Find(id);
+            try
+            {
+                DateTime start = DateTime.Now;
+                Table table = db.Tables.Find(id);
 
-            PythonScriptEngine.InitScriptEngine();
-            PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript);
+                PythonScriptEngine.InitScriptEngine();
+                PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript);
 
-            ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
-            runScope.ImportModule("cPickle");
+                ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
+                runScope.ImportModule("cPickle");
 
-            string init_pickledState = Compression.DecompressStringState(table.GameState);
-            DateTime modulesLoaded = DateTime.Now;
+                string init_pickledState = Compression.DecompressStringState(table.GameState);
+                DateTime modulesLoaded = DateTime.Now;
 
-            // PYTHON UPDATE
+                // PYTHON UPDATE
 
-            // Input state                                                                                                              
-            runScope.SetVariable("inputState", init_pickledState);
-            runScope.SetVariable("update", update);
-            // Input array of seats.
-            Seat[] seatsArray = table.Seats.ToArray();
-            runScope.SetVariable("seats", seatsArray);
+                // Input state                                                                                                              
+                runScope.SetVariable("inputState", init_pickledState);
+                runScope.SetVariable("update", update);
+                // Input array of seats.
+                Seat[] seatsArray = table.Seats.ToArray();
+                runScope.SetVariable("seats", seatsArray);
 
-            DateTime variablesSet = DateTime.Now;
+                DateTime variablesSet = DateTime.Now;
 
-            ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);gameState.set_waiting_status(seats);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
-            runSource.Execute(runScope);
+                ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);gameState.set_waiting_status(seats);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
+                runSource.Execute(runScope);
 
-            string final_pickledState = runScope.GetVariable("finalState");
-            bool game_over = runScope.GetVariable("game_over");
-            if (game_over == true)
-            {                
-                if (table.TableState != (int)TableState.Complete && table.Version.DevStage == "Release")
+                string final_pickledState = runScope.GetVariable("finalState");
+                bool game_over = runScope.GetVariable("game_over");
+                if (game_over == true)
                 {
-                    // Log player wins/losses
-                    foreach (Seat s in table.Seats)
+                    if (table.TableState != (int)TableState.Complete && table.Version.DevStage == "Release")
                     {
-                        Player p = s.Player;
-                        if (p.Records == null) p.Records = new List<Record>();
-                        // Find record if it exists. Otherwise create one.
-                        Record r = p.Records.FirstOrDefault(record => record.GameId == table.GameId);
-                        if (r == null)
+                        // Log player wins/losses
+                        foreach (Seat s in table.Seats)
                         {
-                            r = new Record();
-                            r.GameId = table.GameId;
-                            r.PlayerId = p.PlayerID;
-                            p.Records.Add(r);
+                            Player p = s.Player;
+                            if (p.Records == null) p.Records = new List<Record>();
+                            // Find record if it exists. Otherwise create one.
+                            Record r = p.Records.FirstOrDefault(record => record.GameId == table.GameId);
+                            if (r == null)
+                            {
+                                r = new Record();
+                                r.GameId = table.GameId;
+                                r.PlayerId = p.PlayerID;
+                                p.Records.Add(r);
+                            }
+                            if (table.Ranked == true)
+                            {
+                                r.RankedGamesPlayed++;
+                                if (s.Result == "Win")
+                                    r.RankedWins++;
+                                if (s.Result == "Loss")
+                                    r.RankedLosses++;
+                                if (s.Result == "Draw")
+                                    r.RankedDraws++;
+                            }
+                            else
+                            {
+                                r.GamesPlayed++;
+                                if (s.Result == "Win")
+                                    r.Wins++;
+                                if (s.Result == "Loss")
+                                    r.Losses++;
+                                if (s.Result == "Draw")
+                                    r.Draws++;
+                            }
+
                         }
-                        if (table.Ranked == true)
-                        {
-                            r.RankedGamesPlayed++;
-                            if (s.Result == "Win")
-                                r.RankedWins++;
-                            if (s.Result == "Loss")
-                                r.RankedLosses++;
-                            if (s.Result == "Draw")
-                                r.RankedDraws++;
-                        }
-                        else
-                        {
-                            r.GamesPlayed++;
-                            if (s.Result == "Win")
-                                r.Wins++;
-                            if (s.Result == "Loss")
-                                r.Losses++;
-                            if (s.Result == "Draw")
-                                r.Draws++;
-                        }
+                        // Game just ended. Collect stats.
+                        runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; stats = json.dumps(gameState.stats())", SourceCodeKind.Statements);
+                        runSource.Execute(runScope);
+                        String latestStats = runScope.GetVariable("stats");
+                        if (table.Version.StatLog == "" || table.Version.StatLog == null)
+                            table.Version.StatLog = "[]";
+                        table.Version.StatLog = table.Version.StatLog.Remove(table.Version.StatLog.Length - 1);
+                        if (table.Version.StatLog.Length > 1)
+                            table.Version.StatLog += ",";
+                        table.Version.StatLog += latestStats + "]";
 
                     }
-                    // Game just ended. Collect stats.
-                    runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; stats = json.dumps(gameState.stats())", SourceCodeKind.Statements);
-                    runSource.Execute(runScope);
-                    String latestStats = runScope.GetVariable("stats");
-                    if (table.Version.StatLog == "" || table.Version.StatLog == null)
-                        table.Version.StatLog = "[]";
-                    table.Version.StatLog = table.Version.StatLog.Remove(table.Version.StatLog.Length - 1);
-                    if(table.Version.StatLog.Length > 1)
-                        table.Version.StatLog += ",";
-                    table.Version.StatLog += latestStats + "]";
-
+                    table.TableState = (int)TableState.Complete;
                 }
-                table.TableState = (int)TableState.Complete;
-            }
-            table.GameState = Compression.CompressStringState(final_pickledState);
+                table.GameState = Compression.CompressStringState(final_pickledState);
 
-            DateTime scriptsExecuted = DateTime.Now;
+                DateTime scriptsExecuted = DateTime.Now;
 
-            db.SaveChanges();
+                db.SaveChanges();
 
-            DateTime databaseSaved = DateTime.Now;
+                DateTime databaseSaved = DateTime.Now;
 
-            // Send updated states to clients
-            IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
-            dynamic clients = connectionManager.GetClients<GameList>();
-            for (int i = 0; i < table.Seats.Count; i++)
-            {
-                Seat s = table.Seats.ElementAt(i);
-                if (table.SoloPlayTest == false || s.Waiting == true)
+                // Send updated states to clients
+                IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
+                dynamic clients = connectionManager.GetClients<GameList>();
+                for (int i = 0; i < table.Seats.Count; i++)
                 {
-                    string viewJson = GetPythonView(table, final_pickledState, i);
-                    clients[s.Player.Name + id].main_updateGameState(viewJson);
+                    Seat s = table.Seats.ElementAt(i);
+                    if (table.SoloPlayTest == false || s.Waiting == true)
+                    {
+                        string viewJson = GetPythonView(table, final_pickledState, i);
+                        clients[s.Player.Name + id].main_updateGameState(viewJson);
+                    }
                 }
+                DateTime end = DateTime.Now;
+                TimeSpan totalTime = end.Subtract(start);
+                TimeSpan moduleLoadTime = modulesLoaded.Subtract(start);
+                TimeSpan variablesSetTime = variablesSet.Subtract(modulesLoaded);
+                TimeSpan scriptsExecutedTime = scriptsExecuted.Subtract(variablesSet);
+                TimeSpan databaseSavedTime = databaseSaved.Subtract(scriptsExecuted);
+                TimeSpan updateTime = end.Subtract(databaseSaved);
+                return View();
             }
-            DateTime end = DateTime.Now;
-            TimeSpan totalTime = end.Subtract(start);
-            TimeSpan moduleLoadTime = modulesLoaded.Subtract(start);
-            TimeSpan variablesSetTime = variablesSet.Subtract(modulesLoaded);
-            TimeSpan scriptsExecutedTime = scriptsExecuted.Subtract(variablesSet);
-            TimeSpan databaseSavedTime = databaseSaved.Subtract(scriptsExecuted);
-            TimeSpan updateTime = end.Subtract(databaseSaved);
-            return View();
+            catch (Exception e)
+            {
+                return Content(e.ToString());
+            }
         }
 
         //

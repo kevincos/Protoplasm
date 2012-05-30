@@ -121,6 +121,7 @@
     <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Controllers\GameVersionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MatchRequestController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\PostController.cs" />
     <Compile Include="Controllers\TableController.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="GameState\GeomancerState.cs" />
     <Compile Include="Models\Feedback.cs" />
     <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\MatchRequest.cs" />
     <Compile Include="Models\PersonInputModel.cs" />
     <Compile Include="Models\PlayerIdentity.cs" />
     <Compile Include="Models\Post.cs" />
@@ -618,6 +620,7 @@
     <Content Include="README.jQuery.vsdoc.txt" />
     <Content Include="Scripts\Connect4\connect4.main.js" />
     <Content Include="Scripts\Convoy\convoy.main.js" />
+    <Content Include="Scripts\gameList.js" />
     <Content Include="Scripts\GameCore\gamecore.hexboard2.js" />
     <Content Include="Scripts\GameCore\gamecore.infowindow2.js" />
     <Content Include="Scripts\GameCore\gamecore.hand2.js" />

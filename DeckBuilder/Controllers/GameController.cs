@@ -19,6 +19,7 @@ namespace DeckBuilder.Controllers
 
         public ViewResult Index()
         {
+            ViewBag.currentPlayer = User.Identity.Name;
             return View(db.Games.ToList());
         }
 
