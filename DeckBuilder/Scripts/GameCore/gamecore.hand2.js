@@ -39,9 +39,17 @@ HandInstance2.prototype.update = function () {
             $.ajax({
                 url: updateUrl,
                 type: 'POST',
-                dataType: 'json',
+                dataType: 'text',
                 data: JSON.stringify(update),
-                contentType: 'application/json; charset=utf-8'
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if ($('#debug').length == 0) {
+                        alert(data)
+                    }
+                    else {
+                        $('#debug').html(data);
+                    }
+                }
             });
 
         }

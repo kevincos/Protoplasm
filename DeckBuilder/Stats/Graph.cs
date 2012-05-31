@@ -93,7 +93,7 @@ namespace DeckBuilder.Stats
                 primaryConditionList = new List<Condition>();
             if (secondaryConditionList == null)
                 secondaryConditionList = new List<Condition>();
-            PythonScriptEngine.InitScriptEngine();
+            PythonScriptEngine.InitScriptEngine(false);
             ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
             runScope.ImportModule("protoplasm_stats");
             runScope.ImportModule("json");

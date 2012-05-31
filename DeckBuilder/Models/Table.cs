@@ -53,22 +53,21 @@ namespace DeckBuilder.Models
 
         public void GenerateInitialState()
         {
-            PythonScriptEngine.InitScriptEngine();
-            PythonScriptEngine.LoadModules(Version.ModuleName, Version.PythonScript);
+            PythonScriptEngine.InitScriptEngine(SoloPlayTest == true || Alpha == true);
+            PythonScriptEngine.LoadModules(Version.ModuleName, Version.PythonScript, SoloPlayTest == true || Alpha == true, Version.GameVersionID);
 
-            ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
+
+            ScriptScope runScope = PythonScriptEngine.GetScope(SoloPlayTest == true || Alpha == true);
             runScope.ImportModule("cPickle");
             runScope.ImportModule("protoplasm");
-            runScope.ImportModule(Version.ModuleName);
+            runScope.ImportModule(Version.ModuleName + Version.GameVersionID);
 
             // Input array of seats.
             Seat[] seatsArray = Seats.ToArray();
             runScope.SetVariable("seats", seatsArray);
 
-            ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("initialState = " + Version.ModuleName + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SourceCodeKind.Statements);                
-
-            runSource.Execute(runScope);
-
+            string error = PythonScriptEngine.RunCode(runScope, "initialState = " + Version.ModuleName + Version.GameVersionID + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SoloPlayTest || Alpha);
+            
             ChatRecord = "";
 
             GameState = Compression.CompressStringState(runScope.GetVariable("pickledState"));

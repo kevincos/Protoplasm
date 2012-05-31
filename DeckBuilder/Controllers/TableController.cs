@@ -28,6 +28,7 @@ using DeckBuilder.Protoplasm_Python;
 
 namespace DeckBuilder.Controllers
 { 
+
     public class TableController : Controller
     {
         private DeckBuilderContext db = new DeckBuilderContext();
@@ -105,7 +106,7 @@ namespace DeckBuilder.Controllers
             }
 
             string pickledState = Compression.DecompressStringState(table.GameState);                
-            ViewBag.state = new HtmlString(GetPythonView(table, pickledState, playerIndex));
+            ViewBag.state = new HtmlString(GetPythonView(table, pickledState, playerIndex,true).Item1);
 
 
             ViewBag.InitialChatData = new HtmlString(table.ChatRecord);
@@ -162,12 +163,13 @@ namespace DeckBuilder.Controllers
             return RedirectToAction("Play", new { id = newTable.TableID });
         }
 
-        public string GetPythonView(Table table, string pickledState, int playerIndex)
+        public Tuple<string,string> GetPythonView(Table table, string pickledState, int playerIndex, bool force)
         {
-            PythonScriptEngine.InitScriptEngine();
-            PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript);
+            
+            PythonScriptEngine.InitScriptEngine(table.Alpha || table.SoloPlayTest);
+            PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript, table.Alpha || table.SoloPlayTest, table.Version.GameVersionID);
 
-            ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
+            ScriptScope runScope = PythonScriptEngine.GetScope(table.Alpha || table.SoloPlayTest);
             runScope.ImportModule("cPickle");
             
             // Output state
@@ -180,23 +182,17 @@ namespace DeckBuilder.Controllers
             // Input playerId
             runScope.SetVariable("playerIndex", playerIndex);
 
-            ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerIndex))", SourceCodeKind.Statements);
-
-            for (int attempts = 0; attempts < 3; attempts++)
+            if (force)
+                PythonScriptEngine.ForceRunCode(runScope, "from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerIndex))", table.Alpha || table.SoloPlayTest, 3);
+            else
             {
-                try
-                {
-                    runSource.Execute(runScope);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    PythonScriptEngine.errors.Add(e.ToString());
-                    runSource.Execute(runScope);
-                }
-            }
+                string error = PythonScriptEngine.RunCode(runScope, "from encodings import hex_codec; import json; gameState = cPickle.loads(inputState);jsonString=json.dumps(gameState.view(playerIndex))", table.Alpha || table.SoloPlayTest);
+                if(error != "")
+                    return Tuple.Create<string, string>("", error);            
 
-            return runScope.GetVariable("jsonString");            
+            }
+            
+            return Tuple.Create<string,string>(runScope.GetVariable("jsonString"),"");            
         }
 
         // Update
@@ -208,10 +204,10 @@ namespace DeckBuilder.Controllers
                 DateTime start = DateTime.Now;
                 Table table = db.Tables.Find(id);
 
-                PythonScriptEngine.InitScriptEngine();
-                PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript);
+                PythonScriptEngine.InitScriptEngine(table.Alpha || table.SoloPlayTest);
+                PythonScriptEngine.LoadModules(table.Version.ModuleName, table.Version.PythonScript, table.Alpha || table.SoloPlayTest,table.Version.GameVersionID);
 
-                ScriptScope runScope = PythonScriptEngine.engine.CreateScope();
+                ScriptScope runScope = PythonScriptEngine.GetScope(table.Alpha || table.SoloPlayTest);
                 runScope.ImportModule("cPickle");
 
                 string init_pickledState = Compression.DecompressStringState(table.GameState);
@@ -228,8 +224,9 @@ namespace DeckBuilder.Controllers
 
                 DateTime variablesSet = DateTime.Now;
 
-                ScriptSource runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("gameState = cPickle.loads(inputState);gameState.update(update);gameState.set_waiting_status(seats);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", SourceCodeKind.Statements);
-                runSource.Execute(runScope);
+                string errorString = PythonScriptEngine.RunCode(runScope, "gameState = cPickle.loads(inputState);gameState.update(update);gameState.set_waiting_status(seats);game_over = gameState.game_over;finalState = cPickle.dumps(gameState)", table.Alpha || table.SoloPlayTest);
+                if (errorString != "")
+                    return Content(errorString);
 
                 string final_pickledState = runScope.GetVariable("finalState");
                 bool game_over = runScope.GetVariable("game_over");
@@ -274,8 +271,9 @@ namespace DeckBuilder.Controllers
 
                         }
                         // Game just ended. Collect stats.
-                        runSource = PythonScriptEngine.engine.CreateScriptSourceFromString("from encodings import hex_codec; import json; stats = json.dumps(gameState.stats())", SourceCodeKind.Statements);
-                        runSource.Execute(runScope);
+                        errorString = PythonScriptEngine.RunCode(runScope, "from encodings import hex_codec; import json; stats = json.dumps(gameState.stats())", table.Alpha || table.SoloPlayTest);
+                        if (errorString != "")
+                            return Content(errorString);
                         String latestStats = runScope.GetVariable("stats");
                         if (table.Version.StatLog == "" || table.Version.StatLog == null)
                             table.Version.StatLog = "[]";
@@ -303,8 +301,10 @@ namespace DeckBuilder.Controllers
                     Seat s = table.Seats.ElementAt(i);
                     if (table.SoloPlayTest == false || s.Waiting == true)
                     {
-                        string viewJson = GetPythonView(table, final_pickledState, i);
-                        clients[s.Player.Name + id].main_updateGameState(viewJson);
+                        Tuple<string,string> viewInfo = GetPythonView(table, final_pickledState, i,false);
+                        if(viewInfo.Item2 != "")
+                            return Content(viewInfo.Item2);
+                        clients[s.Player.Name + id].main_updateGameState(viewInfo.Item1);
                     }
                 }
                 DateTime end = DateTime.Now;
