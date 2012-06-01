@@ -59,6 +59,7 @@ namespace DeckBuilder.Controllers
 
             Table newTable = new Table();
             newTable = db.Tables.Add(newTable);
+            //newTable.LastUpdateTime = DateTime.Now;
             newTable.Game = db.Games.Single(g => g.Name == game.Name);
             newTable.Version = newTable.Game.Versions.First();            
             newTable.TableState = (int)TableState.Proposed;

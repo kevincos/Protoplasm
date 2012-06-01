@@ -129,6 +129,7 @@ namespace DeckBuilder.Controllers
             // Create Table
             Table newTable = new Table();
             newTable = db.Tables.Add(newTable);
+            //newTable.LastUpdateTime = DateTime.Now;
             newTable.Version = db.Versions.Find(versionId);
             newTable.Game = newTable.Version.ParentGame;
             newTable.TableState = (int)TableState.Proposed;

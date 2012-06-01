@@ -46,6 +46,10 @@ namespace DeckBuilder.Controllers
             {
                 db.Tables.Remove(t);
             }
+            foreach (Seat s in db.Seats)
+            {
+                db.Seats.Remove(s);
+            }
             db.SaveChanges();
             return RedirectToAction("Index", "Home");
         }

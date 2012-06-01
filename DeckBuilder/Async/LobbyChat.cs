@@ -259,6 +259,7 @@ namespace DeckBuilder.Async
                     // Create Table
                     Table newTable = new Table();
                     newTable = db.Tables.Add(newTable);
+                    //newTable.LastUpdateTime = DateTime.Now;
                     string gameName = proposal.gameName.Replace("*","");
                     newTable.Game = db.Games.Single(g => g.Name == gameName);
                     newTable.Version = newTable.Game.Versions.Single(v => v.GameVersionID == proposal.versionId);
