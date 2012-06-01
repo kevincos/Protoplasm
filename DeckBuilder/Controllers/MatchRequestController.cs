@@ -42,6 +42,8 @@ namespace DeckBuilder.Controllers
                 Table newTable = new Table();
                 newTable = db.Tables.Add(newTable);
                 newTable.Version = db.Versions.Find(game.LatestRelease.GameVersionID);
+                if (newTable.Version.DevStage == "Alpha")
+                    newTable.Alpha = true;
                 newTable.Game = newTable.Version.ParentGame;
                 newTable.TableState = (int)TableState.Proposed;
                 db.SaveChanges();

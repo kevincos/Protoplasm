@@ -263,6 +263,8 @@ namespace DeckBuilder.Async
                     newTable.Game = db.Games.Single(g => g.Name == gameName);
                     newTable.Version = newTable.Game.Versions.Single(v => v.GameVersionID == proposal.versionId);
                     newTable.TableState = (int)TableState.Proposed;
+                    if (newTable.Version.DevStage == "Alpha")
+                        newTable.Alpha = true;
                     db.SaveChanges();
 
                     // Create Seats

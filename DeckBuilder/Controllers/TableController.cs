@@ -132,6 +132,8 @@ namespace DeckBuilder.Controllers
             newTable.Version = db.Versions.Find(versionId);
             newTable.Game = newTable.Version.ParentGame;
             newTable.TableState = (int)TableState.Proposed;
+            if (newTable.Version.DevStage == "Alpha")
+                newTable.Alpha = true;
             db.SaveChanges();
 
             // Create Seats
@@ -368,6 +370,58 @@ namespace DeckBuilder.Controllers
                 return RedirectToAction("Index");
             }
             return View(table);
+        }
+
+        public ActionResult Remove(int id)
+        {            
+            Player player = db.Players.Where(p => p.Name == User.Identity.Name).Single();
+            Table table = db.Tables.Find(id);
+            table.Seats.First(s => s.PlayerId == player.PlayerID).Removed = true;
+
+            bool destroyTable = true;
+            foreach (Seat s in table.Seats)
+            {
+                if (s.Removed == false)
+                    destroyTable = false;
+            }
+
+            if (destroyTable == true)
+                db.Tables.Remove(table);
+            db.SaveChanges();
+
+            // Sets seat to Removed. If both seats are Removed, delete table.
+            return RedirectToAction("Profile", "Home");
+        }
+
+        public ActionResult Cancel(int id)
+        {
+            // Sets table to Cancelled and Removes it from current player's list.
+            Player player = db.Players.Where(p => p.Name == User.Identity.Name).Single();
+            Table table = db.Tables.Find(id);
+            Seat seat = table.Seats.First(s => s.PlayerId == player.PlayerID);
+            if (seat.Accepted == false)
+            {
+                table.TableState = (int)TableState.Cancelled;
+                seat.Removed = true;
+            }
+            db.SaveChanges();
+            return RedirectToAction("Profile", "Home");
+        }
+
+        public ActionResult Forfeit(int id)
+        {
+            // Sets table to completed.
+            Player player = db.Players.Where(p => p.Name == User.Identity.Name).Single();
+            Table table = db.Tables.Find(id);
+            Seat seat = table.Seats.First(s => s.PlayerId == player.PlayerID);
+            if (table.Seats.Count == 2)
+            {
+                table.TableState = (int)TableState.Complete;
+                seat.Removed = true;
+            }
+            db.SaveChanges();
+
+            return RedirectToAction("Profile", "Home");
         }
 
         //

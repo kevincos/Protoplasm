@@ -34,13 +34,25 @@ namespace DeckBuilder.Controllers
                 if (v.DevStage != "Alpha" && v.DevStage != "Release")
                     v.DevStage = "Alpha";
             }
+            
             db.SaveChanges();
 
             return RedirectToAction("Index");
         }
 
+        public ActionResult WipeTables()
+        {
+            foreach (Table t in db.Tables)
+            {
+                db.Tables.Remove(t);
+            }
+            db.SaveChanges();
+            return RedirectToAction("Index", "Home");
+        }
+
         public ActionResult Index()
         {
+
             ViewBag.TopPosts = db.Posts.Include(p=>p.Player).OrderByDescending(p => p.Date).Take(2);
             return View();
         }

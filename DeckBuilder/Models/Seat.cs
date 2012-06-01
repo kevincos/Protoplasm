@@ -21,6 +21,8 @@ namespace DeckBuilder.Models
         public bool Accepted { get; set; }
         public bool Waiting { get; set; }
         public bool Removed { get; set; }
+        public bool Forfeit { get; set; }
+        
         public string Result { get; set; }
 
         // Rock Paper Scissors Data

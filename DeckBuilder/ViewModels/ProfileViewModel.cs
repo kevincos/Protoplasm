@@ -14,6 +14,7 @@ namespace DeckBuilder.ViewModels
         public int tableId;
         public String linkText;
         public bool cancellable;
+        public bool forceWin = false;
 
         public SeatViewModel(Seat seat)
         {
@@ -31,6 +32,9 @@ namespace DeckBuilder.ViewModels
             cancellable = false;
             if (seat.Accepted == false && (TableState)(t.TableState) == TableState.Proposed)
                 cancellable = true;
+
+            //if(seat.Table.LastUpdateTime
+              //  forceWin = true;
 
             List<String> opponentNames = t.Seats.Where(s => s != seat).Select(s => s.Player.Name).ToList();
             formattedOpponentNames = opponentNames[0];
@@ -94,15 +98,28 @@ namespace DeckBuilder.ViewModels
         public List<SeatViewModel> ActiveGames;
         public List<SeatViewModel> CompletedGames;
         public List<SeatViewModel> ProposedGames;
+        public List<SeatViewModel> CancelledGames;
+
+        public List<SeatViewModel> DevGames;
+
+        public List<SeatViewModel> ActiveRankedGames;
+        public List<SeatViewModel> CompletedRankedGames;
 
         public List<RecordViewModel> GameRecords;
 
         public ProfileViewModel(Player viewPlayer)
         {
             player = viewPlayer;
-            ActiveGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.InPlay).Select(s => new SeatViewModel(s)).ToList();
-            CompletedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Complete).Select(s => new SeatViewModel(s)).ToList();
-            ProposedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Proposed).Select(s => new SeatViewModel(s)).ToList();
+
+            ActiveRankedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.InPlay && s.Removed == false && s.Table.Ranked == true && s.Table.Alpha == false).Select(s => new SeatViewModel(s)).ToList();
+            CompletedRankedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Complete && s.Removed == false && s.Table.Ranked == true && s.Table.Alpha == false).Select(s => new SeatViewModel(s)).ToList();
+
+            DevGames = player.ActiveSeats.Where(s => s.Removed == false && s.Table.Alpha == true).Select(s => new SeatViewModel(s)).ToList();
+
+            ActiveGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.InPlay && s.Removed == false && s.Table.Ranked == false && s.Table.Alpha == false).Select(s => new SeatViewModel(s)).ToList();
+            CompletedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Complete && s.Removed == false && s.Table.Ranked == false && s.Table.Alpha == false).Select(s => new SeatViewModel(s)).ToList();
+            ProposedGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Proposed && s.Removed == false && s.Table.Ranked == false && s.Table.Alpha == false).Select(s => new SeatViewModel(s)).ToList();
+            CancelledGames = player.ActiveSeats.Where(s => s.Table.TableState == (int)TableState.Cancelled && s.Removed == false && s.Table.Ranked == false && s.Table.Alpha == false).Select(s => new SeatViewModel(s)).ToList();
 
             GameRecords = player.Records.Select(r => new RecordViewModel(r)).ToList();
         }

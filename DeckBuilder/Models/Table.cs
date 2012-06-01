@@ -49,7 +49,7 @@ namespace DeckBuilder.Models
 
         public bool SoloPlayTest { get; set; }
         public bool Ranked { get; set; }
-        public bool Alpha { get; set; }
+        public bool Alpha { get; set; }        
 
         public void GenerateInitialState()
         {

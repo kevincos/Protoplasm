@@ -60,7 +60,7 @@ namespace DeckBuilder.Controllers
             Table newTable = new Table();
             newTable = db.Tables.Add(newTable);
             newTable.Game = db.Games.Single(g => g.Name == game.Name);
-            newTable.Version = newTable.Game.Versions.First();
+            newTable.Version = newTable.Game.Versions.First();            
             newTable.TableState = (int)TableState.Proposed;
             newTable.SoloPlayTest = true;
             db.SaveChanges();
