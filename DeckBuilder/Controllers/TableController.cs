@@ -384,9 +384,9 @@ namespace DeckBuilder.Controllers
             {
                 if (s.Removed == false)
                     destroyTable = false;
-            }
+            }            
 
-            if (destroyTable == true)
+            if (destroyTable == true || table.SoloPlayTest == true)
                 db.Tables.Remove(table);
             db.SaveChanges();
 

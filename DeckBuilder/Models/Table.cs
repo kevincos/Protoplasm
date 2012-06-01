@@ -51,7 +51,7 @@ namespace DeckBuilder.Models
         public bool Ranked { get; set; }
         public bool Alpha { get; set; }
 
-        public DateTime LastUpdateTime { get; set; }
+        //public DateTime LastUpdateTime { get; set; }
 
 
         public void GenerateInitialState()

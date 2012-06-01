@@ -37,6 +37,7 @@
         <div>
             @item.gameName with @item.formattedOpponentNames @item.status                    
             @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+            @Html.ActionLink("Forfeit", "Forfeit", "Table", new { id = item.tableId }, null)
         </div>
     }
     <h3>Unranked</h3>
@@ -45,6 +46,7 @@
         <div>
             @item.gameName with @item.formattedOpponentNames @item.status                    
             @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
         </div>
     }
     <h2>Proposed Games</h2>    
@@ -57,23 +59,38 @@
             {
                 @Html.ActionLink("Cancel", "Cancel", "Table", new { id = item.tableId }, null)
             }
+            else
+            {
+                @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+            }
         </div>
     }
     <h2>Completed Games</h2>
     <h3>Ranked</h3>
-    @foreach (var item in @Model.CompletedGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-        </div>
-    }
-    <h3>Unranked</h3>
     @foreach (var item in @Model.CompletedRankedGames)
     {
         <div>
             @item.gameName with @item.formattedOpponentNames @item.status
             @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+        </div>
+    }
+    <h3>Unranked</h3>
+    @foreach (var item in @Model.CompletedGames)
+    {
+        <div>
+            @item.gameName with @item.formattedOpponentNames @item.status
+            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+        </div>
+    }
+    <h2>Dev Games</h2>
+    @foreach (var item in @Model.DevGames)
+    {
+        <div>
+            @item.gameName with @item.formattedOpponentNames @item.status
+            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
         </div>
     }
     <h2>Cancelled Games</h2>
@@ -82,6 +99,7 @@
         <div>
             @item.gameName with @item.formattedOpponentNames @item.status
             @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
         </div>
     }
 </fieldset>
