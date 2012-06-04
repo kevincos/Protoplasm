@@ -54,7 +54,7 @@ namespace DeckBuilder.Models
         //public DateTime LastUpdateTime { get; set; }
 
 
-        public void GenerateInitialState()
+        public string GenerateInitialState()
         {
             PythonScriptEngine.InitScriptEngine(SoloPlayTest == true || Alpha == true);
             PythonScriptEngine.LoadModules(Version.ModuleName, Version.PythonScript, SoloPlayTest == true || Alpha == true, Version.GameVersionID);
@@ -70,10 +70,13 @@ namespace DeckBuilder.Models
             runScope.SetVariable("seats", seatsArray);
 
             string error = PythonScriptEngine.RunCode(runScope, "initialState = " + Version.ModuleName + Version.GameVersionID + ".Init(seats);pickledState = cPickle.dumps(initialState,0)", SoloPlayTest || Alpha);
-            
+            if (error != "")
+                return error;
+
             ChatRecord = "";
 
             GameState = Compression.CompressStringState(runScope.GetVariable("pickledState"));
+            return "";
         }
     }
 }

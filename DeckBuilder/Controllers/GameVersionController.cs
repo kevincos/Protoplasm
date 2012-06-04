@@ -84,9 +84,19 @@ namespace DeckBuilder.Controllers
 
             newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
 
-            newTable.GenerateInitialState();
-            db.SaveChanges();
-            return RedirectToAction("Play", "Table", new { id = newTable.TableID, playerIndex = 0 });
+            string error = newTable.GenerateInitialState();
+            if (error == "")
+            {
+                db.SaveChanges();
+                return RedirectToAction("Play", "Table", new { id = newTable.TableID, playerIndex = 0 });
+            }
+            else
+            {
+                db.Tables.Remove(newTable);
+                error = error.Replace("<br/>", "\n");
+                error = error.Replace("<string>", "Unknown");
+                return RedirectToAction("Edit", "GameVersion", new { id = id, initError = error });
+            }
         }
 
                 //
@@ -176,8 +186,13 @@ namespace DeckBuilder.Controllers
         //
         // GET: /GameVersion/Edit/5
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int id, String initError)
         {
+            if(initError != null)
+            {
+                String htmlError = initError.Replace("\n", "<br/>");
+                ViewBag.Error = htmlError;
+            }
             GameVersion version = db.Versions.Find(id);
             return View(version);
         }

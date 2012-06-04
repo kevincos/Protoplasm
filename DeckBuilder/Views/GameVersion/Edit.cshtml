@@ -34,6 +34,8 @@
             @Html.ValidationMessageFor(model => model.ModuleName)
         </div>
 
+        <div class="error">@Html.Raw(@ViewBag.Error)</div>
+
         <div class="editor-label">
             @Html.LabelFor(model => model.PythonScript)  (@Html.ActionLink("Documentation", "Docs", "Home", null, null))
         </div>
