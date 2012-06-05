@@ -1,24 +1,83 @@
 ﻿@model DeckBuilder.Models.LogOnModel
-
 @{
     ViewBag.Title = "Log On";
 }
-
-<h2>Log On</h2>
+<h2>
+    Log On</h2>
 <p>
-    Please enter your user name and password. @Html.ActionLink("Register", "Register") if you don't have an account.
+    Please enter your username and password. @Html.ActionLink("Register", "Register")
+    if you don't have an account.
 </p>
-
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<form action="Authenticate?ReturnUrl=@HttpUtility.UrlEncode(Request.QueryString["ReturnUrl"])" method="post" id="openid_form">
+<input type="hidden" name="action" value="verify" />
+<div>
+    <fieldset>
+        <legend>Login using OpenID</legend>
+        <div class="openid_choice">
+            <p>
+                Please click your account provider:</p>
+            <div id="openid_btns">
+            </div>
+        </div>
+        <div id="openid_input_area">
+            @Html.TextBox("openid_identifier")
+            <input type="submit" value="Log On" />
+        </div>
+        <noscript>
+            <p>
+                OpenID is service that allows you to log-on to many different websites using a single
+                indentity. Find out <a href="http://openid.net/what/">more about OpenID</a> and
+                <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
+        </noscript>
+        <div>
+            @if (Model != null)
+            {
+                if (String.IsNullOrEmpty(Model.UserName))
+                {
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.OpenID)
+                </div>
+                <div class="editor-field">
+                    @Html.DisplayFor(model => model.OpenID)
+                </div>
+                <p class="button">
+                    @Html.ActionLink("New User ,Register", "Register", new { OpenID = Model.OpenID, FacebookID = Model.FacebookID })
+                </p>
+                }
+                else
+                {
+                    //user exist 
+                <p class="buttonGreen">
+                    <a href="@Url.Action("Index", "Home")">Welcome , @Model.UserName, Continue..." </a>
+                </p>
+
+                }
+            }
+        </div>
+    </fieldset>
+</div>
+</form>
+
+
+<div>
+    <fieldset>
+        <legend>Or Login With Facebook</legend>
+
+                <div class="openid_choice">
+            <p>Click to login with Facebook:
+                </p>
+            <a href=@Url.RouteUrl(new { controller = "Account", action = "FacebookLogin" })>log in with Facebook</a>
+    </fieldset>
+</div>
 
 @Html.ValidationSummary(true, "Login was unsuccessful. Please correct the errors and try again.")
-
-@using (Html.BeginForm()) {
+@using (Html.BeginForm())
+{
     <div>
         <fieldset>
-            <legend>Account Information</legend>
-
+            <legend>Or Login Normally</legend>
             <div class="editor-label">
                 @Html.LabelFor(m => m.UserName)
             </div>
@@ -26,7 +85,6 @@
                 @Html.TextBoxFor(m => m.UserName)
                 @Html.ValidationMessageFor(m => m.UserName)
             </div>
-
             <div class="editor-label">
                 @Html.LabelFor(m => m.Password)
             </div>
@@ -34,13 +92,11 @@
                 @Html.PasswordFor(m => m.Password)
                 @Html.ValidationMessageFor(m => m.Password)
             </div>
-
             <div class="editor-label">
                 @Html.CheckBoxFor(m => m.RememberMe)
                 @Html.LabelFor(m => m.RememberMe)
             </div>
-
-            <p>
+            <p >
                 <input type="submit" value="Log On" />
             </p>
         </fieldset>

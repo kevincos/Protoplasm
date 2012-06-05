@@ -117,6 +117,7 @@
     <Compile Include="Async\WaitingArea.cs" />
     <Compile Include="Async\GameList.cs" />
     <Compile Include="Async\LobbyChat.cs" />
+    <Content Include="Content\logon.css" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CardController.cs" />
     <Compile Include="Controllers\DeckController.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="ViewModels\PlayerEntryViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\empty.gif" />
     <Content Include="Content\Images\Canyon\advance_one.png" />
     <Content Include="Content\Images\Canyon\advance_three.png" />
     <Content Include="Content\Images\Canyon\advance_two.png" />
@@ -337,10 +339,14 @@
     <Content Include="Content\Images\Mechtonic\unit_frame_yellow.png" />
     <Content Include="Content\Images\mysterycat.png" />
     <Content Include="Content\Images\mysterycat2.png" />
+    <Content Include="Content\Images\openid-inputicon.gif" />
+    <Content Include="Content\Images\openid-providers-en.png" />
     <Content Include="Content\Images\reversilogo.png" />
     <Content Include="Content\Images\rpslogo.png" />
     <Content Include="Content\Images\tblaze.PNG" />
     <Content Include="Content\jquery.jqplot.min.css" />
+    <Content Include="Content\openid-shadow.css" />
+    <Content Include="Content\openid.css" />
     <Content Include="Content\Protoplasm.css" />
     <Content Include="Content\GamePage.css" />
     <Content Include="Content\Images\ampcrystal.png" />
@@ -622,6 +628,8 @@
     <Content Include="README.jQuery.vsdoc.txt" />
     <Content Include="Scripts\Connect4\connect4.main.js" />
     <Content Include="Scripts\Convoy\convoy.main.js" />
+    <Content Include="Scripts\openid-en.js" />
+    <Content Include="Scripts\openid-jquery.js" />
     <Content Include="Scripts\waitingRoom.js" />
     <Content Include="Scripts\gameList.js" />
     <Content Include="Scripts\GameCore\gamecore.hexboard2.js" />

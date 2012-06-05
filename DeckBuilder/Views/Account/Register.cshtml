@@ -9,7 +9,7 @@
     Use the form below to create a new account. 
 </p>
 <p>
-    Passwords are required to be a minimum of @Membership.MinRequiredPasswordLength characters in length.
+    Passwords are required to be a minimum of @ViewBag.PasswordLength characters in length.
 </p>
 
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
@@ -20,7 +20,26 @@
     <div>
         <fieldset>
             <legend>Account Information</legend>
-
+            @if (ViewData["OpenID"] != null)
+            {
+            <div class="editor-label">
+                @Html.Label("OpenID")
+            </div>
+            <div class="editor-label">
+                @Html.Label((string)ViewBag.OpenID)
+            </div>
+            }
+            
+            @if (ViewData["FacebookID"] != null)
+            {
+            <div class="editor-label">
+                @Html.Label("FacebookID")
+            </div>
+            <div class="editor-label">
+                @Html.Label((string)ViewBag.FacebookID)
+            </div>
+            }
+            
             <div class="editor-label">
                 @Html.LabelFor(m => m.UserName)
             </div>
