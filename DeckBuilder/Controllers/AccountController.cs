@@ -63,13 +63,13 @@ namespace DeckBuilder.Controllers
                         });
                         db.SaveChanges();
                         FormsService.SignIn(model.UserName, false /* createPersistentCookie */);
-                        return RedirectToAction("Home", "Index", new { id = playerToAdd.PlayerID });
+                        return RedirectToAction("Index", "Home");
                     }
                     else
                     {
                         Player player = db.Players.Single(p => p.Name == model.UserName);
                         FormsService.SignIn(model.UserName, false /* createPersistentCookie */);
-                        return RedirectToAction("Home", "Index", new { id = player.PlayerID });
+                        return RedirectToAction("Index", "Home");
                     }
                 }
                 else
@@ -292,13 +292,13 @@ namespace DeckBuilder.Controllers
                     });
                     db.SaveChanges();
                     FormsService.SignIn(user.UserName, false /* createPersistentCookie */);
-                    return RedirectToAction("Home", "Index", new { id = playerToAdd.PlayerID });
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
                     Player player = db.Players.Single(p => p.Name == user.UserName);
                     FormsService.SignIn(user.UserName, false /* createPersistentCookie */);
-                    return RedirectToAction("Home", "Index", new { id = player.PlayerID });
+                    return RedirectToAction("Index", "Home");
                 }
             }
 
@@ -351,13 +351,13 @@ namespace DeckBuilder.Controllers
                             });
                             db.SaveChanges();
                             FormsService.SignIn(user.UserName, false /* createPersistentCookie */);
-                            return RedirectToAction("Home", "Index", new { id = playerToAdd.PlayerID });
+                            return RedirectToAction("Index", "Home");
                         }
                         else
                         {
                             Player player = db.Players.Single(p => p.Name == user.UserName);
                             FormsService.SignIn(user.UserName, false /* createPersistentCookie */);
-                            return RedirectToAction("Home", "Index", new { id = player.PlayerID });
+                            return RedirectToAction("Index", "Home");
                         }
                     }
 
