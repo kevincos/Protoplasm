@@ -14,7 +14,7 @@ var providers_large = {
 		name : 'Yahoo',
 		url : 'http://me.yahoo.com/'
 	},
-	aol : {
+	/*aol : {
 		name : 'AOL',
 		label : 'Enter your AOL screenname.',
 		url : 'http://openid.aol.com/{username}'
@@ -28,25 +28,16 @@ var providers_large = {
 		name : 'OpenID',
 		label : 'Enter your OpenID.',
 		url : null
-	}
+	}*/
 };
 
-var providers_small = {
+var providers_small = {/*
 	livejournal : {
 		name : 'LiveJournal',
 		label : 'Enter your Livejournal username.',
 		url : 'http://{username}.livejournal.com/'
 	},
-	/* flickr: {
-		name: 'Flickr',        
-		label: 'Enter your Flickr username.',
-		url: 'http://flickr.com/{username}/'
-	}, */
-	/* technorati: {
-		name: 'Technorati',
-		label: 'Enter your Technorati username.',
-		url: 'http://technorati.com/people/technorati/{username}/'
-	}, */
+
 	wordpress : {
 		name : 'Wordpress',
 		label : 'Enter your Wordpress.com username.',
@@ -62,16 +53,7 @@ var providers_small = {
 		label : 'Your Verisign username',
 		url : 'http://{username}.pip.verisignlabs.com/'
 	},
-	/* vidoop: {
-		name: 'Vidoop',
-		label: 'Your Vidoop username',
-		url: 'http://{username}.myvidoop.com/'
-	}, */
-	/* launchpad: {
-		name: 'Launchpad',
-		label: 'Your Launchpad username',
-		url: 'https://launchpad.net/~{username}'
-	}, */
+
 	claimid : {
 		name : 'ClaimID',
 		label : 'Your ClaimID username',
@@ -86,7 +68,7 @@ var providers_small = {
 		name : 'Google Profile',
 		label : 'Enter your Google Profile username',
 		url : 'http://www.google.com/profiles/{username}'
-	}
+	}*/
 };
 
 openid.locale = 'en';

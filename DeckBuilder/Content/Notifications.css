@@ -1,0 +1,111 @@
+﻿#NotificationDropdown
+{
+    display:none;
+    white-space: nowrap;
+    overflow: hidden;
+    
+    position:absolute;
+    background-color:white;
+    width:380px;
+    
+    
+    
+    z-index:80;
+    float:right;
+    background-image: url('empty.gif');
+    
+    padding:10px;
+    
+    margin:0px;   
+    
+    text-align:left;
+    
+    border: 5px ridge #e0e0e0;
+}
+
+#LogonDropdown
+{
+    display:none;
+    white-space: nowrap;
+    overflow: hidden;
+    
+    position:absolute;
+    background-color:white;
+    width:380px;
+    height:500px;
+    
+    border: 5px ridge #e0e0e0;
+    
+    z-index:80;
+    left:-300px;
+    background-image: url('empty.gif');
+    
+    padding:10px;
+    
+    margin:0px;   
+    
+    text-align:left;
+}
+
+#NotificationHover
+{
+    position:relative;
+    background-color:white;
+    z-index:100;
+    width:300px;
+    height:20px;
+    display:inline-block;
+    text-align:center;
+    padding:0px;
+    margin:0px;
+
+    display:none;
+}
+
+.NotificationMessage
+{
+    background-color:white;
+    display:inline-block;
+    width:350px;
+    white-space: nowrap;
+    overflow:hidden;
+    height:18px;
+}
+
+.NotificationRemove
+{
+    background-color:white;
+    display:inline-block;
+    overflow:hidden;
+    width:30px;
+    height:18px;
+    text-align:center;
+}
+
+#LogoffHover
+{    
+    position:relative;
+    background-color:white;
+    width:100px;
+    height:20px;
+    display:inline-block;
+    text-align:center;
+    padding:0px;
+    margin:0px;
+ 
+    display:none;
+}
+
+#LogonHover
+{
+    position:relative;
+    background-color:white;
+    width:100px;
+    height:20px;
+    display:inline-block;
+    text-align:center;
+    padding:0px;
+    margin:0px;
+ 
+    display:none;
+}

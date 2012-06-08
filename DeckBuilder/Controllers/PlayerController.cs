@@ -57,6 +57,16 @@ namespace DeckBuilder.Controllers
         //
         // GET: /Player/Details/5
 
+        public ViewResult Notifications(int id)
+        {
+            Player player = db.Players.Find(id);
+            
+            return View(db.Notifications.Where(n=>n.PlayerID == id));
+        }
+
+        //
+        // GET: /Player/Details/5
+
         public ViewResult Developer(int id)
         {
             Player player = db.Players.Find(id);

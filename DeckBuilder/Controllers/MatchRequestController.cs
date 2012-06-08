@@ -81,6 +81,20 @@ namespace DeckBuilder.Controllers
 
                 newTable.GenerateInitialState();
 
+                foreach (Seat seat in newTable.Seats)
+                {
+                    SeatViewModel viewModel = new SeatViewModel(seat);
+                    String message = "";
+                    if (seat.Waiting == true)
+                        message = "Your turn in " + newTable.Game.Name + " with " + viewModel.formattedOpponentNames + ". (Ranked) " + DateTime.Now;
+                    else
+                        message = "A new game of " + newTable.Game.Name + " has been started with " + viewModel.formattedOpponentNames + ". (Ranked) " + DateTime.Now;
+
+                    Notification n = new Notification { PlayerID = seat.PlayerId, Message = message, TableID = newTable.TableID, DatePosted = DateTime.Now, Read = false, Url = "/Table/Play/" + newTable.TableID };
+                    db.Notifications.Add(n);
+
+                }
+                db.SaveChanges();
 
                 IConnectionManager connectionManager = AspNetHost.DependencyResolver.Resolve<IConnectionManager>();
                 dynamic clients = connectionManager.GetClients<WaitingArea>();

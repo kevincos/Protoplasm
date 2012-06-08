@@ -1,0 +1,32 @@
+﻿
+<script type="text/javascript">
+        $(document).ready(function () {
+            initNotifications("@ViewBag.Name");
+        });   
+</script>
+
+<div id="NotificationHover">
+    @ViewBag.NotificationsCount new alerts.
+    <div id="NotificationDropdown">
+    @foreach (var notification in ViewBag.Notifications)
+    {
+        <div class="NotificationMessage">
+        <a href="@notification.Url"> @notification.Message</a>
+        </div>
+        <div class="NotificationRemove">
+        X
+        </div>
+        <br />
+    }
+    @Html.ActionLink("See all notifications...", "Notifications", "Player", new { id = ViewBag.PlayerId }, null)
+</div>
+</div><div id="LogoffHover">
+    @Html.ActionLink("Log Off", "LogOff", "Account")
+</div>
+
+<div id="LogonHover">
+    @Html.ActionLink("Log On", "LogOn", "Account")
+    <div id="LogonDropdown">   
+        @Html.Action("LogOnPartial", "Account");
+    </div>
+</div>

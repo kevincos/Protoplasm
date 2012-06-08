@@ -7,6 +7,8 @@
     <link href="@Url.Content("~/Content/GamePage.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/Protoplasm.css")" rel="stylesheet" type="text/css" />
     
+    <link href="@Url.Content("~/Content/Notifications.css")" rel="stylesheet" type="text/css" />
+
     <link href="@Url.Content("~/Content/openid-shadow.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/openid.css")" rel="stylesheet" type="text/css" />
 
@@ -33,13 +35,15 @@
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.track.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/GameCore/gamecore.main.js")" type="text/javascript"></script>
 
+    <script src="@Url.Content("~/Scripts/notifications.js")" type="text/javascript"></script>
+
     <script src="@Url.Content("~/Scripts/openid-jquery.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/openid-en.js")" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
             openid.init('openid_identifier');
-        });
+        });        
     </script>
 </head>
 <body>
@@ -47,7 +51,7 @@
         <div class="page">
             <header>
                 <div id="logindisplay">
-                    @Html.Partial("_LogOnPartial")
+                    @Html.Action("_Menu","Home")
                 </div>
                 <div id="navbar">
                     <div class="logo">

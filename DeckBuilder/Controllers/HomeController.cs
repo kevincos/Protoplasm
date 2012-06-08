@@ -60,6 +60,28 @@ namespace DeckBuilder.Controllers
             ViewBag.TopPosts = db.Posts.Include(p=>p.Player).OrderByDescending(p => p.Date).Take(2);
             return View();
         }
+
+        [ChildActionOnly]
+        public ActionResult _Menu()
+        {            
+            var player = db.Players.Where(p => p.Name == User.Identity.Name).SingleOrDefault();
+            if (player == null)
+            {
+                ViewBag.Name = "";
+                ViewBag.Notifications = new List<Notification>();
+                ViewBag.PlayerId = 0;
+                ViewBag.NotificationsCount = 0;
+            }
+            else
+            {
+                ViewBag.Name = player.Name;
+                ViewBag.PlayerId = player.PlayerID;
+                ViewBag.Notifications = db.Notifications.Where(n => n.PlayerID == player.PlayerID).OrderBy(n => n.DatePosted).Take(10);
+                ViewBag.NotificationsCount = db.Notifications.Where(n => n.PlayerID == player.PlayerID).Count();
+            }
+
+            return PartialView();
+        }
         
         [Authorize]
         public ActionResult Profile()

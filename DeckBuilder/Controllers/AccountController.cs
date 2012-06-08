@@ -48,6 +48,44 @@ namespace DeckBuilder.Controllers
             return View();
         }
 
+        public ActionResult LogOnPartial()
+        {
+
+            return PartialView();
+        }
+
+        [HttpPost]
+        public EmptyResult LogOnPartial(LogOnModel model, string returnUrl)
+        {
+            if (ModelState.IsValid)
+            {
+                if (MembershipService.ValidateUser(model.UserName, model.Password))
+                {
+                    if (db.Players.Where(p => p.Name == model.UserName).Count() == 0)
+                    {
+                        Player playerToAdd = db.Players.Add(new Player
+                        {
+                            Name = model.UserName
+                        });
+                        db.SaveChanges();
+                        FormsService.SignIn(model.UserName, false /* createPersistentCookie */);                        
+                    }
+                    else
+                    {
+                        Player player = db.Players.Single(p => p.Name == model.UserName);
+                        FormsService.SignIn(model.UserName, false /* createPersistentCookie */);                        
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "The user name or password provided is incorrect.");
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return new EmptyResult();
+        }
+
         [HttpPost]
         public ActionResult LogOn(LogOnModel model, string returnUrl)
         {

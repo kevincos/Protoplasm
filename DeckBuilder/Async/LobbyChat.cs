@@ -176,7 +176,8 @@ namespace DeckBuilder.Async
             if (activePlayers.ContainsKey(data) == false)
                 activePlayers.Add(data, 0);
             activePlayers[data]++;
-            connectionIdToName.Add(Context.ConnectionId, data);
+            if(!connectionIdToName.Keys.Contains(Context.ConnectionId))
+                connectionIdToName.Add(Context.ConnectionId, data);
 
             Clients.addPlayer(data);         
         }

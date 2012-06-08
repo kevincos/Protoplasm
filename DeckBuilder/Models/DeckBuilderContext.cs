@@ -22,6 +22,7 @@ namespace DeckBuilder.Models
         public DbSet<CardSet> CardSets { get; set; }
         public DbSet<Deck> Decks { get; set; }
         public DbSet<MatchRequest> MatchRequests { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

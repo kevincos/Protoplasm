@@ -1,0 +1,33 @@
+﻿@model IEnumerable<DeckBuilder.Models.Notification>
+
+<script src="@Url.Content("~/Scripts/gameList.js")" type="text/javascript"></script>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Notifications</h2>
+
+
+@foreach (var item in Model)
+{
+    if (item.Suppressed == false)
+    {
+        if (item.Read == true)
+        {
+            <div>
+                <a href=@item.Url>@item.Message</a>
+                @Html.ActionLink("Mark","Mark","Notification",new {id=@item.NotificationID},null)
+                @Html.ActionLink("Remove","Remove","Notification",new {id=@item.NotificationID},null)                
+            </div>    
+        }
+        else
+        {
+            <div style="background-color:Lime">
+                <a href=@item.Url>@item.Message</a>
+                @Html.ActionLink("Mark","Mark","Notification",new {id=@item.NotificationID},null)
+                @Html.ActionLink("Remove","Remove","Notification",new {id=@item.NotificationID},null)                
+            </div>    
+        }
+    }
+}

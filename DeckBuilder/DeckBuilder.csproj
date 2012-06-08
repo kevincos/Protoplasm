@@ -114,12 +114,15 @@
   <ItemGroup>
     <Compile Include="App_Start\DontDropDBJustCreateTables.cs" />
     <Compile Include="App_Start\DontDropDbJustCreateTablesIfModelChangedStart.cs" />
+    <Compile Include="Async\NotificationsHub.cs" />
     <Compile Include="Async\WaitingArea.cs" />
     <Compile Include="Async\GameList.cs" />
     <Compile Include="Async\LobbyChat.cs" />
+    <Content Include="Content\Notifications.css" />
     <Content Include="Content\logon.css" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CardController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\DeckController.cs" />
     <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Controllers\GameVersionController.cs" />
@@ -169,6 +172,7 @@
     <Compile Include="Models\Feedback.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\MatchRequest.cs" />
+    <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\PersonInputModel.cs" />
     <Compile Include="Models\PlayerIdentity.cs" />
     <Compile Include="Models\Post.cs" />
@@ -628,6 +632,7 @@
     <Content Include="README.jQuery.vsdoc.txt" />
     <Content Include="Scripts\Connect4\connect4.main.js" />
     <Content Include="Scripts\Convoy\convoy.main.js" />
+    <Content Include="Scripts\notifications.js" />
     <Content Include="Scripts\openid-en.js" />
     <Content Include="Scripts\openid-jquery.js" />
     <Content Include="Scripts\waitingRoom.js" />
@@ -835,6 +840,9 @@
     <Content Include="Views\GameVersion\Stats.cshtml" />
     <Content Include="Views\MatchRequest\Index.cshtml" />
     <Content Include="Views\Table\Wait.cshtml" />
+    <Content Include="Views\Player\Notifications.cshtml" />
+    <Content Include="Views\Shared\_Menu.cshtml" />
+    <Content Include="Views\Account\LogonPartial.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
