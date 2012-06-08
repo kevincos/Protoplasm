@@ -61,7 +61,21 @@ namespace DeckBuilder.Controllers
         {
             Player player = db.Players.Find(id);
             
-            return View(db.Notifications.Where(n=>n.PlayerID == id));
+            return View(db.Notifications.Where(n=>n.PlayerID == id && n.Suppressed == false));
+        }
+
+        public JsonResult RecentNotifications(int id)
+        {
+            Player player = db.Players.Find(id);
+
+            return Json(db.Notifications.Where(n => n.PlayerID == player.PlayerID && n.Suppressed == false).OrderByDescending(n => n.DatePosted).Take(10).ToList());            
+        }
+
+        public JsonResult UnreadNotificationsCount(int id)
+        {
+            Player player = db.Players.Find(id);
+
+            return Json(db.Notifications.Where(n => n.PlayerID == player.PlayerID && n.Read == false && n.Suppressed == false).OrderByDescending(n => n.DatePosted).Count());
         }
 
         //

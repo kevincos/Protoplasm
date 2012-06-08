@@ -92,6 +92,7 @@ namespace DeckBuilder.Controllers
 
                     Notification n = new Notification { PlayerID = seat.PlayerId, Message = message, TableID = newTable.TableID, DatePosted = DateTime.Now, Read = false, Url = "/Table/Play/" + newTable.TableID };
                     db.Notifications.Add(n);
+                    NotificationsHub.UpdateNotifications(seat.Player.Name, seat.PlayerId);
 
                 }
                 db.SaveChanges();

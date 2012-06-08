@@ -32,7 +32,15 @@ namespace DeckBuilder.Controllers
             Notification n = db.Notifications.Find(id);
             db.Notifications.Remove(n);
             db.SaveChanges();
-            return RedirectToAction("Notifications", "Player", new { id = n.PlayerID });
+            return RedirectToAction("Notifications", "Player", new { id = n.PlayerID });            
+        }
+
+        public JsonResult ActiveRemove(int id)
+        {
+            Notification n = db.Notifications.Find(id);
+            db.Notifications.Remove(n);
+            db.SaveChanges();
+            return Json(n.PlayerID);
         }
 
         public ViewResult Index()

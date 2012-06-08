@@ -6,20 +6,31 @@
 </script>
 
 <div id="NotificationHover">
-    @ViewBag.NotificationsCount new alerts.
+    <div id="AlertCount">
+        @ViewBag.NotificationsCount new alerts.
+    </div>
     <div id="NotificationDropdown">
-    @foreach (var notification in ViewBag.Notifications)
-    {
-        <div class="NotificationMessage">
-        <a href="@notification.Url"> @notification.Message</a>
+        <div id="NotificationList">
+            @foreach (var notification in ViewBag.Notifications)
+            {
+                <div class="NotificationMessage">
+                @if (notification.Read == true)
+                {
+                    <a href="@notification.Url"> @notification.Message</a>
+                }
+                else
+                {
+                    <a class="UnreadMessage" href="@notification.Url"> @notification.Message</a>
+                }
+                </div>
+                <div class="NotificationRemove" id="@notification.NotificationID">
+                X
+                </div>
+                <br />
+            }
         </div>
-        <div class="NotificationRemove">
-        X
-        </div>
-        <br />
-    }
     @Html.ActionLink("See all notifications...", "Notifications", "Player", new { id = ViewBag.PlayerId }, null)
-</div>
+    </div>
 </div><div id="LogoffHover">
     @Html.ActionLink("Log Off", "LogOff", "Account")
 </div>

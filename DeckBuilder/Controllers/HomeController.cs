@@ -76,8 +76,8 @@ namespace DeckBuilder.Controllers
             {
                 ViewBag.Name = player.Name;
                 ViewBag.PlayerId = player.PlayerID;
-                ViewBag.Notifications = db.Notifications.Where(n => n.PlayerID == player.PlayerID).OrderBy(n => n.DatePosted).Take(10);
-                ViewBag.NotificationsCount = db.Notifications.Where(n => n.PlayerID == player.PlayerID).Count();
+                ViewBag.Notifications = db.Notifications.Where(n => n.PlayerID == player.PlayerID && n.Suppressed == false).OrderByDescending(n => n.DatePosted).Take(10);
+                ViewBag.NotificationsCount = db.Notifications.Where(n => n.PlayerID == player.PlayerID && n.Read==false && n.Suppressed == false).Count();
             }
 
             return PartialView();

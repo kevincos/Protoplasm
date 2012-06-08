@@ -82,6 +82,11 @@
     text-align:center;
 }
 
+.UnreadMessage
+{        
+    font-weight:bold;
+}
+
 #LogoffHover
 {    
     position:relative;

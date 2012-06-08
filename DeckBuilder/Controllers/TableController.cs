@@ -183,6 +183,7 @@ namespace DeckBuilder.Controllers
 
                 Notification n = new Notification { PlayerID = s.PlayerId, Message = message, TableID = newTable.TableID, DatePosted = DateTime.Now, Read = false, Url = "/Table/Play/" + newTable.TableID };
                 db.Notifications.Add(n);
+                NotificationsHub.UpdateNotifications(s.Player.Name,s.PlayerId);
                 
             }
             db.SaveChanges();
@@ -282,7 +283,8 @@ namespace DeckBuilder.Controllers
                             existingNotification.Suppressed = false;
                             existingNotification.Url = "/Table/Play/" + table.TableID;
                             existingNotification.Message = newMessage;
-                        }                        
+                        }
+                        NotificationsHub.UpdateNotifications(seatsArray[i].Player.Name, seatsArray[i].PlayerId);                            
                     }
                     else if (seatsArray[i].Waiting != previousWaitingStates[i] && seatsArray[i].Waiting == false)
                     {
@@ -291,6 +293,7 @@ namespace DeckBuilder.Controllers
                         {
                             existingNotification.Read = true;
                             existingNotification.Suppressed = true;
+                            NotificationsHub.UpdateNotifications(seatsArray[i].Player.Name, seatsArray[i].PlayerId);                            
                             db.SaveChanges();
                         }
                     }
@@ -299,7 +302,8 @@ namespace DeckBuilder.Controllers
                         Notification existingNotification = db.Notifications.SingleOrDefault(n => n.PlayerID == targetPlayerId && n.TableID == id);
                         if (existingNotification != null)
                         {
-                            existingNotification.Read = true;                            
+                            existingNotification.Read = true;
+                            NotificationsHub.UpdateNotifications(seatsArray[i].Player.Name, seatsArray[i].PlayerId);                            
                             db.SaveChanges();
                         }
                     }
