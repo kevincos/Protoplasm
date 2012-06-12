@@ -73,7 +73,6 @@ namespace DeckBuilder.Controllers
                 {
                     PlayerId = player.PlayerID,
                     TableId = newTable.TableID,
-                    DeckId = db.Decks.First().DeckID,
                     Accepted = true,
                     Waiting = false
                 };

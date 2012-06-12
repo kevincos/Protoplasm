@@ -277,7 +277,6 @@ namespace DeckBuilder.Async
                         {
                             PlayerId = p.PlayerID,
                             TableId = newTable.TableID,
-                            DeckId = db.Decks.First().DeckID,
                             Accepted = true,
                             Waiting = false                            
                         };                        
@@ -286,7 +285,7 @@ namespace DeckBuilder.Async
 
                     db.SaveChanges();
 
-                    newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
+                    newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Single();
                     
                     newTable.GenerateInitialState();
                     db.SaveChanges();

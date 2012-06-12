@@ -12,8 +12,8 @@ namespace DeckBuilder.Models
         public int PlayerId { get; set; }
         public virtual Player Player { get; set; }
 
-        public int DeckId { get; set; }
-        public virtual Deck Deck { get; set; }
+        //public int DeckId { get; set; }
+        //public virtual Deck Deck { get; set; }
 
         public int TableId { get; set; }
         public virtual Table Table { get; set; }

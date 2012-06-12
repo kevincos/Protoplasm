@@ -54,8 +54,7 @@ namespace DeckBuilder.Controllers
                 Seat s = new Seat
                 {
                     PlayerId = player.PlayerID,
-                    TableId = newTable.TableID,
-                    DeckId = db.Decks.First().DeckID,
+                    TableId = newTable.TableID,                    
                     Accepted = true,
                     Waiting = false
                 };
@@ -65,8 +64,7 @@ namespace DeckBuilder.Controllers
                     Seat s2 = new Seat
                     {
                         PlayerId = match.PlayerId,
-                        TableId = newTable.TableID,
-                        DeckId = db.Decks.First().DeckID,
+                        TableId = newTable.TableID,                        
                         Accepted = true,
                         Waiting = false
                     };

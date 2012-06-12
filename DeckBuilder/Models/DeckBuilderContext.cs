@@ -26,10 +26,10 @@ namespace DeckBuilder.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Seat>()
+            /*modelBuilder.Entity<Seat>()
                 .HasRequired(s => s.Deck)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(false);*/
 
 
             base.OnModelCreating(modelBuilder);

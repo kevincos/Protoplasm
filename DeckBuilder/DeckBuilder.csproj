@@ -168,7 +168,6 @@
     <Compile Include="Models\CardSet.cs" />
     <Compile Include="Models\Deck.cs" />
     <Compile Include="Models\DeckBuilderContext.cs" />
-    <Compile Include="GameState\GeomancerState.cs" />
     <Compile Include="Models\Feedback.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\MatchRequest.cs" />
@@ -630,8 +629,6 @@
     <Content Include="Python\__future__.py" />
     <Content Include="Python\__phello__.foo.py" />
     <Content Include="README.jQuery.vsdoc.txt" />
-    <Content Include="Scripts\Connect4\connect4.main.js" />
-    <Content Include="Scripts\Convoy\convoy.main.js" />
     <Content Include="Scripts\notifications.js" />
     <Content Include="Scripts\openid-en.js" />
     <Content Include="Scripts\openid-jquery.js" />
@@ -640,18 +637,10 @@
     <Content Include="Scripts\GameCore\gamecore.hexboard2.js" />
     <Content Include="Scripts\GameCore\gamecore.infowindow2.js" />
     <Content Include="Scripts\GameCore\gamecore.hand2.js" />
-    <Content Include="Scripts\GameCore\gamecore.hand.js" />
-    <Content Include="Scripts\GameCore\gamecore.hexboard.js" />
-    <Content Include="Scripts\GameCore\gamecore.infowindow.js" />
     <Content Include="Scripts\GameCore\gamecore.js" />
     <Content Include="Scripts\GameCore\gamecore.main.js" />
-    <Content Include="Scripts\GameCore\gamecore.squareboard.js" />
     <Content Include="Scripts\GameCore\gamecore.squareboard2.js" />
     <Content Include="Scripts\GameCore\gamecore.track.js" />
-    <Content Include="Scripts\Geomancer\geomancer.draw.js" />
-    <Content Include="Scripts\Geomancer\geomancer.init.js" />
-    <Content Include="Scripts\Geomancer\geomancer.overlay.js" />
-    <Content Include="Scripts\Geomancer\geomancer.update.js" />
     <Content Include="Scripts\Graphics\sprite.js" />
     <Content Include="Scripts\Graphics\spritecontext.js" />
     <Content Include="Scripts\json2.js" />
@@ -667,14 +656,11 @@
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\lobbychat.js" />
-    <Content Include="Scripts\Mechtonic\mechtonic.main.js" />
     <Content Include="Scripts\modernizr-1.7.js" />
     <Content Include="Scripts\modernizr-1.7.min.js" />
-    <Content Include="Scripts\Onslaught\onslaught.main.js" />
     <Content Include="Scripts\play.js" />
     <Content Include="Scripts\Math\vector.js" />
     <Content Include="Scripts\playerList.js" />
-    <Content Include="Scripts\RPS\rpsmain.js" />
     <Content Include="Scripts\stats.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

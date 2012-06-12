@@ -34,7 +34,8 @@ namespace DeckBuilder.Controllers
                 if (v.DevStage != "Alpha" && v.DevStage != "Release")
                     v.DevStage = "Alpha";
             }
-            
+
+           
             db.SaveChanges();
 
             return RedirectToAction("Index");
