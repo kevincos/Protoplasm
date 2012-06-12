@@ -73,7 +73,7 @@ namespace DeckBuilder.Controllers
 
                 db.SaveChanges();
 
-                newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Include("Seats.Player").Single();
+                newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Player").Single();
                 newTable.Ranked = true;
                 newTable.TableState = (int)TableState.InPlay;
 

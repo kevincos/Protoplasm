@@ -164,7 +164,7 @@ namespace DeckBuilder.Controllers
 
             db.SaveChanges();
             
-            newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Include("Seats.Deck.CardSets.Card").Single();
+            newTable = db.Tables.Where(t => t.TableID == newTable.TableID).Single();
 
             newTable.GenerateInitialState();
             db.SaveChanges();
