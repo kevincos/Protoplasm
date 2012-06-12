@@ -237,7 +237,11 @@ namespace DeckBuilder.Async
             // Invoke a method on the calling client
             //Clients.addMessage(Caller.name + ": " + data);
 
-            Clients.addMessage(DateTime.Now.Hour + ":" + DateTime.Now.Minute + "  " + Context.User.Identity.Name + ": " + chatText);
+            foreach (String playerName in activePlayers.Keys)
+            {
+                Clients["LOBBY_"+playerName].addMessage(DateTime.Now.Hour + ":" + DateTime.Now.Minute + "  " + Context.User.Identity.Name + ": " + chatText);
+            }
+            //Clients.addMessage(DateTime.Now.Hour + ":" + DateTime.Now.Minute + "  " + Context.User.Identity.Name + ": " + chatText);
         }
 
         public void LeaveLobby()
