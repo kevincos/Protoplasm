@@ -108,7 +108,7 @@ namespace DeckBuilder.Controllers
             PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
             var player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
             ViewBag.PlayerName = player.Name;
-            SelectList deckDropdown = new SelectList(player.Decks, "DeckID", "Name");
+            //SelectList deckDropdown = new SelectList(player.Decks, "DeckID", "Name");
 
             List<GameVersion> versionList = db.Games.ToList().Select(g => g.LatestRelease).ToList();
             versionList.AddRange(player.CreatedGames.ToList().Select(g => g.ActiveDev).ToList());
@@ -118,7 +118,7 @@ namespace DeckBuilder.Controllers
             SelectList roomDropdown = new SelectList(new List<string> { "General", "Classic", "Prototype" });
             
             
-            ViewBag.SelectedDeck = deckDropdown;
+            //ViewBag.SelectedDeck = deckDropdown;
             ViewBag.SelectedGame = gameDropdown;
             ViewBag.LobbyRoom = roomDropdown;
             return View();

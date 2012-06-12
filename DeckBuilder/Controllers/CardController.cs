@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using DeckBuilder.Models;
 
+/*
 namespace DeckBuilder.Controllers
 { 
     public class CardController : Controller
@@ -106,4 +107,4 @@ namespace DeckBuilder.Controllers
             base.Dispose(disposing);
         }
     }
-}
+}*/

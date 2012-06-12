@@ -19,8 +19,8 @@ namespace DeckBuilder.Models
         [MaxLength(1024)]
         public string ProfileImageUrl { get; set; }
 
-        public virtual ICollection<CardSet> CardSets { get; set; }
-        public virtual ICollection<Deck> Decks { get; set; }
+        //public virtual ICollection<CardSet> CardSets { get; set; }
+        //public virtual ICollection<Deck> Decks { get; set; }
         public virtual ICollection<Table> Tables { get; set; }
 
         public virtual ICollection<Player> Friends { get; set; }

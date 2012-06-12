@@ -123,7 +123,7 @@ namespace DeckBuilder.Controllers
                 return RedirectToAction("Details", "Player", new { id = player.PlayerID });
             
 
-            PopulateOwnedCards(player);
+            //PopulateOwnedCards(player);
             return View(player);
         }
 
@@ -135,21 +135,21 @@ namespace DeckBuilder.Controllers
         {
             
             var playerToUpdate = db.Players
-            .Include(p => p.CardSets)           
+            //.Include(p => p.CardSets)           
             .Where(p => p.PlayerID == id)
             .Single();
             if (TryUpdateModel(playerToUpdate))
             {
                 if (ModelState.IsValid)
                 {
-                    UpdateOwnedCards(playerToUpdate, cardQuantities);
+                    //UpdateOwnedCards(playerToUpdate, cardQuantities);
                     db.Entry(playerToUpdate).State = EntityState.Modified;
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
                 return View(playerToUpdate);
             }
-            PopulateOwnedCards(playerToUpdate);
+            //PopulateOwnedCards(playerToUpdate);
             return View(playerToUpdate);
         }
 
@@ -174,7 +174,7 @@ namespace DeckBuilder.Controllers
             return RedirectToAction("Index");
         }
 
-
+        /*
         private void PopulateOwnedCards(Player player)
         {
             var allCards = db.Cards;
@@ -246,7 +246,7 @@ namespace DeckBuilder.Controllers
 
                 }
             }
-        }
+        }*/
 
 
         protected override void Dispose(bool disposing)

@@ -162,10 +162,35 @@
     <Compile Include="Migrations\201204251642384_LinkTableToGame1.Designer.cs">
       <DependentUpon>201204251642384_LinkTableToGame1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201206121756357_RemoveDeck.cs" />
+    <Compile Include="Migrations\201206121756357_RemoveDeck.Designer.cs">
+      <DependentUpon>201206121756357_RemoveDeck.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201206121839276_RemoveDecks.cs" />
+    <Compile Include="Migrations\201206121839276_RemoveDecks.Designer.cs">
+      <DependentUpon>201206121839276_RemoveDecks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201206121845391_RemoveDecks2.cs" />
+    <Compile Include="Migrations\201206121845391_RemoveDecks2.Designer.cs">
+      <DependentUpon>201206121845391_RemoveDecks2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201206121924336_DropCards.cs" />
+    <Compile Include="Migrations\201206121924336_DropCards.Designer.cs">
+      <DependentUpon>201206121924336_DropCards.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201206121950082_FinalFix.cs" />
+    <Compile Include="Migrations\201206121950082_FinalFix.Designer.cs">
+      <DependentUpon>201206121950082_FinalFix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201206121952179_RemoveDeckIDColumn.cs" />
+    <Compile Include="Migrations\201206121952179_RemoveDeckIDColumn.Designer.cs">
+      <DependentUpon>201206121952179_RemoveDeckIDColumn.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\CardSet.cs" />
+    <Compile Include="Models\CardType.cs" />
     <Compile Include="Models\Deck.cs" />
     <Compile Include="Models\DeckBuilderContext.cs" />
     <Compile Include="Models\Feedback.cs" />

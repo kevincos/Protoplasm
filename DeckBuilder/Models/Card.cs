@@ -48,12 +48,15 @@ namespace DeckBuilder.Models
         public int Unit_Speed { get; set; }
         public string Unit_Awareness { get; set; }
 
+
         //public int extra { get; set; }
 
-        [DisplayName("Type")]
-        public int? CardTypeId { get; set; }
+        //[DisplayName("Type")]
+        //public int CardTypeId { get; set; }
+
+        //public virtual CardType CardType { get; set; }
         
-        public virtual ICollection<CardSet> CardSets { get; set; }
+        //public virtual ICollection<CardSet> CardSets { get; set; }
 
 
     }

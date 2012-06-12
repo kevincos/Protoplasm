@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DeckBuilder.Models
 {
+    
     public class CardSet
     {
         public int CardSetID { get; set; }
