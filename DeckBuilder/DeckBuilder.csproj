@@ -118,6 +118,7 @@
     <Compile Include="Async\WaitingArea.cs" />
     <Compile Include="Async\GameList.cs" />
     <Compile Include="Async\LobbyChat.cs" />
+    <Content Include="Content\Images\UI\bg4.png" />
     <Content Include="Content\Notifications.css" />
     <Content Include="Content\logon.css" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -165,7 +166,6 @@
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\CardSet.cs" />
-    <Compile Include="Models\CardType.cs" />
     <Compile Include="Models\Deck.cs" />
     <Compile Include="Models\DeckBuilderContext.cs" />
     <Compile Include="GameState\GeomancerState.cs" />

@@ -34,8 +34,7 @@ namespace DeckBuilder.Controllers
         // GET: /Card/Create
 
         public ActionResult Create()
-        {
-            ViewBag.CardTypeId = new SelectList(db.CardTypes, "CardTypeId", "Name", 1);
+        {            
             return View();
         } 
 
@@ -61,8 +60,7 @@ namespace DeckBuilder.Controllers
         public ActionResult Edit(int id)
         {
             Card card = db.Cards.Find(id);
-
-            ViewBag.CardTypeId = new SelectList(db.CardTypes, "CardTypeId", "Name", card.CardTypeId);
+            
             return View(card);
         }
 

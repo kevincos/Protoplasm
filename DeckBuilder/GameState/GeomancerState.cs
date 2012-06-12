@@ -164,26 +164,6 @@ namespace DeckBuilder.Games
         public void AddCardSet(CardSet set, GeomancerPlayerContext playerContext)
         {
             
-            for (int i = 0; i < set.Quantity; i++)
-            {
-                GeomancerCard newCard = new GeomancerCard { name = set.Card.Name, url = set.Card.CardArtUrl, description = set.Card.Description, cost = set.Card.ManaCost };
-                if (set.Card.CardType.Name == "Summon")
-                {
-                    newCard.type = "Summon";
-                    newCard.castUnit = new GeomancerUnit { name = set.Card.Unit_Name, awareness = set.Card.Unit_Awareness, attack = set.Card.Unit_Attack, defense = set.Card.Unit_Defense, maxHP = set.Card.Unit_MaxHP, speed = set.Card.Unit_Speed, url = set.Card.Unit_Url, playerId = 0 };
-                }
-                if (set.Card.CardType.Name == "Crystal")
-                {
-                    newCard.type = "Crystal";
-                    newCard.castCrystal = new GeomancerCrystal { name = set.Card.Crystal_Name, url = set.Card.Crystal_Url, mana = set.Card.Crystal_Mana, range = set.Card.Crystal_Range };
-                }
-                if (set.Card.CardType.Name == "Spell")
-                {
-                    newCard.type = "Spell";                    
-                }
-                playerContext.deck.Add(newCard);
-                playerContext.deckCount++;
-            }
         }
 
         public void DrawCard(Random r, GeomancerPlayerContext playerContext)

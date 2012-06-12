@@ -16,7 +16,7 @@ namespace DeckBuilder.Models
 
         public DbSet<Player> Players { get; set; }
         public DbSet<Card> Cards { get; set; }
-        public DbSet<CardType> CardTypes { get; set; }
+        
         public DbSet<Table> Tables { get; set; }
         public DbSet<Seat> Seats { get; set; }
         public DbSet<CardSet> CardSets { get; set; }
@@ -31,8 +31,7 @@ namespace DeckBuilder.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Card>()
-                    .HasRequired(c => c.CardType);
+
             base.OnModelCreating(modelBuilder);
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<DeckBuilderContext, Configuration>());
         }
