@@ -4,11 +4,11 @@ namespace DeckBuilder.Migrations
     using System.Data.Entity.Migrations;
     using System.Data.Entity.Migrations.Infrastructure;
     
-    public sealed partial class RemoveDeckIDColumn : IMigrationMetadata
+    public sealed partial class FixLocalDb : IMigrationMetadata
     {
         string IMigrationMetadata.Id
         {
-            get { return "201206121952179_RemoveDeckIDColumn"; }
+            get { return "201206122228352_FixLocalDb"; }
         }
         
         string IMigrationMetadata.Source

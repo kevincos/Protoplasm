@@ -8,61 +8,7 @@ using SignalR.Hubs;
 using DeckBuilder.Models;
 
 namespace DeckBuilder.Async
-{
-    public class GameProposal
-    {
-        public String game = "";
-
-        public String player1;
-        public bool player1Confirmed = false;
-        public int player1Deck;
-        
-
-        public String player2;
-        public bool player2Confirmed = false;
-        public int player2Deck;
-
-        public bool InvolvesPlayer(string player)
-        {
-            if (player1 == player || player2 == player)
-                return true;
-            return false;
-        }
-
-        public bool InvolvesPlayers(string p1, string p2)
-        {
-            return InvolvesPlayer(p1) && InvolvesPlayer(p2);
-        }
-
-        public void ConfirmPlayer(string player, int deckId)
-        {
-            if (player1 == player)
-            {
-                player1Confirmed = true;
-                player1Deck = deckId;
-            }
-            if (player2 == player) 
-            {
-                player2Confirmed = true;
-                player2Deck = deckId;
-            }
-        }
-
-        public int GetDeckId(string player)
-        {
-            if (player == player1)
-                return player1Deck;
-            if (player == player2)
-                return player2Deck;
-            return 0;
-        }
-
-        public bool IsConfirmed()
-        {
-            return (player1Confirmed && player2Confirmed);
-        }
-    }
-
+{    
     public class ProposalPlayerStatus
     {
         public string name { get; set; }
@@ -154,14 +100,12 @@ namespace DeckBuilder.Async
         private DeckBuilderContext db = new DeckBuilderContext();
 
         public static Dictionary<string, int> activePlayers = new Dictionary<string,int>();
-        public static Dictionary<string, string> connectionIdToName = new Dictionary<string, string>();
-        public static List<GameProposal> proposals = new List<GameProposal>();
+        public static Dictionary<string, string> connectionIdToName = new Dictionary<string, string>();        
         public static List<Proposal> activeProposals = new List<Proposal>();
 
         public void Reset()
         {
-            activePlayers = new Dictionary<string,int>();
-            proposals = new List<GameProposal>();
+            activePlayers = new Dictionary<string,int>();            
             connectionIdToName = new Dictionary<string, string>();
         }
 
@@ -171,8 +115,8 @@ namespace DeckBuilder.Async
 
             Caller.name = data;
             Caller.updatePlayerlist(activePlayers.Keys);   
-
-            AddToGroup(data);
+            
+            AddToGroup("LOBBY_"+data);
             if (activePlayers.ContainsKey(data) == false)
                 activePlayers.Add(data, 0);
             activePlayers[data]++;
@@ -192,12 +136,12 @@ namespace DeckBuilder.Async
             foreach (string name in p.PlayerNames)
             {
                 List<Proposal> proposals = GetProposalsForPlayer(name);
-                Clients[name].updateProposals(proposals);
+                Clients["LOBBY_"+name].updateProposals(proposals);
             }
             if (cancelledPlayer != null)
             {
                 List<Proposal> proposals = GetProposalsForPlayer(cancelledPlayer);
-                Clients[cancelledPlayer].updateProposals(proposals);
+                Clients["LOBBY_"+cancelledPlayer].updateProposals(proposals);
             }
         }
 
@@ -210,26 +154,6 @@ namespace DeckBuilder.Async
             return;
         }
 
-        public void ProposeGame(string opponent, string game)
-        {
-            if (activePlayers.ContainsKey(opponent))
-            {
-                GameProposal proposal = new GameProposal();
-                proposal.game = game;
-                proposal.player1 = Caller.name;
-                proposal.player2 = opponent;
-                bool proposalExists = false;
-                foreach (GameProposal p in proposals)
-                {
-                    if (p.InvolvesPlayers(Caller.name, opponent))
-                        proposalExists = true;
-                }
-                if(proposalExists == false)
-                    proposals.Add(proposal);
-
-                Clients[opponent].proposalNotification(Caller.name);
-            }
-        }
 
         public void CancelProposal(int id, string name)
         {
@@ -296,7 +220,7 @@ namespace DeckBuilder.Async
                     // Redirect plyaers to game
                     foreach (string playerName in proposal.PlayerNames)
                     {
-                        Clients[playerName].beginGame(newTable.TableID);
+                        Clients["LOBBY_"+playerName].beginGame(newTable.TableID);
                     }                                                       
                 }
                 else

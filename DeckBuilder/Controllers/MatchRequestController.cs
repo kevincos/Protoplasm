@@ -81,17 +81,7 @@ namespace DeckBuilder.Controllers
 
                 foreach (Seat seat in newTable.Seats)
                 {
-                    SeatViewModel viewModel = new SeatViewModel(seat);
-                    String message = "";
-                    if (seat.Waiting == true)
-                        message = "Your turn in " + newTable.Game.Name + " with " + viewModel.formattedOpponentNames + ". (Ranked) " + DateTime.Now;
-                    else
-                        message = "A new game of " + newTable.Game.Name + " has been started with " + viewModel.formattedOpponentNames + ". (Ranked) " + DateTime.Now;
-
-                    Notification n = new Notification { PlayerID = seat.PlayerId, Message = message, TableID = newTable.TableID, DatePosted = DateTime.Now, Read = false, Url = "/Table/Play/" + newTable.TableID };
-                    db.Notifications.Add(n);
-                    NotificationsHub.UpdateNotifications(seat.Player.Name, seat.PlayerId);
-
+                    NotificationsHub.AddMatch(db, seat, newTable);
                 }
                 db.SaveChanges();
 
@@ -101,7 +91,7 @@ namespace DeckBuilder.Controllers
                 foreach (MatchRequest match in successfulMatches)
                 {
                     Player opponent = db.Players.Find(match.PlayerId);
-                    clients[opponent.Name + match.MatchRequestID].goToTable(newTable.TableID);
+                    clients["WAIT" + opponent.Name + match.MatchRequestID].goToTable(newTable.TableID);
                     db.MatchRequests.Remove(match);
                 }
                 

@@ -48,6 +48,13 @@ namespace DeckBuilder.Protoplasm_Python
 
         public static DeckBuilderContext db = new DeckBuilderContext();
 
+        public static void Reset()
+        {
+            loadedModules = null;
+            errors = null;
+            engine = null;
+        }
+
         public static TracebackDelegate OnTraceback(TraceBackFrame frame, string result, object payload)
         {
             FunctionCode code = (FunctionCode)frame.f_code;

@@ -17,7 +17,7 @@ namespace DeckBuilder.Async
         public void EnterGame(string name)
         {
             Caller.name = name;
-            AddToGroup(name);
+            AddToGroup("GAME_"+name);
         }
 
         public void Chat(int tableId, string chatText)
@@ -30,7 +30,7 @@ namespace DeckBuilder.Async
             db.SaveChanges();
             foreach (Seat s in table.Seats)
             {
-                Clients[s.Player.Name + tableId].update_chat(fullMessage);
+                Clients["GAME_" + s.Player.Name + tableId].update_chat(fullMessage);
             }
         }
     }

@@ -91,12 +91,8 @@ namespace DeckBuilder.Controllers
                 }
                 
             // Unmark notification
-            Notification existingNotification = db.Notifications.SingleOrDefault(n => n.PlayerID == currentSeat.PlayerId && n.TableID == id);
-            if (existingNotification != null)
-            {
-                existingNotification.Read = true;                
-                db.SaveChanges();
-            }
+            NotificationsHub.MarkAsRead(db, currentSeat, table);
+
 
             if (table.TableState == (int)TableState.Proposed)
             {
@@ -172,17 +168,7 @@ namespace DeckBuilder.Controllers
 
             foreach (Seat s in newTable.Seats)
             {                
-                SeatViewModel viewModel = new SeatViewModel(s);
-                String message = "";
-                if(s.Accepted == true)
-                    message = "You started a game of " + newTable.Game.Name + " with " + viewModel.formattedOpponentNames + ". (TableID:" + newTable.TableID + ") " + DateTime.Now;
-                else
-                    message = "A new game of " + newTable.Game.Name + " has been proposed with " + viewModel.formattedOpponentNames + ". (TableID:" + newTable.TableID + ") " + DateTime.Now;
-
-                Notification n = new Notification { PlayerID = s.PlayerId, Message = message, TableID = newTable.TableID, DatePosted = DateTime.Now, Read = false, Url = "/Table/Play/" + newTable.TableID };
-                db.Notifications.Add(n);
-                NotificationsHub.UpdateNotifications(s.Player.Name,s.PlayerId);
-                
+                NotificationsHub.Challenge(db, s, newTable);                
             }
             db.SaveChanges();
 
@@ -260,51 +246,8 @@ namespace DeckBuilder.Controllers
 
                 for(int i =0; i < seatsArray.Length; i++)
                 {
-                    int targetPlayerId = seatsArray[i].PlayerId;
-                    if (seatsArray[i].Waiting != previousWaitingStates[i] && seatsArray[i].Waiting == true)
-                    {
-                        // ADD NOTIFICATION
-                        
-                        Notification existingNotification = db.Notifications.FirstOrDefault(n => n.PlayerID == targetPlayerId && n.TableID == table.TableID);
-                        SeatViewModel viewModel = new SeatViewModel(seatsArray[i]);
-                        String newMessage = "Your turn in " + table.Game.Name + " with " + viewModel.formattedOpponentNames + ". (TableID:"+table.TableID+") " + DateTime.Now;
-                        
-                        if (existingNotification == null)
-                        {
-                            Notification n = new Notification { PlayerID = seatsArray[i].PlayerId, Message = newMessage, TableID = table.TableID, DatePosted = DateTime.Now, Read = false, Url = "/Table/Play/" + table.TableID };
-                            db.Notifications.Add(n);
-                        }
-                        else
-                        {
-                            existingNotification.DatePosted = DateTime.Now;
-                            existingNotification.Read = false;
-                            existingNotification.Suppressed = false;
-                            existingNotification.Url = "/Table/Play/" + table.TableID;
-                            existingNotification.Message = newMessage;
-                        }
-                        NotificationsHub.UpdateNotifications(seatsArray[i].Player.Name, seatsArray[i].PlayerId);                            
-                    }
-                    else if (seatsArray[i].Waiting != previousWaitingStates[i] && seatsArray[i].Waiting == false)
-                    {
-                        Notification existingNotification = db.Notifications.SingleOrDefault(n => n.PlayerID == targetPlayerId && n.TableID == id);
-                        if (existingNotification != null)
-                        {
-                            existingNotification.Read = true;
-                            existingNotification.Suppressed = true;
-                            NotificationsHub.UpdateNotifications(seatsArray[i].Player.Name, seatsArray[i].PlayerId);                            
-                            db.SaveChanges();
-                        }
-                    }
-                    else if (seatsArray[i].Waiting == true)
-                    {
-                        Notification existingNotification = db.Notifications.SingleOrDefault(n => n.PlayerID == targetPlayerId && n.TableID == id);
-                        if (existingNotification != null)
-                        {
-                            existingNotification.Read = true;
-                            NotificationsHub.UpdateNotifications(seatsArray[i].Player.Name, seatsArray[i].PlayerId);                            
-                            db.SaveChanges();
-                        }
-                    }
+                    NotificationsHub.UpdateNotificationState(db, seatsArray[i], table, previousWaitingStates[i]);
+                    
                 }
 
                 string final_pickledState = runScope.GetVariable("finalState");
@@ -407,7 +350,7 @@ namespace DeckBuilder.Controllers
                         Tuple<string,string> viewInfo = GetPythonView(table, final_pickledState, i,false);
                         if(viewInfo.Item2 != "")
                             return Content(viewInfo.Item2);
-                        clients[s.Player.Name + id].main_updateGameState(viewInfo.Item1);
+                        clients["GAME_"+s.Player.Name + id].main_updateGameState(viewInfo.Item1);
                     }
                 }
                 DateTime end = DateTime.Now;

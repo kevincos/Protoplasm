@@ -12,6 +12,7 @@ using DeckBuilder.Models;
 using System.Data;
 using System.Data.Entity;
 
+using DeckBuilder.Protoplasm_Python;
 
 namespace DeckBuilder.Controllers
 {
@@ -38,6 +39,19 @@ namespace DeckBuilder.Controllers
            
             db.SaveChanges();
 
+            return RedirectToAction("Index");
+        }
+
+        [Authorize]
+        public ActionResult ResetPython()
+        {
+            PlayerIdentity playerIdentity = (PlayerIdentity)User.Identity;
+            var player = db.Players.Where(p => p.Name == playerIdentity.Name).Single();
+            if (player.Name != "KevinC")
+            {
+                return RedirectToAction("Index");
+            }
+            PythonScriptEngine.Reset();
             return RedirectToAction("Index");
         }
 

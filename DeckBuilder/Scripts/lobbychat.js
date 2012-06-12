@@ -11,7 +11,7 @@ function initLobbyChat(playerName) {
             $('#playerList').append("<div class='playerCheckbox' id=chatItem_" + name + "><input type='checkbox' name='player' value='" + name + "'/>" + name + "</div>");
 
             $('#chatItem_' + name).click(name, function (input) {
-                lobbyChatClient.proposeGame(input.data);
+                //lobbyChatClient.proposeGame(input.data);
                 $('#proposal').append('<button id=confirm>Play game with ' + input.data + '?</button>');
                 $('#confirm').click(input.data, function (input) {
                     lobbyChatClient.confirm(input.data, $('#SelectedDeck').val());
@@ -28,6 +28,7 @@ function initLobbyChat(playerName) {
         };
 
         lobbyChatClient.updatePlayerlist = function (array) {
+            $('#playerList').empty();
             for (var i = 0; i < array.length; i++) {
                 if (playerName != array[i]) {
                     addPlayerToList(array[i]);
@@ -85,7 +86,7 @@ function initLobbyChat(playerName) {
                         else
                             $('#proposal' + i).append("<span>(Waiting)</span>");
                     }
-                }                
+                }
                 $('#ready' + i).click(proposals[i], function (prop) {
                     lobbyChatClient.confirmProposal(prop.data.ProposalID, playerName);
                 });

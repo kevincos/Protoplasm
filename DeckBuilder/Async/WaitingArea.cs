@@ -17,7 +17,7 @@ namespace DeckBuilder.Async
         public void EnterWaitingArea(string name)
         {
             Caller.name = name;
-            AddToGroup(name);
+            AddToGroup("WAIT" + name);
         }
 
 
