@@ -3,61 +3,52 @@
 <script src="@Url.Content("~/Scripts/gameList.js")" type="text/javascript"></script>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Games List";
 }
 
-<h2>Index</h2>
+<h2>Protoplasm Games</h2>
+
+<p>Here you'll find a listing of all games that have been released on Protoplasm, along with the option to start a Ranked Match. In-development games created by you will also appear here.</p>
 
 @if(ViewBag.currentPlayer != "" && ViewBag.currentPlayer != null)
 {
-    <div><input type="checkbox" />Launch games in new tab.</div>
+    <div><input id="newTabBox" type="checkbox" />Launch games in new tab.</div>
 }
 
-@foreach (var item in Model) {    
-    <div class="ListPanelLong">
-        <a href="Game/Details/@item.GameID"><span class="PanelLink"></span></a>
+@foreach (var item in Model) {
+    if (item.LatestRelease != null || item.Creator.Name == ViewBag.currentPlayer)
+    {
+        <div class="ListPanelLong">
+            <a href="Game/Details/@item.GameID"><span class="PanelLink"></span></a>
             
-        <img class="ListPanelImage" alt="@item.Name" 
-                        src="@item.ImageUrl" />        
+            <img class="ListPanelImage" alt="@item.Name" 
+                            src="@item.ImageUrl" />        
         
-        <div class="ListPanelInfo">     
-            <div class="ListPanelHeader">@item.Name</div>                   
-            <span class = "ListPanelText">Creator: @item.Creator.Name</span>
-            <span class = "ListPanelText">Games Played: 25</span>
-        </div>
+            <div class="ListPanelInfo">     
+                <div class="ListPanelHeader">@item.Name</div>                   
+                <span class = "ListPanelText">Creator: @item.Creator.Name</span>
+                <span class = "ListPanelText">Games Played: @item.CompletedGames</span>
+            </div>
 
-        <div class = "ListPanelDescription">
-            <span class = "ListPanelText">@item.Description</span>
-        </div>
-        @if (ViewBag.currentPlayer != "" && ViewBag.currentPlayer != null)
-        {
-            <div class = "ListPanelStartMatch">
-                @if (item.LatestRelease != null)
-                {
-                    if (item.LatestRelease.MaxPlayers == 2)
+            <div class = "ListPanelDescription">
+                <span class = "ListPanelText">@item.Description</span>
+            </div>
+            @if (ViewBag.currentPlayer != "" && ViewBag.currentPlayer != null)
+            {
+                <div class = "ListPanelStartMatch">
+                    @if (item.LatestRelease != null)
                     {
                         <select style="display:none" id=@item.GameID>
                             @for (var i = 2; i <= item.LatestRelease.MaxPlayers; i++)
                             {
                                 <option value=@i>@i</option>
                             }
-                        </select>                        
-                        <button class="RankedMatchButton" style="margin-top:12px" value="@item.GameID">Play Ranked Match</button>
+                        </select>                               
+                        <!--<div><a href="@Url.Action("Add", "MatchRequest", new {numPlayers=2, gameId=item.GameID})" class="RankedMatchButton" target="_blank"></a></div>                        -->
+                        <div><a href="/MatchRequest/Add?gameId=@item.GameID&numPlayers=2" class="RankedMatchButton" target="_blank"></a></div> 
                     }
-                    else
-                    {                        
-                        <span>Number of Players
-                        <select id=@item.GameID>
-                            @for (var i = 2; i <= item.LatestRelease.MaxPlayers; i++)
-                            {
-                                <option value=@i>@i</option>
-                            }
-                        </select>
-                        </span>
-                        <button class="RankedMatchButton" value="@item.GameID">Play Ranked Match</button>
-                    }
-                }
-            </div>
-        }
-    </div>    
+                </div>
+            }
+        </div>    
+    }
 }

@@ -6,6 +6,42 @@ function initLobbyChat(playerName) {
     $("document").ready(function () {
         var lobbyChatClient = $.connection.lobbyChat;
 
+        $('#SelectedGame').change(function () {
+            $.ajax({
+                url: '../GameVersion/ImageUrl/' + $(this).val(),
+                success: function (data) {                    
+                    $('#proposeGameImg').attr("src","../"+data);
+                }
+            });
+        });
+        $.ajax({
+            url: '../GameVersion/ImageUrl/' + $('#SelectedGame').val(),
+            success: function (data) {
+                $('#proposeGameImg').attr("src", "../" + data);
+            }
+        });
+
+        $('#SelectedGameRanked').change(function () {
+            $.ajax({
+                url: '../Game/ImageUrl/' + $(this).val(),
+                success: function (data) {                    
+                    $('#quickGameImg').attr("src", "../" + data);
+                }
+            });
+        });
+        $.ajax({
+            url: '../Game/ImageUrl/' + $('#SelectedGameRanked').val(),
+            success: function (data) {
+                $('#quickGameImg').attr("src", "../" + data);
+            }
+        });
+
+        $('button.QuickPlayButton').click(name, function (input) {
+            var searchId = "#" + this.value;
+            var list = $(searchId);
+            window.location.href = "../MatchRequest/Add?gameId=" + $('#SelectedGameRanked').val() + "&numPlayers=2";
+        });
+
 
         function addPlayerToList(name) {
             $('#playerList').append("<div class='playerCheckbox' id=chatItem_" + name + "><input type='checkbox' name='player' value='" + name + "'/>" + name + "</div>");
@@ -22,7 +58,7 @@ function initLobbyChat(playerName) {
         // Start the connection
 
         lobbyChatClient.addMessage = function (data) {
-            var chatlog = $("#lobbychat");
+            var chatlog = $("#lobbychattextarea");
             chatlog.append("<div id='chatline'>" + data + "</div>");
             chatlog.scrollTop(chatlog[0].scrollHeight);
         };

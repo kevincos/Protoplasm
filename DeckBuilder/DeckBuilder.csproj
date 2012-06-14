@@ -118,6 +118,7 @@
     <Compile Include="Async\WaitingArea.cs" />
     <Compile Include="Async\GameList.cs" />
     <Compile Include="Async\LobbyChat.cs" />
+    <Content Include="Content\Images\Site\ranked_match.png" />
     <Content Include="Content\Images\UI\bg4.png" />
     <Content Include="Content\Notifications.css" />
     <Content Include="Content\logon.css" />
@@ -138,6 +139,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Compression.cs" />
+    <Compile Include="Helpers\HtmlHelpers.cs" />
     <Compile Include="Migrations\201203271948003_AddCrystalData.cs" />
     <Compile Include="Migrations\201203271948003_AddCrystalData.Designer.cs">
       <DependentUpon>201203271948003_AddCrystalData.cs</DependentUpon>

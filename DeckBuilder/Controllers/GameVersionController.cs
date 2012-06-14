@@ -98,6 +98,13 @@ namespace DeckBuilder.Controllers
             }
         }
 
+
+        public String ImageUrl(int id)
+        {
+            Game game = db.Versions.Find(id).ParentGame;
+            return game.ImageUrl;
+        }
+
                 //
         // TEST: /GameVersion/Test/5
 

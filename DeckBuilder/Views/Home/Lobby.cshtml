@@ -2,30 +2,47 @@
     ViewBag.Title = "Lobby";
 }
 
-<h2>@Html.DropDownList("LobbyRoom")</h2>
+<h2>Lobby</h2>
 
-<div style = "display:block; height:30em">
-    <div style="display:inline; float:left">
+<div style = "display:block; height:387px">
+    <div style="display:inline; width: 130px; float:left" class="logsection">
+        @Html.DropDownList("SelectedGame", null, new { @class = "gamedropdown" })        
+        <br />
+        <img id=proposeGameImg class="gamelogo" src="../../Content/Images/reversilogo.png"/>
+        <br />
+        <button id="proposalButton">Play Game With</button> 
+        <br />  <br />
+        <form id="playerList" >
+        </form>
+    </div>
+    
+    <div style="display:inline; float:right">
         <div id="lobbychat" class="logsection">        
+            <div id="lobbychattextarea">
+            </div>
+            <form id="chatform">
+                <input id="lobbychatinput"/>        
+                <button id="lobbychatbutton" type = "submit">Say</button>
+            </form>
         </div>
-
-        <form id="chatform">
-            <input id="lobbychatinput"/>        
-            <button id="lobbychatbutton" type = "submit">Say</button>
-        </form>
     </div>
-    <div style="display:inline">
-        
-        <form id="playerList" class="logsection">
-        </form>
+   
+ 
+</div>
+
+
+<div class = "lobbysection">
+
+    <div id="proposalList" class = "logsection">
+    </div>
+</div><div class = "lobbysection">
+    <div id="quickPlayArea" class = "logsection">
+        @Html.DropDownList("SelectedGameRanked", null, new { @class = "gamedropdown" })
+        <img id=quickGameImg  class="gamelogo" src="../../Content/Images/connect4logo.png"/>
+        <button id="proposalButton" class="QuickPlayButton">Quick Play</button>  
     </div>
 </div>
 
-@Html.DropDownList("SelectedGame")
-<button id="proposalButton">Propose Game</button>    
-
-<div id="proposalList" class = "logsection">
-</div>
 
 <script type="text/javascript">
 

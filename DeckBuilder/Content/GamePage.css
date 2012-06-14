@@ -10,6 +10,36 @@
     border: 5px ridge #a0a0a0
 }
 
+.lobbysection
+{
+    display:inline-block;
+    vertical-align:top;
+}
+
+
+.quickplaysection
+{
+    display:inline-block;
+    vertical-align:top;
+    width:600px;
+    background-color:Red;
+}
+
+#chatform
+{
+    display:inline-block;
+}
+
+#proposalButton
+{
+    width:128px;
+}
+
+.gamedropdown
+{
+    width:128px;
+}
+
 #log
 {
     height: 16em;
@@ -30,15 +60,28 @@
 
 #lobbychat 
 {
-    height: 30em;    
-    width: 600px;        
+    height: 354px;    
+    width: 643px;        
+}
+
+#lobbychattextarea
+{
+    height: 330px;    
+    width: 555px;        
+    overflow: auto;    
 }
 
 
 #playerList
 {
-    width: 14em;
-    height: 30em;
+    width: 128px;
+    height: 369px;    
+}
+
+.gamelogo
+{
+    width:128px;
+    height:128px;
 }
 
 #playerCheckbox
@@ -49,7 +92,13 @@
 #proposalList
 {
     height: 15em;
-    width: 30em;
+    width: 480px;
+}
+
+#quickPlayArea
+{
+    height: 15em;
+    width: 130px;
 }
 
 #chatline
@@ -68,12 +117,12 @@
 
 #lobbychatinput
 {    
-    width: 34em;
+    width: 520px;    
 }
 
 #lobbychatbutton
 {    
-    width: 5em;
+    width: 100px;        
 }
 
 #datablock

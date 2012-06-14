@@ -5,9 +5,14 @@
         });   
 </script>
 
-<div id="NotificationHover">
+<div id="NotificationHover" class="AlertBar">
     <div id="AlertCount">
-        @ViewBag.NotificationsCount new alerts.
+        <span class=alerts_name>
+        Welcome @ViewBag.Name
+        </span>
+        <span class=alerts_count>
+          @ViewBag.NotificationsCount new alerts.
+        </span>
     </div>
     <div id="NotificationDropdown">
         <div id="NotificationList">
@@ -31,12 +36,13 @@
         </div>
     @Html.ActionLink("See all notifications...", "Notifications", "Player", new { id = ViewBag.PlayerId }, null)
     </div>
-</div><div id="LogoffHover">
+</div><div id="LogoffHover" class="AlertBar">
     @Html.ActionLink("Log Off", "LogOff", "Account")
 </div>
 
-<div id="LogonHover">
+<div id="LogonHover" class="AlertBar">
     @Html.ActionLink("Log On", "LogOn", "Account")
+    <!--<a href="@Url.Action("LogOn", "Account")" class=imageLink><img class=imageBase src="@Url.Content("~/Content/Images/Site/Logon.png")", alt="LogOn" /></a>-->
     <div id="LogonDropdown">   
         @Html.Action("LogOnPartial", "Account");
     </div>

@@ -124,17 +124,19 @@ namespace DeckBuilder.Controllers
             ViewBag.PlayerName = player.Name;
             //SelectList deckDropdown = new SelectList(player.Decks, "DeckID", "Name");
 
-            List<GameVersion> versionList = db.Games.ToList().Select(g => g.LatestRelease).ToList();
-            versionList.AddRange(player.CreatedGames.ToList().Select(g => g.ActiveDev).ToList());
-            versionList = versionList.Where(v => v != null).ToList();
-            SelectList gameDropdown = new SelectList(versionList, "GameVersionID", "DisplayName");            
-
-            SelectList roomDropdown = new SelectList(new List<string> { "General", "Classic", "Prototype" });
+            //List<GameVersion> releaseGames = db.Games.ToList().Select(g => g.LatestRelease).ToList();
+            List<Game> releaseGames = db.Games.ToList();
+            releaseGames = releaseGames.Where(g => g.LatestRelease != null).ToList();
+            List<GameVersion> allGames = db.Games.ToList().Select(g => g.LatestRelease).ToList();
+            allGames.AddRange(player.CreatedGames.ToList().Select(g => g.ActiveDev).ToList());
+            allGames = allGames.Where(v => v != null).ToList();
+            releaseGames = releaseGames.Where(v => v != null).ToList();
+            SelectList gameDropdown = new SelectList(allGames, "GameVersionID", "DisplayName");
+            SelectList rankedGameDropdown = new SelectList(releaseGames, "GameID", "Name");
             
-            
-            //ViewBag.SelectedDeck = deckDropdown;
             ViewBag.SelectedGame = gameDropdown;
-            ViewBag.LobbyRoom = roomDropdown;
+            ViewBag.SelectedGameRanked = rankedGameDropdown;
+            
             return View();
         }
 

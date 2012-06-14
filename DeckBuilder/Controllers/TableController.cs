@@ -256,6 +256,7 @@ namespace DeckBuilder.Controllers
                 {
                     if (table.TableState != (int)TableState.Complete && table.Version.DevStage == "Release")
                     {
+                        table.Game.CompletedGames++;
                         // Log player wins/losses
                         foreach (Seat s in table.Seats)
                         {

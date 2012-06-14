@@ -6,17 +6,17 @@
     
     position:absolute;
     background-color:white;
-    width:380px;
-    
+    width:400px;
+    left:-4px;
     
     
     z-index:80;
-    float:right;
+    
     background-image: url('empty.gif');
     
     padding:10px;
     
-    margin:0px;   
+    margin:0px;       
     
     text-align:left;
     
@@ -49,16 +49,9 @@
 
 #NotificationHover
 {
-    position:relative;
-    background-color:white;
     z-index:100;
     width:300px;
-    height:20px;
-    display:inline-block;
     text-align:center;
-    padding:0px;
-    margin:0px;
-
     display:none;
 }
 
@@ -89,28 +82,25 @@
 
 #LogoffHover
 {    
-    position:relative;
-    background-color:white;
     width:100px;
-    height:20px;
-    display:inline-block;
     text-align:center;
-    padding:0px;
-    margin:0px;
- 
     display:none;
 }
 
 #LogonHover
 {
+    width:100px;    
+    text-align:center;
+    display:none;
+}
+
+.AlertBar
+{
     position:relative;
     background-color:white;
-    width:100px;
+    border: 2px solid gray;
     height:20px;
-    display:inline-block;
-    text-align:center;
     padding:0px;
     margin:0px;
- 
-    display:none;
+    padding-left: 10px;
 }

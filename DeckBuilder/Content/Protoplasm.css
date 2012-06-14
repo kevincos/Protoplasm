@@ -66,6 +66,37 @@ section {
     width: 800px; 
 }
 
+.imageLink
+{    
+    width:100px;
+    height:50px;
+    padding:0px;
+    margin:0px;
+}
+
+.imageBase
+{
+    width:inherit;
+    height:inherit;
+}
+
+
+.logonButton
+{
+    background: white url('~/Content/Images/Site/logon.png') no-repeat top;
+    width:inherit;
+    height:inherit;
+}
+
+.alerts_name
+{    
+    float:left;
+}
+
+.alerts_count
+{    
+}
+
 .logo
 {
     display:inline;
@@ -92,7 +123,7 @@ section {
 {
     position:relative; 
     border: 5px ridge #e0e0e0;
-    width:800px;
+    width:820px;
     height:60px;    
 }
 
@@ -128,9 +159,21 @@ section {
 
 .RankedMatchButton
 {
-    width:140px;
-    height:25px;
-    margin-left:10px;
+    display:block;
+    width:196px;
+    height:64px;
+    
+    margin-top:-6px;
+    
+    background-image: url('Images/Site/ranked_match.png');
+    background-position: top;
+    text-indent: -9999px;
+    cursor:pointer;
+}
+
+.RankedMatchButton:hover
+{
+    background-position: bottom;
 }
 
 .ListPanelDescription
@@ -143,6 +186,7 @@ section {
     margin:0px;
     z-index: 3;    
     padding:5px;
+    overflow:hidden;
 }
 
 
