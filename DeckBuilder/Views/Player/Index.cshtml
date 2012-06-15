@@ -3,35 +3,87 @@
 @model IEnumerable<DeckBuilder.Models.Player>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Player List";
 }
 
-<h2>Index</h2>
+<h2>Players</h2>
 
-@foreach (var item in Model) {    
-    <div class="ListPanel">
-        <a href="Player/Details/@item.PlayerID"><span class="PanelLink"></span></a>
-            
-        <img class="ListPanelImage" alt="@item.Name" 
-                        src="@item.ProfileImageUrl" />        
-        
-        <div class="ListPanelInfo">     
-            <div class="ListPanelHeader">@item.Name</div>                   
-            <span class = "ListPanelText">Level: 100</span>
-            <span class = "ListPanelText">Exp: 3203</span>
-        </div>
+<p>Search for your friends in the Protoplasm databse. Check out their stats or challenge them to a game using the dropdown menu. Development versions of your games are indicated by an asterisk.</p>
 
-        @if (ViewBag.currentPlayer != @item.Name)
-        {
-            <div class = "ListPanelInvite">
-                <select class="ListPanelSelect" id=@item.PlayerID>                    
-                    @for (var i = 0; i < ViewBag.gameNameList.Count; i++)
-                    {
-                        <option value = @ViewBag.gameVersionList[i]>@ViewBag.gameNameList[i]</option>
-                    }
-                </select>
-                <button class="ListPanelButton" value="@item.PlayerID">Challenge</button>
+<span>Search: <input type="text" id="SearchBox" /></span> 
+
+<span class="ListNavigationArea">
+<span id="PrevPage" class="ListNavigation">(Prev) </span>
+<span id="DisplayRange"></span>
+<span id="NextPage" class="ListNavigation"> (Next)</span>
+</span>
+<br /><br />
+
+<div id="PlayerList">
+    @for (var i = 0; i < 10; i++)
+    {
+        <div class="ListPanel">
+            <a class="PanelLinkAnchor" href=""><span class="PanelLink"></span></a>
+            <img class="ListPanelImage" alt="Unknown" 
+                    src="@Url.Content("~/Content/Images/Site/questionmark.png")" />
+            <div class="ListPanelInfo">     
+                <div class="ListPanelHeader">Name</div>                   
+                <span class = "ListPanelText">Level: ??</span>
+                <span class = "ListPanelText">Exp: ??</span>
             </div>
-        }
-    </div>    
-}
+            <div class = "ListPanelInvite">
+                <select class="ListPanelSelect">       
+                    @for (var j = 0; j < ViewBag.gameNameList.Count; j++)
+                    {
+                        <option value = @ViewBag.gameVersionList[j]>@ViewBag.gameNameList[j]</option>
+                    }             
+                </select>
+                <div><a class="ChallengeButton"></a></div> 
+            </div>
+        </div>
+    }
+
+    <!--
+    @foreach (var item in Model)
+    {    
+        <div class="ListPanel">
+            <a class="PanelLinkAncor" href="Player/Details/@item.PlayerID"><span class="PanelLink"></span></a>
+            
+            @if (item.ProfileImageUrl != null && item.ProfileImageUrl != "")
+            {
+                <img class="ListPanelImage" alt="@item.Name" 
+                                src="@item.ProfileImageUrl" />        
+            }
+            else
+            {
+                <img class="ListPanelImage" alt="@item.Name" 
+                                src="@Url.Content("~/Content/Images/Site/questionmark.png")" />        
+            }        
+        
+            <div class="ListPanelInfo">     
+                <div class="ListPanelHeader">@item.Name</div>                   
+                <span class = "ListPanelText">Level: 100</span>
+                <span class = "ListPanelText">Exp: 3203</span>
+            </div>
+
+            @if (ViewBag.currentPlayer != @item.Name)
+            {
+                <div class = "ListPanelInvite">
+                    <select class="ListPanelSelect" id="Dropdown@(item.PlayerID)">                    
+                        @for (var i = 0; i < ViewBag.gameNameList.Count; i++)
+                        {
+                            <option value = @ViewBag.gameVersionList[i]>@ViewBag.gameNameList[i]</option>
+                        }
+                    </select>
+                    <div><a class="ChallengeButton" id=@item.PlayerID></a></div> 
+                </div>
+            }
+        </div>    
+    }
+    -->
+</div>
+
+
+<script type="text/jscript">
+    initPlayerList("@ViewBag.currentPlayer","@ViewBag.gameNameList","@ViewBag.gameVersionList");    
+</script>

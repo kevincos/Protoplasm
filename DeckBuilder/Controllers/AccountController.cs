@@ -145,7 +145,7 @@ namespace DeckBuilder.Controllers
             {
                 // Attempt to register the user
 
-                String uniqueID = null;
+                String uniqueID = model.UserName;
                 if (model.OpenID != null)
                     uniqueID = "OPENID" + model.OpenID;
                 if (model.FacebookID != null)

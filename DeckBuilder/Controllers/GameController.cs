@@ -45,6 +45,7 @@ namespace DeckBuilder.Controllers
             Game game = db.Games.Find(id);
             return game.ImageUrl;
         }
+        
 
         public ActionResult CreateVersion(int id)
         {

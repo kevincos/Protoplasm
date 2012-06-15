@@ -78,6 +78,15 @@ namespace DeckBuilder.Controllers
             return Json(db.Notifications.Where(n => n.PlayerID == player.PlayerID && n.Read == false && n.Suppressed == false).OrderByDescending(n => n.DatePosted).Count());
         }
 
+
+        public JsonResult Search(String searchString, int page)
+        {
+            PlayerListViewModel results = new PlayerListViewModel();
+            results.players = db.Players.Where(p => p.Name.Contains(searchString)).OrderBy(p=>p.Name).Skip(10*page).Take(10).Select(p => new PlayerEntryViewModel { PlayerId = p.PlayerID, Name = p.Name, ImageUrl = p.ProfileImageUrl }).ToList();
+            results.count = db.Players.Where(p => p.Name.Contains(searchString)).Count();
+            return Json(results);
+        }
+
         //
         // GET: /Player/Details/5
 

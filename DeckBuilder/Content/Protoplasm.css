@@ -1,4 +1,6 @@
-﻿body {
+﻿html {overflow-y: scroll;}
+
+body {
     background-color: #999999;    
     font-size: .85em;
     font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
@@ -48,7 +50,11 @@ section {
     background-color: #E1EAE1;
     padding:0px;
     padding-top:2px;
+    padding-bottom:10px;
     margin-top:5px;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
 }
 
 .page {
@@ -56,7 +62,8 @@ section {
     margin-left: auto;
     margin-right: auto;
     padding:0px;
-    margin-top:0px;
+    margin-top:0px;    
+    
 }
 
 .gameArea 
@@ -115,7 +122,7 @@ section {
 {
     position:relative; 
     border: 5px ridge #e0e0e0;
-    width:640px;
+    width:820px;
     height:60px;    
 }
 
@@ -147,6 +154,7 @@ section {
 
 .ListPanelSelect
 {
+    margin-left:140px;
     width:140px;
 }
 
@@ -155,6 +163,38 @@ section {
     width:120px;
     height:30px;
     margin-left:30px;
+}
+
+.ListNavigation
+{
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.ListNavigationArea
+{
+    float:right;
+    margin-right:10px;
+}
+
+.ChallengeButton
+{
+    display:block;
+    width:196px;
+    height:64px;
+    margin-left:310px;
+    
+    margin-top:-42px;
+    
+    background-image: url('Images/Site/challenge.png');
+    background-position: top;
+    text-indent: -9999px;
+    cursor:pointer;
+}
+
+.ChallengeButton:hover
+{
+    background-position: bottom;
 }
 
 .RankedMatchButton
@@ -246,14 +286,14 @@ section {
     margin-top:20px;
     width: 870px;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: auto;    
 }
 
 #main {
     padding: 5px 15px 15px 15px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 840px;
+    margin:0px 25px 0px 25px;
+    
+    
     background-color: #fff;
     border-radius: 4px 0 0 0;
     -webkit-border-radius: 4px 0 0 0;
@@ -261,6 +301,23 @@ section {
 }
 
 
+footer, 
+#footer {
+    background-color: #fff;    
+    
+    color: #999;
+    padding: 5px 15px 15px 15px;
+    margin:0px 25px 0px 25px;
+    
+    text-align: center;
+    line-height: normal;
+    
+    font-size: .9em;
+    border-radius: 0 0 4px 4px;
+    -webkit-border-radius: 0 0 4px 4px;
+    -moz-border-radius: 0 0 4px 4px;
+    
+}
 
 .PostHeader
 {
