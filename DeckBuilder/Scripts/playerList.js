@@ -4,7 +4,7 @@ var playerList_count = 0;
 var playerList_maxPages = 0;
 var playerList_currentPlayer = "";
 
-function initPlayerList(playerName, gameNames, gameVersions) {
+function initPlayerList(playerName) {
 
     playerList_currentPlayer = playerName;
 
