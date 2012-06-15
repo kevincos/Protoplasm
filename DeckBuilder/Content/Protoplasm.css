@@ -124,6 +124,7 @@ section {
     border: 5px ridge #e0e0e0;
     width:820px;
     height:60px;    
+    overflow:hidden;
 }
 
 .ListPanelLong
@@ -132,6 +133,7 @@ section {
     border: 5px ridge #e0e0e0;
     width:820px;
     height:60px;    
+    overflow:hidden;
 }
 
 .ListPanelImage

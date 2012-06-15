@@ -118,6 +118,8 @@
     <Compile Include="Async\WaitingArea.cs" />
     <Compile Include="Async\GameList.cs" />
     <Compile Include="Async\LobbyChat.cs" />
+    <Content Include="Content\Images\Site\challenge.png" />
+    <Content Include="Content\Images\Site\questionmark.png" />
     <Content Include="Content\Images\Site\ranked_match.png" />
     <Content Include="Content\Images\UI\bg4.png" />
     <Content Include="Content\Notifications.css" />
@@ -196,6 +198,8 @@
     <Compile Include="Protoplasm\HexBoard.cs" />
     <Compile Include="Protoplasm\PlayerContext.cs" />
     <Compile Include="Protoplasm\SquareBoard.cs" />
+    <Content Include="Scripts\jquery-1.7.1.min.js" />
+    <Content Include="Scripts\jquery-1.7.1.js" />
     <Compile Include="Stats\Condition.cs" />
     <Compile Include="Stats\Graph.cs" />
     <Compile Include="ViewModels\ProfileViewModel.cs" />

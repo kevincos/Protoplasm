@@ -55,11 +55,16 @@ function initPlayerList(playerName) {
                 $('#DisplayRange').text("Players " + (1 + playerList_page * 10) + "-" + Math.min((playerList_page + 1) * 10, playerList_count) + " of " + playerList_count);
                 $('.ListPanel').each(function (index) {
                     if (index < data.players.length) {
-                        $(this).children().show();
+                        $(this).find('.PanelLinkAnchor').css("display", "block");
+                        $(this).find('.ListPanelInfo').css("display", "inline-block");
+                        $(this).find('.ListPanelInvite').css("display", "inline-block");
+                        $(this).find('.ListPanelImage').css("display", "inline-block");
+
                         var imageSrc = data.players[index].ImageUrl;
                         if (imageSrc == "" || imageSrc == null)
                             imageSrc = "/Content/Images/Site/questionmark.png";
                         $(this).find('.ListPanelImage').attr('src', imageSrc);
+                        $(this).find('.ListPanelImage').css('display', 'inline-block');
                         $(this).find('.ListPanelHeader').text(data.players[index].Name);
                         $(this).find('.PanelLinkAnchor').attr('href', "Player/Details/" + data.players[index].PlayerId);
                         if (data.players[index].Name != playerList_currentPlayer) {
@@ -74,10 +79,12 @@ function initPlayerList(playerName) {
                         }
                     }
                     else {
-                        $(this).children().hide();
-                        var panel = $(this);
+                        $(this).find('.PanelLinkAnchor').css("display", "none");
+                        $(this).find('.ListPanelInfo').css("display", "none");
+                        $(this).find('.ListPanelInvite').css("display", "none");
+                        $(this).find('.ListPanelImage').css("display", "none");
                         $(this).find('.ChallengeButton').removeAttr('id');
-                        $(this).find('.ListPanelSelect').removeAttr('id');
+                        $(this).find('.ListPanelSelect').removeAttr('id');                        
                     }
                 });
             }
