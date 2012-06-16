@@ -198,6 +198,7 @@
     <Compile Include="Protoplasm\HexBoard.cs" />
     <Compile Include="Protoplasm\PlayerContext.cs" />
     <Compile Include="Protoplasm\SquareBoard.cs" />
+    <Content Include="Scripts\profilePage.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Scripts\jquery-1.7.1.js" />
     <Compile Include="Stats\Condition.cs" />

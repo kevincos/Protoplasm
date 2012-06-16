@@ -1,110 +1,159 @@
 ﻿@model DeckBuilder.ViewModels.ProfileViewModel
 
+<script src="@Url.Content("~/Scripts/profilePage.js")" type="text/javascript"></script>
+
 @{
-    ViewBag.Title = "Profile Page";
+    ViewBag.Title = (Model.player.Name)+ "'s Profile Page";
 }
 
-<fieldset>
+<div class="ProfileInfo">
+    <h1 style="display:inline-block">@Model.player.Name </h1> 
+    @if (Model.Editable == true)
+    {
+        <h2 class="ProfileEditLink" style="display:inline-block">@Html.ActionLink("(Edit)", "Edit", new { id = Model.player.PlayerID })  </h2>
+    }
+    @if (Model.player.ProfileImageUrl != null && Model.player.ProfileImageUrl != "")
+    {
+        <img class="GameProfileImage" src="@Model.player.ProfileImageUrl" alt="@Model.player.Name" />
+    }
+    else
+    {
+        <img class="GameProfileImage" src="@Url.Content("~/Content/Images/Site/questionmark.png")" alt="@Model.player.Name" />
+    }
+    <p class="GamePageDescription"> <span class="GamePageDescriptionHeader">Description: </span>    @Model.player.Description</p>
 
-    <div class="ListPanelImage">
-        <img src = "@Model.player.ProfileImageUrl" />
-    </div>
-
-    <div class="ListPanelInfo">     
-        <div class="ListPanelHeader">@Model.player.Name</div>                   
-        <span class = "ListPanelText">Level: 100</span>
-        <span class = "ListPanelText">Exp: 3203</span>
-    </div>
 
     @foreach (var record in @Model.GameRecords)
     {
         <div>
-            <h2>@record.Name (Ranked)</h2>
-            Games Played: @record.RankedTotalGames <br />
-            Win Rate: @record.RankedWinPercent %       
-        </div>
-        <div>
-            <h2>@record.Name</h2>
-            Games Played: @record.TotalGames <br />
-            Win Rate: @record.WinPercent %       
+            <h1 class="ParentHeader"><img class="RecordListImage" src="../../@record.ImageUrl"/>@record.Name (@(record.RankedTotalGames+record.TotalGames))</h1>
+            <ul>
+                <li>
+                    <div>
+                        <h3>Ranked</h3>
+                        Games Played: @record.RankedTotalGames <br />
+                        Win Rate: @record.RankedWinPercent %       
+                    </div>
+                    <div>
+                        <h3>Unranked</h3>
+                        Games Played: @record.TotalGames <br />
+                        Win Rate: @record.WinPercent %       
+                    </div>
+                </li>
+            </ul>
         </div>
     }
 
-    <h2>Active Games</h2>
-    <h3>Ranked</h3>
-    @foreach (var item in @Model.ActiveRankedGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status                    
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-            @Html.ActionLink("Forfeit", "Forfeit", "Table", new { id = item.tableId }, null)
-        </div>
-    }
-    <h3>Unranked</h3>
-    @foreach (var item in @Model.ActiveGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status                    
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
-        </div>
-    }
-    <h2>Proposed Games</h2>    
-    @foreach (var item in @Model.ProposedGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-            @if (item.cancellable == true)
+</div>
+<div class="ProfileTables">     
+    <div>
+        <h2  class="ParentHeader">Active Games (@(Model.ActiveGames.Count() + Model.ActiveRankedGames.Count()))</h2>   
+        <ul>             
+            <li>
+                <h3 class="ParentHeader">Ranked (@Model.ActiveRankedGames.Count())</h3>
+                <ul>
+                    @foreach (var item in @Model.ActiveRankedGames)
+                    {
+                        <li>
+                            @item.gameName with @item.formattedOpponentNames @item.status                    
+                            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+                            @Html.ActionLink("Forfeit", "Forfeit", "Table", new { id = item.tableId }, null)
+                        </li>
+                    }
+                </ul>
+            </li>
+            <li>
+                <h3 class="ParentHeader">Unranked (@Model.ActiveGames.Count())</h3>
+                <ul>
+                    @foreach (var item in @Model.ActiveGames)
+                    {
+                        <li>
+                            @item.gameName with @item.formattedOpponentNames @item.status                    
+                            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+                            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+                        </li>
+                    }
+                </ul>
+            </li>        
+        </ul>
+    </div>  
+    <div>
+        <h2 class="ParentHeader">Proposed Games (@Model.ProposedGames.Count())</h2>    
+        <ul>
+            @foreach (var item in @Model.ProposedGames)
             {
-                @Html.ActionLink("Cancel", "Cancel", "Table", new { id = item.tableId }, null)
+                <li>
+                    @item.gameName with @item.formattedOpponentNames @item.status
+                    @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+                    @if (item.cancellable == true)
+                    {
+                        @Html.ActionLink("Cancel", "Cancel", "Table", new { id = item.tableId }, null)
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+                    }
+                </li>
             }
-            else
+        </ul>
+    </div>
+    <div>
+        <h2 class="ParentHeader">Completed Games (@(Model.CompletedRankedGames.Count() + @Model.CompletedGames.Count()))</h2>
+        <ul>
+            <li>
+                <h3  class="ParentHeader">Ranked (@Model.CompletedRankedGames.Count())</h3>
+                <ul>
+                    @foreach (var item in @Model.CompletedRankedGames)
+                    {
+                        <li>
+                            @item.gameName with @item.formattedOpponentNames @item.status
+                            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+                            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+                        </li>
+                    }
+                </ul>
+            </li>
+            <li>
+                <h3 class="ParentHeader">Unranked (@Model.CompletedGames.Count())</h3>
+                <ul>
+                    @foreach (var item in @Model.CompletedGames)
+                    {
+                        <li>
+                            @item.gameName with @item.formattedOpponentNames @item.status
+                            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+                            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+                        </li>
+                    }
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <h2 class="ParentHeader">Dev Games (@Model.DevGames.Count())</h2>
+        <ul>
+            @foreach (var item in @Model.DevGames)
             {
-                @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+                <li>
+                    @item.gameName with @item.formattedOpponentNames @item.status
+                    @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+                    @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+                </li>
             }
-        </div>
-    }
-    <h2>Completed Games</h2>
-    <h3>Ranked</h3>
-    @foreach (var item in @Model.CompletedRankedGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
-        </div>
-    }
-    <h3>Unranked</h3>
-    @foreach (var item in @Model.CompletedGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
-        </div>
-    }
-    <h2>Dev Games</h2>
-    @foreach (var item in @Model.DevGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
-        </div>
-    }
-    <h2>Cancelled Games</h2>
-    @foreach (var item in @Model.CancelledGames)
-    {
-        <div>
-            @item.gameName with @item.formattedOpponentNames @item.status
-            @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
-            @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
-        </div>
-    }
-</fieldset>
+        </ul>
+    </div>
+    <div>
+        <h2 class="ParentHeader">Cancelled Games (@Model.CancelledGames.Count())</h2>
+        <ul>
+            @foreach (var item in @Model.CancelledGames)
+            {
+                <li>
+                    @item.gameName with @item.formattedOpponentNames @item.status
+                    @Html.ActionLink(item.linkText, "Play", "Table", new { id = item.tableId }, null)
+                    @Html.ActionLink("Remove", "Remove", "Table", new { id = item.tableId }, null)
+                </li>
+            }
+        </ul>
+    </div>
+    
+</div>
 
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.player.PlayerID }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>

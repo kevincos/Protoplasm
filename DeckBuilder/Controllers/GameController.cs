@@ -34,7 +34,9 @@ namespace DeckBuilder.Controllers
                 GameId = id,
                 Creator = game.Creator,
                 Name = game.Name,
-                Versions = game.Versions.ToList()
+                Versions = game.Versions.ToList(),
+                ImageUrl = game.ImageUrl,
+                Description = game.Description
             };
             viewModel.SetRankings(game.Records);
             return View(viewModel);

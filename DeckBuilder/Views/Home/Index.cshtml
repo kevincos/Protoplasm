@@ -1,1 +1,16 @@
-﻿
+﻿@{
+    ViewBag.Title = "Player List";
+}
+
+@foreach (DeckBuilder.Models.Post post in @ViewBag.TopPosts)
+{
+    <div class="PostHeader">
+        <img class="PostHeaderImage" src="@post.Player.ProfileImageUrl"/>
+        <span class="PostTitle">@post.Title</span><br />
+        <span class="PostName">@post.Player.Name</span>
+        <span class="PostDate">@post.Date</span>
+    </div>
+    <br />
+    <div> @Html.Raw(@HttpUtility.HtmlDecode(@post.Content))
+    </div>
+}

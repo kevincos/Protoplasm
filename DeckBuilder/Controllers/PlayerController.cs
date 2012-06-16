@@ -51,6 +51,8 @@ namespace DeckBuilder.Controllers
         {
             Player player = db.Players.Find(id);
             ProfileViewModel playerViewModel = new ProfileViewModel(player);
+            if (User.Identity.Name == player.Name)
+                playerViewModel.Editable = true;
             return View(playerViewModel);
         }
 

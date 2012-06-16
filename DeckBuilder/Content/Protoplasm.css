@@ -283,6 +283,103 @@ section {
     background-image: url('empty.gif');
 }
 
+.GameProfileImage
+{
+    width:300px;
+    height:300px;
+    padding:15px;
+}
+
+.GamePageInfo
+{
+    display:inline-block;
+    
+    width:400px;
+    height:600px;
+    background-color:#F8F8F8;
+    padding-left:15px; 
+    vertical-align:top;
+}
+
+.GamePageDescriptionHeader
+{    
+    top:-15px;
+    left:4px;
+    position: absolute;
+    padding: 2px 4px 2px 4px;    
+    background-color:#B3B3B3;
+    float:left;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    z-index:10;
+    text-indent: 0px;
+}
+
+.GamePageDescription
+{
+    position:relative;
+    background-color:#D3D3D3;
+    width:330px; 
+    padding:10px;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    min-height:50px;
+    text-indent: 10px;
+}
+
+.GamePageTables
+{
+    display:inline-block;
+    right:100px;
+    padding-left:15px; 
+    width:400px;
+    height:600px;
+    background-color:#F8F8F8;
+    vertical-align:top;
+    float:right;
+}
+
+.RecordListImage
+{
+    width:32px;
+    height:32px;
+}
+
+.ProfileInfo
+{
+    display:inline-block;
+    
+    width:360px;
+    
+    min-height:600px;
+    background-color:#F8F8F8;
+    padding-left:15px; 
+    vertical-align:top;
+}
+
+.ProfileEditLink
+{    
+    float:right;
+}
+
+.ParentHeader
+{
+    cursor:pointer;
+}
+
+.ProfileTables
+{
+    display:inline-block;
+    right:100px;
+    padding-left:15px; 
+    width:440px;
+    min-height:600px;
+    background-color:#F8F8F8;
+    vertical-align:top;    
+}
+
 #navbar
 {
     margin-top:20px;
@@ -334,6 +431,8 @@ footer,
 {
     float: left;
     padding: .2cm;
+    width:64px;
+    height:64px;
 }
 
 .PostHeaderInfo

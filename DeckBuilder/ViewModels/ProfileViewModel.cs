@@ -60,6 +60,7 @@ namespace DeckBuilder.ViewModels
         public int Draws { get; set; }
         public int Losses { get; set; }
         public int WinPercent { get; set; }
+        public String ImageUrl { get; set; }
 
         public int RankedTotalGames { get; set; }
         public int RankedWins { get; set; }
@@ -73,6 +74,7 @@ namespace DeckBuilder.ViewModels
             Losses = r.Losses;
             Draws = r.Draws;
             TotalGames = r.GamesPlayed;
+            ImageUrl = r.Game.ImageUrl;
             if(TotalGames == 0)
                 WinPercent = 0;
             else
@@ -94,6 +96,8 @@ namespace DeckBuilder.ViewModels
     public class ProfileViewModel
     {
         public Player player;
+
+        public bool Editable = false;
 
         public List<SeatViewModel> ActiveGames;
         public List<SeatViewModel> CompletedGames;

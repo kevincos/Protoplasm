@@ -20,14 +20,16 @@ namespace DeckBuilder.ViewModels
 
         public String Name { get; set; }
         public Player Creator { get; set; }
+        public String Description { get; set; }
+        public String ImageUrl { get; set; }
 
         public List<DeckBuilder.Models.GameVersion> Versions { get; set; }
 
         public List<RankViewModel> Rankings { get; set; }
 
         public void SetRankings(ICollection<Record> records)
-        {
-            Rankings = records.OrderByDescending(r => r.RankedWins * 100 / r.RankedGamesPlayed).Select(r => new RankViewModel { Name = r.Player.Name, GamesPlayed = r.RankedGamesPlayed, WinRate = r.RankedWins * 100 / r.RankedGamesPlayed }).ToList();
+        {            
+            Rankings = records.Where(r=>r.RankedGamesPlayed != 0).OrderByDescending(r => r.RankedWins * 100 / r.RankedGamesPlayed).Select(r => new RankViewModel { Name = r.Player.Name, GamesPlayed = r.RankedGamesPlayed, WinRate = r.RankedWins * 100 / r.RankedGamesPlayed }).ToList();
         }
     }
 }

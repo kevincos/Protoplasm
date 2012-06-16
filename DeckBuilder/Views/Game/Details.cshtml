@@ -4,79 +4,83 @@
     ViewBag.Title = @Model.Name;
 }
 
-<h2>@Model.Name</h2>
+<div class="GamePageInfo">
+    <h1>@Model.Name</h1>
+    <img class="GameProfileImage" src="../../@Model.ImageUrl" alt="@Model.Name" />
+    
+    
+        
+        <p class="GamePageDescription"> <span class="GamePageDescriptionHeader">Description: </span>    @Model.Description</p>
+    
+    <div style="margin-left:90px"><a href="/MatchRequest/Add?gameId=@Model.GameId&numPlayers=2" class="RankedMatchButton" target="_blank"></a></div> 
+</div>
+<div class="GamePageTables">   
 
+    <br />
+    <table>
+        <tr>
+            <th>
+                Rank
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Win Rate
+            </th>
+            <th>
+                Games Played
+            </th>
+        </tr>
 
-<table>
-    <tr>
-        <th>
-            Rank
-        </th>
-        <th>
-            Name
-        </th>
-        <th>
-            Win Rate
-        </th>
-        <th>
-            Games Played
-        </th>
-        <th></th>
-    </tr>
+        <h2>Leaderboard</h2><br />
+        @for (var i = 0; i < Model.Rankings.Count; i++)
+        {
+            <tr>
+                <td>
+                    @(i+1)
+                </td>        
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Rankings[i].Name)
+                </td>        
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Rankings[i].WinRate)
+                </td>  
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Rankings[i].GamesPlayed)
+                </td>  
+            </tr>
+        }
+    </table>
 
-@for (var i = 0; i < Model.Rankings.Count; i++)
-{
-    <tr>
-        <td>
-            @(i+1)
-        </td>        
-        <td>
-            @Html.DisplayFor(modelItem => Model.Rankings[i].Name)
-        </td>        
-        <td>
-            @Html.DisplayFor(modelItem => Model.Rankings[i].WinRate)
-        </td>  
-        <td>
-            @Html.DisplayFor(modelItem => Model.Rankings[i].GamesPlayed)
-        </td>  
-    </tr>
-}
-</table>
-<br />
+    <br />
 
-@Html.ActionLink("Add Version", "CreateVersion/"+Model.GameId)
+    <table>
+        <tr>
+            <th>
+                Version
+            </th>
+            <th>
+                Dev Stage
+            </th>
+            <th>
+                Date
+            </th>
+        </tr>
 
-<table>
-    <tr>
-        <th>
-            Version
-        </th>
-        <th>
-            MaxPlayers
-        </th>
-        <th>
-            Dev Stage
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model.Versions) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.VersionString)
-        </td>        
-        <td>
-            @Html.DisplayFor(modelItem => item.MaxPlayers)
-        </td>  
-        <td>
-            @Html.DisplayFor(modelItem => item.DevStage)
-        </td>  
-        <td>
-            @Html.ActionLink("Edit", "Edit", "GameVersion", new { id=item.GameVersionID }, null) |
-            @Html.ActionLink("Details", "Details", "GameVersion", new { id=item.GameVersionID }, null) |
-            @Html.ActionLink("Delete", "Delete", "GameVersion", new { id = item.GameVersionID }, null)
-        </td>
-    </tr>
-}
-
-</table>
+        <h2>Version History</h2><br />
+        @foreach (var item in Model.Versions) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VersionString)
+                </td>        
+                <td>
+                    @Html.DisplayFor(modelItem => item.DevStage)
+                </td>  
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreationDate)
+                </td>  
+            </tr>
+        }
+    </table>
+</div>

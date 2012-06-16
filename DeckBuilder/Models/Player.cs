@@ -16,6 +16,8 @@ namespace DeckBuilder.Models
         [MaxLength(50)]
         public string Name { get; set; }
 
+        public string Description { get; set; }
+
         [MaxLength(1024)]
         public string ProfileImageUrl { get; set; }
 
